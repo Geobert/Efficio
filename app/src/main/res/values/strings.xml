@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Efficio</string>
+    <string name="no_item">No item. Use quick add below to create some.</string>
+    <string name="store">Store</string>
+</resources>
