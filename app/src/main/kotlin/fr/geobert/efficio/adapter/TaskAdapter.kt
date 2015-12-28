@@ -1,22 +1,21 @@
 package fr.geobert.efficio.adapter
 
-import android.database.Cursor
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
-import fr.geobert.efficio.misc.map
+import java.util.*
 
-class TaskAdapter(cursor: Cursor) : RecyclerView.Adapter<TaskRowHolder>() {
-    val taskList = cursor.map { Task(it) }
+class TaskAdapter(list: MutableList<Task>) : RecyclerView.Adapter<TaskViewHolder>() {
+    val taskList = LinkedList<Task>(list)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskRowHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val l = LayoutInflater.from(parent.context).inflate(R.layout.item_row, parent, false)
-        return TaskRowHolder(l)
+        return TaskViewHolder(l)
     }
 
-    override fun onBindViewHolder(holder: TaskRowHolder, position: Int) {
+    override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val t = taskList[position]
         holder.checkbox.isChecked = t.isDone
         holder.name.text = t.item.name
@@ -24,5 +23,22 @@ class TaskAdapter(cursor: Cursor) : RecyclerView.Adapter<TaskRowHolder>() {
 
     override fun getItemCount(): Int {
         return taskList.count()
+    }
+
+    fun removeItem(pos: Int): Task {
+        val d = taskList.removeAt(pos)
+        notifyItemRemoved(pos)
+        return d
+    }
+
+    fun addItem(pos: Int, d: Task) {
+        taskList.add(pos, d)
+        notifyItemInserted(pos)
+    }
+
+    fun moveItem(from: Int, to: Int) {
+        val d = taskList.removeAt(from)
+        taskList.add(to, d)
+        notifyItemMoved(from, to)
     }
 }

@@ -44,7 +44,7 @@ class DbContentProvider : ContentProvider() {
             addUri(DepartmentTable.PATH, DEP, DEP_WITH_ID)
             addUri(StoreTable.PATH, STORE, STORE_WITH_ID)
             addUri(ItemWeightTable.PATH, ITEM_WEIGHT, ITEM_WEIGHT_WITH_ID)
-            addUri(DepWeightTable.PATH, DEP_WEIGHT, DEP_WEIGHT_WITH_ID)
+            addUri(StoreCompositionTable.PATH, DEP_WEIGHT, DEP_WEIGHT_WITH_ID)
             addUri(ItemDepTable.PATH, ITEM_DEP, ITEM_DEP_WITH_ID)
             addUri(TaskTable.PATH, TASK, TASK_WITH_ID)
 
@@ -57,7 +57,7 @@ class DbContentProvider : ContentProvider() {
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
         val uriType = sURIMatcher.match(uri)
-        val id = mDbHelper!!.writableDatabase!!.insert(switchToTable(uriType, uri), null, values)
+        val id = mDbHelper!!.writableDatabase!!.insert(switchToTableWrite(uriType, uri), null, values)
         var insertionUri: Uri? = null
         if (id > 0) {
             insertionUri = when (uriType) {
@@ -65,7 +65,7 @@ class DbContentProvider : ContentProvider() {
                 DEP -> DepartmentTable.buildWithId(id)
                 STORE -> StoreTable.buildWithId(id)
                 ITEM_WEIGHT -> ItemWeightTable.buildWithId(id)
-                DEP_WEIGHT -> DepWeightTable.buildWithId(id)
+                DEP_WEIGHT -> StoreCompositionTable.buildWithId(id)
                 ITEM_DEP -> ItemDepTable.buildWithId(id)
                 else -> throw IllegalArgumentException("Unknown URI: " + uri)
             }
@@ -84,22 +84,35 @@ class DbContentProvider : ContentProvider() {
             else -> {
             }
         }
-        queryBuilder.tables = switchToTable(uriType, uri)
+        queryBuilder.tables = switchToTableRead(uriType, uri)
         val c = queryBuilder.query(mDbHelper!!.readableDatabase, projection, selection,
                 selectionArgs, null, null, sortOrder)
         c.setNotificationUri(context.contentResolver, uri)
         return c
     }
 
-    private fun switchToTable(uriType: Int, uri: Uri): String {
+    private fun switchToTableRead(uriType: Int, uri: Uri): String {
         return when (uriType) {
             ITEM, ITEM_WITH_ID -> ItemTable.TABLE_NAME
             DEP, DEP_WITH_ID -> DepartmentTable.TABLE_NAME
             STORE, STORE_WITH_ID -> StoreTable.TABLE_NAME
             ITEM_WEIGHT, ITEM_WEIGHT_WITH_ID -> ItemWeightTable.TABLE_NAME
-            DEP_WEIGHT, DEP_WEIGHT_WITH_ID -> DepWeightTable.TABLE_NAME
+            DEP_WEIGHT, DEP_WEIGHT_WITH_ID -> StoreCompositionTable.TABLE_JOINED
             ITEM_DEP, ITEM_DEP_WITH_ID -> ItemDepTable.TABLE_NAME
             TASK, TASK_WITH_ID -> TaskTable.TABLE_JOINED
+            else -> throw IllegalArgumentException("Unknown URI: " + uri)
+        }
+    }
+
+    private fun switchToTableWrite(uriType: Int, uri: Uri): String {
+        return when (uriType) {
+            ITEM, ITEM_WITH_ID -> ItemTable.TABLE_NAME
+            DEP, DEP_WITH_ID -> DepartmentTable.TABLE_NAME
+            STORE, STORE_WITH_ID -> StoreTable.TABLE_NAME
+            ITEM_WEIGHT, ITEM_WEIGHT_WITH_ID -> ItemWeightTable.TABLE_NAME
+            DEP_WEIGHT, DEP_WEIGHT_WITH_ID -> StoreCompositionTable.TABLE_NAME
+            ITEM_DEP, ITEM_DEP_WITH_ID -> ItemDepTable.TABLE_NAME
+            TASK, TASK_WITH_ID -> TaskTable.TABLE_NAME
             else -> throw IllegalArgumentException("Unknown URI: " + uri)
         }
     }
@@ -113,7 +126,7 @@ class DbContentProvider : ContentProvider() {
     override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
         val db = mDbHelper!!.writableDatabase
         var id: String? = uri.lastPathSegment
-        val table = switchToTable(sURIMatcher.match(uri), uri)
+        val table = switchToTableWrite(sURIMatcher.match(uri), uri)
         // return nb updated items
         return if (id != null) {
             if (selection == null || selection.trim().length == 0) {
@@ -140,7 +153,7 @@ class DbContentProvider : ContentProvider() {
 
         var customSelection = selection ?: "1"
 
-        var deleted = db!!.delete(switchToTable(uriType, uri), customSelection, selectionArgs)
+        var deleted = db!!.delete(switchToTableWrite(uriType, uri), customSelection, selectionArgs)
 
         if (deleted > 0) {
             context.contentResolver.notifyChange(uri, null)

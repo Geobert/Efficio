@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Efficio</string>
-    <string name="no_item">No item. Use quick add below to create some.</string>
+    <string name="no_item">No item, please use quick add below to create one.</string>
     <string name="store">Store</string>
+    <string name="choose_or_create_dep">Choose or Create Department</string>
+    <string name="no_dep">No existing department,\nplease create one above</string>
 </resources>

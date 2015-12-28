@@ -3,6 +3,7 @@ package fr.geobert.efficio.db
 import android.content.ContentValues
 import android.content.Context
 import android.content.CursorLoader
+
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Task
 
@@ -24,18 +25,18 @@ object TaskTable : BaseTable() {
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreTable.TABLE_NAME)} " +
             "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemTable.TABLE_NAME)} " +
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, ItemDepTable.TABLE_NAME)} " +
-            "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, DepWeightTable.TABLE_NAME, DepWeightTable.COL_STORE_ID)} " +
+            "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreCompositionTable.TABLE_NAME, StoreCompositionTable.COL_STORE_ID)} " +
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, ItemWeightTable.TABLE_NAME, ItemWeightTable.COL_STORE_ID)} " +
-            "${leftOuterJoin(DepWeightTable.TABLE_NAME, DepWeightTable.COL_DEP_ID, DepartmentTable.TABLE_NAME)} "
+            "${leftOuterJoin(StoreCompositionTable.TABLE_NAME, StoreCompositionTable.COL_DEP_ID, DepartmentTable.TABLE_NAME)} "
 
-    override val COLS_TO_QUERY: Array<String> = arrayOf("$TABLE_NAME.${BaseColumns._ID}", // 0
-            "$TABLE_NAME.$COL_ITEM_ID", "${ItemTable.TABLE_NAME}.${ItemTable.COL_NAME} as item_name", // 2
-            "$TABLE_NAME.$COL_STORE_ID", "${StoreTable.TABLE_NAME}.${StoreTable.COL_NAME} as store_name", // 4
-            "${DepartmentTable.TABLE_NAME}.${BaseColumns._ID} as dep_id", // 5
-            "${DepartmentTable.TABLE_NAME}.${DepartmentTable.COL_NAME} as dep_name", // 6
-            "${DepWeightTable.TABLE_NAME}.${DepWeightTable.COL_WEIGHT} as dep_weight", // 7
-            "${ItemWeightTable.TABLE_NAME}.${ItemWeightTable.COL_WEIGHT} as item_weight", // 8
-            COL_IS_DONE // 9
+    override val COLS_TO_QUERY: Array<String> = arrayOf("$TABLE_NAME.${BaseColumns._ID}",
+            "$TABLE_NAME.$COL_ITEM_ID", "${ItemTable.TABLE_NAME}.${ItemTable.COL_NAME} as item_name",
+            "$TABLE_NAME.$COL_STORE_ID", "${StoreTable.TABLE_NAME}.${StoreTable.COL_NAME} as store_name",
+            "${DepartmentTable.TABLE_NAME}.${BaseColumns._ID} as dep_id",
+            "${DepartmentTable.TABLE_NAME}.${DepartmentTable.COL_NAME} as dep_name",
+            "${StoreCompositionTable.TABLE_NAME}.${StoreCompositionTable.COL_WEIGHT} as dep_weight",
+            "${ItemWeightTable.TABLE_NAME}.${ItemWeightTable.COL_WEIGHT} as item_weight",
+            COL_IS_DONE
     )
 
     val RESTRICT_TO_STORE = "(${TaskTable.TABLE_NAME}.$COL_STORE_ID = ?)"

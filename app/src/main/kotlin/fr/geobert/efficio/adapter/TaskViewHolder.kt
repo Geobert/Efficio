@@ -6,7 +6,7 @@ import android.widget.CheckBox
 import android.widget.TextView
 import fr.geobert.efficio.R
 
-class TaskRowHolder(val view: View) : RecyclerView.ViewHolder(view) {
+class TaskViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
     var name = view.findViewById(R.id.name) as TextView
     var checkbox = view.findViewById(R.id.checkbox) as CheckBox
 }

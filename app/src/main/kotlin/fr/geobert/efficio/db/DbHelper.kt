@@ -31,7 +31,7 @@ class DbHelper : SQLiteOpenHelper {
         db.execSQL(ItemTable.CREATE_TABLE)
         db.execSQL(DepartmentTable.CREATE_TABLE)
         db.execSQL(StoreTable.CREATE_TABLE)
-        db.execSQL(DepWeightTable.CREATE_TABLE)
+        db.execSQL(StoreCompositionTable.CREATE_TABLE)
         db.execSQL(ItemWeightTable.CREATE_TABLE)
         db.execSQL(ItemDepTable.CREATE_TABLE)
         db.execSQL(TaskTable.CREATE_TABLE)

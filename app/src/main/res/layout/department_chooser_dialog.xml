@@ -5,10 +5,9 @@
     android:orientation="vertical">
 
     <ImageButton
-        android:id="@+id/quick_add_btn"
+        android:id="@+id/add_dep_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_marginEnd="5dp"
@@ -16,35 +15,31 @@
         android:src="@android:drawable/ic_input_add" />
 
     <EditText
-        android:id="@+id/quick_add_text"
+        android:id="@+id/add_dep_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/quick_add_btn"
+        android:layout_alignBottom="@id/add_dep_btn"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_alignTop="@id/quick_add_btn"
-        android:layout_marginLeft="5dp"
-        android:layout_marginStart="5dp"
-        android:layout_toLeftOf="@id/quick_add_btn"
-        android:layout_toStartOf="@id/quick_add_btn" />
+        android:layout_alignTop="@id/add_dep_btn"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_toLeftOf="@id/add_dep_btn"
+        android:layout_toStartOf="@id/add_dep_btn" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/tasks_list"
+        android:id="@+id/dep_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/quick_add_btn"
-        android:layout_alignParentTop="true"
-        android:visibility="gone" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/add_dep_btn" />
 
     <TextView
         android:id="@+id/empty_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/quick_add_text"
-        android:layout_margin="50dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/add_dep_text"
+        android:layout_margin="20dp"
         android:gravity="center"
-        android:text="@string/no_item"
-        android:textSize="22sp"
-        android:visibility="visible" />
-
+        android:text="@string/no_dep"
+        android:textSize="22sp" />
 </RelativeLayout>

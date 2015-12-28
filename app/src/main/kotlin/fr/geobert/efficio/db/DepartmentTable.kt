@@ -1,6 +1,10 @@
 package fr.geobert.efficio.db
 
+import android.content.ContentValues
+import android.content.Context
+import android.content.CursorLoader
 import android.provider.BaseColumns
+import fr.geobert.efficio.data.Department
 
 object DepartmentTable : BaseTable() {
     override val TABLE_NAME = "departments"
@@ -14,22 +18,24 @@ object DepartmentTable : BaseTable() {
     val CREATE_TRIGGER_ON_DEP_DELETE by lazy {
         "CREATE TRIGGER on_dep_deleted " +
                 "AFTER DELETE ON ${DepartmentTable.TABLE_NAME} BEGIN " +
-                "DELETE FROM ${DepWeightTable.TABLE_NAME} WHERE " +
-                "${DepWeightTable.COL_DEP_ID} = old.${BaseColumns._ID};" +
+                "DELETE FROM ${StoreCompositionTable.TABLE_NAME} WHERE " +
+                "${StoreCompositionTable.COL_DEP_ID} = old.${BaseColumns._ID};" +
                 "DELETE FROM ${ItemDepTable.TABLE_NAME} WHERE " +
                 "${ItemDepTable.COL_DEP_ID} = old.${BaseColumns._ID};" +
                 "END"
     }
 
-    fun create() {
-
+    fun fetchAllDep(activity: Context): CursorLoader {
+        return CursorLoader(activity, CONTENT_URI, COLS_TO_QUERY, null, null, "dep_name desc")
     }
 
-    fun update() {
+    fun create(ctx: Context, department: Department): Long {
+        val v = ContentValues()
+        v.put(COL_NAME, department.name)
 
+        val res = ctx.contentResolver.insert(CONTENT_URI, v)
+        return res.lastPathSegment.toLong()
     }
 
-    fun delete() {
 
-    }
 }
