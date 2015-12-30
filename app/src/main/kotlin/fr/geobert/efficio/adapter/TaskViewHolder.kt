@@ -30,16 +30,8 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: OnDoneStat
             checkbox = view.findViewById(R.id.checkbox) as CheckBox
             layout = view.findViewById(R.id.item_row_layout) as CardView
             content = view.findViewById(R.id.card_content)
-            content.setOnLongClickListener {
-                onLongPressed()
-            }
             checkbox.setOnCheckedChangeListener(this)
         }
-    }
-
-    private fun onLongPressed(): Boolean {
-
-        return true
     }
 
     override fun onCheckedChanged(p0: CompoundButton?, isChecked: Boolean) {
@@ -53,7 +45,7 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: OnDoneStat
 
     fun setBgColor(isChecked: Boolean) {
         layout.setCardBackgroundColor(ContextCompat.getColor(view.context,
-                if (isChecked) R.color.colorPrimaryLight else android.R.color.white))
+                if (isChecked) R.color.colorDivider else android.R.color.white))
     }
 
     fun bind(task: Task) {

@@ -35,11 +35,11 @@ abstract class BaseTable : BaseColumns {
         return ContentUris.parseId(uri)
     }
 
-    fun insert(ctx: Context, values: ContentValues): Long {
+    protected fun insert(ctx: Context, values: ContentValues): Long {
         return ctx.contentResolver.insert(CONTENT_URI, values).lastPathSegment.toLong()
     }
 
-    fun update(ctx: Context, id: Long, values: ContentValues): Int {
+    protected fun update(ctx: Context, id: Long, values: ContentValues): Int {
         return ctx.contentResolver.update(buildWithId(id), values, null, null)
     }
 }

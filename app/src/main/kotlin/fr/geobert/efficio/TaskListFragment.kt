@@ -9,6 +9,8 @@ import android.database.Cursor
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -21,6 +23,7 @@ import fr.geobert.efficio.data.Department
 import fr.geobert.efficio.data.Item
 import fr.geobert.efficio.data.Store
 import fr.geobert.efficio.data.Task
+import fr.geobert.efficio.db.ItemDepTable
 import fr.geobert.efficio.db.ItemTable
 import fr.geobert.efficio.db.ItemWeightTable
 import fr.geobert.efficio.db.TaskTable
@@ -41,9 +44,76 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     var cursorLoader: CursorLoader? = null
     var taskAdapter: TaskAdapter by Delegates.notNull()
     var tasksList: MutableList<Task> = LinkedList()
+
     private val header = Task()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View? {
+    private val taskItemTouchCbk =
+            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+                var lastDragTask: Task? = null
+                override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
+                                    target: RecyclerView.ViewHolder): Boolean {
+                    Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
+                    taskAdapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
+                    updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
+                    return true
+                }
+
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
+                    // nothing
+                }
+
+                override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                    super.onSelectedChanged(viewHolder, actionState)
+                    // end of drag n drop, adapter is correctly ordered but not our representation here
+                    if (viewHolder == null) {
+                        Log.d(TAG, "end of drag n drop, sort the list")
+                        ItemWeightTable.updateWeight(activity, lastDragTask!!.item)
+                        tasksList.sort()
+                    }
+                    lastDragTask = (viewHolder as TaskViewHolder?)?.task
+                }
+            }
+
+    private val taskItemTouchHlp = ItemTouchHelper(taskItemTouchCbk)
+
+    private fun updateTaskWeight(dragged: TaskViewHolder, target: TaskViewHolder) {
+        val dTask = dragged.task
+        val tTask = target.task
+        val dItem = dTask.item
+        val tItem = tTask.item
+        val dDep = dItem.department
+        val tDep = tItem.department
+        if (dragged.adapterPosition < target.adapterPosition) {
+            // item goes up
+            if (dDep.id == tDep.id) {
+                if (dItem.weight == tItem.weight) {
+                    dItem.weight++
+                } else {
+                    if (dItem.weight < tItem.weight) {
+                        dItem.weight = tItem.weight + 1
+                    }
+                }
+            } else {
+                // todo
+            }
+        } else if (dragged.adapterPosition > target.adapterPosition) {
+            // item goes down
+            if (dDep.id == tDep.id) {
+                if (dItem.weight == tItem.weight) {
+                    dItem.weight--
+                } else {
+                    if (dItem.weight > tItem.weight) {
+                        dItem.weight = tItem.weight - 1
+                    }
+                }
+            } else {
+                // todo
+            }
+        }
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup,
+                              savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.inflate(R.layout.item_list_fragment, container, false)
     }
@@ -55,6 +125,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         tasks_list.itemAnimator = DefaultItemAnimator()
         tasks_list.setHasFixedSize(true)
         tasks_list.addItemDecoration(SpaceItemDecoration(10, true))
+        taskItemTouchHlp.attachToRecyclerView(tasks_list)
 
         quick_add_btn.setOnClickListener {
             onAddTaskClicked()
@@ -98,13 +169,15 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         i.id = ItemTable.create(activity, i)
         if (i.id > 0) {
             if (ItemWeightTable.create(activity, i, lastStoreId) > 0) {
-                val t = Task(i)
-                if (TaskTable.create(activity, t, lastStoreId) > 0) {
-                    // add to adapter, but need to find the right position
-                    tasksList.add(t)
-                    tasksList.sort()
-                    taskAdapter.animateTo(tasksList)
-                    quick_add_text.text.clear()
+                if (ItemDepTable.create(activity, i, lastStoreId) > 0) {
+                    val t = Task(i)
+                    if (TaskTable.create(activity, t, lastStoreId) > 0) {
+                        // add to adapter, but need to find the right position
+                        tasksList.add(t)
+                        tasksList.sort()
+                        taskAdapter.animateTo(tasksList)
+                        quick_add_text.text.clear()
+                    }
                 }
             } else {
                 Log.e(TAG, "error on item weight creation")
@@ -157,7 +230,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 
     }
-
 
     //
     // Database operations

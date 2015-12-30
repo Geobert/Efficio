@@ -23,9 +23,9 @@ object TaskTable : BaseTable() {
     val TABLE_JOINED = "$TABLE_NAME " +
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreTable.TABLE_NAME)} " +
             "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemTable.TABLE_NAME)} " +
-            "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, ItemDepTable.TABLE_NAME)} " +
+            "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, ItemDepTable.TABLE_NAME, ItemDepTable.COL_STORE_ID)} " +
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreCompositionTable.TABLE_NAME, StoreCompositionTable.COL_STORE_ID)} " +
-            "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, ItemWeightTable.TABLE_NAME, ItemWeightTable.COL_STORE_ID)} " +
+            "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemWeightTable.TABLE_NAME, ItemWeightTable.COL_ITEM_ID)} " +
             "${leftOuterJoin(StoreCompositionTable.TABLE_NAME, StoreCompositionTable.COL_DEP_ID, DepartmentTable.TABLE_NAME)} "
 
     override val COLS_TO_QUERY: Array<String> = arrayOf("$TABLE_NAME.${BaseColumns._ID}",

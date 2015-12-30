@@ -1,5 +1,9 @@
 package fr.geobert.efficio.db
 
+import android.app.Activity
+import android.content.ContentValues
+import fr.geobert.efficio.data.Item
+
 object ItemDepTable : BaseTable() {
     override val TABLE_NAME: String = "items_dep"
 
@@ -16,5 +20,13 @@ object ItemDepTable : BaseTable() {
 
     override val COLS_TO_QUERY: Array<String>
         get() = throw UnsupportedOperationException()
+
+    fun create(activity: Activity, item: Item, storeId: Long): Long {
+        val v = ContentValues()
+        v.put(COL_STORE_ID, storeId)
+        v.put(COL_DEP_ID, item.department.id)
+        v.put(COL_ITEM_ID, item.id)
+        return insert(activity, v)
+    }
 
 }

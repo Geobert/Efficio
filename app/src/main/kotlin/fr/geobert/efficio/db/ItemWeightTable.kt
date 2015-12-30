@@ -27,4 +27,12 @@ object ItemWeightTable : BaseTable() {
         v.put(COL_WEIGHT, 0)
         return insert(activity, v)
     }
+
+    fun updateWeight(activity: Activity, item: Item): Int {
+        val v = ContentValues()
+        v.put(COL_WEIGHT, item.weight)
+        return update(activity, item.id, v)
+    }
+
+
 }

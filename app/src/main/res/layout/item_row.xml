@@ -15,7 +15,6 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginStart="10dp"
-        android:foreground="@drawable/task_selector_fg"
         card_view:cardCornerRadius="2dp">
 
         <FrameLayout
