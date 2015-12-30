@@ -1,9 +1,9 @@
 package fr.geobert.efficio.db
 
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.CursorLoader
-
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Task
 
@@ -19,7 +19,6 @@ object TaskTable : BaseTable() {
             "$COL_IS_DONE INTEGER NOT NULL, " +
             "${foreignId(COL_STORE_ID, StoreTable.TABLE_NAME)}, " +
             "${foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)}"
-
 
     val TABLE_JOINED = "$TABLE_NAME " +
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreTable.TABLE_NAME)} " +
@@ -40,14 +39,24 @@ object TaskTable : BaseTable() {
     )
 
     val RESTRICT_TO_STORE = "(${TaskTable.TABLE_NAME}.$COL_STORE_ID = ?)"
-    val ORDERING = "dep_weight desc, item_weight desc"
+    val ORDERING = "is_done asc, dep_weight desc, item_weight desc, item_name asc"
 
-    fun fetchAllTasksForStore(ctx: Context, storeId: Long): CursorLoader {
+    fun getAllTasksForStoreLoader(ctx: Context, storeId: Long): CursorLoader {
         return CursorLoader(ctx, TaskTable.CONTENT_URI, TaskTable.COLS_TO_QUERY, RESTRICT_TO_STORE,
                 arrayOf(storeId.toString()), ORDERING)
     }
 
-    fun addTask(ctx: Context, task: Task, storeId: Long) {
-        val values = ContentValues()
+    fun create(activity: Activity, t: Task, storeId: Long): Long {
+        val v = ContentValues()
+        v.put(COL_STORE_ID, storeId)
+        v.put(COL_ITEM_ID, t.item.id)
+        v.put(COL_IS_DONE, false)
+        return insert(activity, v)
+    }
+
+    fun updateDoneState(activity: Activity, task: Task): Int {
+        val v = ContentValues()
+        v.put(COL_IS_DONE, task.isDone)
+        return update(activity, task.id, v)
     }
 }

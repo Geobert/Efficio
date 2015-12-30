@@ -1,5 +1,8 @@
 package fr.geobert.efficio.db
 
+import android.app.Activity
+import android.content.ContentValues
+import fr.geobert.efficio.data.Item
 
 object ItemWeightTable : BaseTable() {
     override val TABLE_NAME: String = "items_weight"
@@ -16,4 +19,12 @@ object ItemWeightTable : BaseTable() {
 
     override val COLS_TO_QUERY: Array<String>
         get() = throw UnsupportedOperationException()
+
+    fun create(activity: Activity, i: Item, storeId: Long): Long {
+        val v = ContentValues()
+        v.put(COL_STORE_ID, storeId)
+        v.put(COL_ITEM_ID, i.id)
+        v.put(COL_WEIGHT, 0)
+        return insert(activity, v)
+    }
 }

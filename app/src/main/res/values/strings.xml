@@ -4,4 +4,5 @@
     <string name="store">Store</string>
     <string name="choose_or_create_dep">Choose or Create Department</string>
     <string name="no_dep">No existing department,\nplease create one above</string>
+    <string name="completed">Completed</string>
 </resources>

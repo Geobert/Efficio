@@ -7,7 +7,6 @@ import android.app.LoaderManager
 import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
-import android.provider.BaseColumns
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.text.Editable
@@ -34,7 +33,7 @@ class DepartmentChoiceDialog : DialogFragment(), LoaderManager.LoaderCallbacks<C
 
     private val TAG = "DepartmentChoiceDialog"
     private val GET_DEP_FROM_STORE = 200
-    private val GET_ALL_DEP = 210
+    //private val GET_ALL_DEP = 210
 
     private var customView: View by Delegates.notNull()
     private var depAdapter: DepartmentAdapter by Delegates.notNull()
@@ -82,10 +81,10 @@ class DepartmentChoiceDialog : DialogFragment(), LoaderManager.LoaderCallbacks<C
             }
 
             if (existingDep != null) {
-                if (existingDep.weight == -1) {
-                    // department comes from another store, so add it to StoreCompositionTable
-                    StoreCompositionTable.create(activity, arguments.getLong("storeId"), existingDep)
-                }
+//                if (existingDep.weight == -1) {
+//                    // department comes from another store, so add it to StoreCompositionTable
+//                    StoreCompositionTable.create(activity, arguments.getLong("storeId"), existingDep)
+//                }
                 onDepartmentChosen(existingDep)
             } else {
                 val d = Department(t)
@@ -170,25 +169,26 @@ class DepartmentChoiceDialog : DialogFragment(), LoaderManager.LoaderCallbacks<C
                     depAdapter = DepartmentAdapter(depsList, this)
                     customView.dep_list.adapter = depAdapter
                 } else {
-                    activity.loaderManager.initLoader(GET_ALL_DEP, Bundle(), this)
-                }
-            }
-            GET_ALL_DEP -> {
-                if (data.count > 0) {
-                    val b = Bundle()
-                    b.putInt("id", data.getColumnIndex(BaseColumns._ID))
-                    b.putInt("name", data.getColumnIndex(DepartmentTable.COL_NAME))
-                    depsList = data.map {
-                        val d = Department(it, b)
-                        d.weight = -1 // flag it as coming from another store
-                        d
-                    }
-                    depAdapter = DepartmentAdapter(depsList, this)
-                    customView.dep_list.adapter = depAdapter
-                } else {
                     depsList = LinkedList<Department>()
+                    //activity.loaderManager.initLoader(GET_ALL_DEP, Bundle(), this)
                 }
             }
+        //            GET_ALL_DEP -> {
+        //                if (data.count > 0) {
+        //                    val b = Bundle()
+        //                    b.putInt("id", data.getColumnIndex(BaseColumns._ID))
+        //                    b.putInt("name", data.getColumnIndex(DepartmentTable.COL_NAME))
+        //                    depsList = data.map {
+        //                        val d = Department(it, b)
+        //                        d.weight = -1 // flag it as coming from another store
+        //                        d
+        //                    }
+        //                    depAdapter = DepartmentAdapter(depsList, this)
+        //                    customView.dep_list.adapter = depAdapter
+        //                } else {
+        //                    depsList = LinkedList<Department>()
+        //                }
+        //            }
             else -> throw IllegalArgumentException("Unknown cursorLoader id")
         }
         setViewsVisibility(data.count)
@@ -196,8 +196,9 @@ class DepartmentChoiceDialog : DialogFragment(), LoaderManager.LoaderCallbacks<C
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor>? {
         return when (id) {
-            GET_DEP_FROM_STORE -> StoreCompositionTable.fetchDepFromStore(activity, args?.getLong("storeId") ?: 0)
-            GET_ALL_DEP -> DepartmentTable.fetchAllDep(activity)
+            GET_DEP_FROM_STORE -> StoreCompositionTable.getDepFromStoreLoader(activity,
+                    args?.getLong("storeId") ?: 0)
+        //GET_ALL_DEP -> DepartmentTable.fetchAllDep(activity)
             else -> null
         }
     }

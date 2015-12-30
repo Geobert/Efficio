@@ -16,16 +16,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import fr.geobert.efficio.adapter.TaskAdapter
+import fr.geobert.efficio.adapter.TaskViewHolder
 import fr.geobert.efficio.data.Department
+import fr.geobert.efficio.data.Item
 import fr.geobert.efficio.data.Store
 import fr.geobert.efficio.data.Task
+import fr.geobert.efficio.db.ItemTable
+import fr.geobert.efficio.db.ItemWeightTable
 import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.misc.SpaceItemDecoration
 import fr.geobert.efficio.misc.map
 import kotlinx.android.synthetic.main.item_list_fragment.*
+import java.util.*
 import kotlin.properties.Delegates
 
 class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, TextWatcher,
-        DepartmentChoiceDialog.DepartmentChoiceListener {
+        DepartmentChoiceDialog.DepartmentChoiceListener,
+        TaskViewHolder.OnDoneStateChangeListener {
     private val GET_TASKS_OF_STORE = 100
     private val TAG = "TaskListFragment"
 
@@ -33,7 +40,8 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     var currentStore: Store? = null
     var cursorLoader: CursorLoader? = null
     var taskAdapter: TaskAdapter by Delegates.notNull()
-    var tasksList: MutableList<Task> by Delegates.notNull()
+    var tasksList: MutableList<Task> = LinkedList()
+    private val header = Task()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -46,6 +54,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         tasks_list.layoutManager = LinearLayoutManager(this.activity)
         tasks_list.itemAnimator = DefaultItemAnimator()
         tasks_list.setHasFixedSize(true)
+        tasks_list.addItemDecoration(SpaceItemDecoration(10, true))
 
         quick_add_btn.setOnClickListener {
             onAddTaskClicked()
@@ -74,7 +83,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         val b = Bundle()
         b.putLong("storeId", lastStoreId)
         d.arguments = b
-        d.show(fragmentManager, "DepChoiceDiag")
+        d.show(fragmentManager, "DepChoiceDialog")
     }
 
     //
@@ -83,17 +92,62 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun onDepartmentChosen(d: Department) {
         Log.d(TAG, "onDepartmentChosen : ${d.name}")
+        // we choose a department, so the task does not exist
+
+        val i = Item(quick_add_text.text.trim().toString(), d)
+        i.id = ItemTable.create(activity, i)
+        if (i.id > 0) {
+            if (ItemWeightTable.create(activity, i, lastStoreId) > 0) {
+                val t = Task(i)
+                if (TaskTable.create(activity, t, lastStoreId) > 0) {
+                    // add to adapter, but need to find the right position
+                    tasksList.add(t)
+                    tasksList.sort()
+                    taskAdapter.animateTo(tasksList)
+                    quick_add_text.text.clear()
+                }
+            } else {
+                Log.e(TAG, "error on item weight creation")
+            }
+        } else {
+            Log.e(TAG, "error on item creation")
+        }
+
     }
 
     override fun onChoiceCanceled() {
-
+        // TODO
     }
 
+    override fun onDoneStateChanged(task: Task) {
+        TaskTable.updateDoneState(activity, task)
+        tasksList.sort()
+        addHeaderIfNeeded(tasksList)
+        taskAdapter.animateTo(tasksList)
+    }
 
     /// TextWatcher
 
     override fun afterTextChanged(s: Editable) {
         quick_add_btn.isEnabled = s.length > 0
+        if (tasksList.count() > 0) {
+            val filteredList = filter(tasksList, s)
+            addHeaderIfNeeded(filteredList)
+            taskAdapter.animateTo(filteredList)
+            tasks_list.scrollToPosition(0)
+        }
+    }
+
+    private fun filter(list: MutableList<Task>, s: Editable): MutableList<Task> {
+        val f = s.toString().toLowerCase()
+        val filtered = LinkedList<Task>()
+        for (t in list) {
+            if ((t.type == TaskAdapter.VIEW_TYPES.Normal && t.item.name.toLowerCase().contains(f)) ||
+                    t.type == TaskAdapter.VIEW_TYPES.Header) {
+                filtered.add(t)
+            }
+        }
+        return filtered
     }
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -103,6 +157,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 
     }
+
 
     //
     // Database operations
@@ -120,9 +175,30 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun onCreateLoader(i: Int, bundle: Bundle?): Loader<Cursor>? {
         return when (i) {
-            GET_TASKS_OF_STORE -> TaskTable.fetchAllTasksForStore(this.activity,
+            GET_TASKS_OF_STORE -> TaskTable.getAllTasksForStoreLoader(this.activity,
                     bundle?.getLong("storeId") ?: 0)
             else -> null
+        }
+    }
+
+    private fun addHeaderIfNeeded(list: MutableList<Task>) {
+        var lastState: Boolean? = null
+        var addPos: Int? = null
+        list.remove(header)
+        for (t in list) {
+            if (t.isDone && lastState == null) {
+                addPos = 0
+            } else {
+                if (lastState == false && t.isDone == true) {
+                    addPos = list.indexOf(t)
+                    break
+                }
+            }
+            lastState = t.isDone
+        }
+
+        if (addPos != null) {
+            list.add(addPos, header)
         }
     }
 
@@ -131,14 +207,16 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
             GET_TASKS_OF_STORE -> {
                 if (cursor.count > 0) {
                     tasksList = cursor.map { Task(it) }
-                    taskAdapter = TaskAdapter(tasksList)
-                    tasks_list.adapter = taskAdapter
                     tasks_list.visibility = View.VISIBLE
                     empty_text.visibility = View.GONE
                 } else {
+                    tasksList = LinkedList<Task>()
                     tasks_list.visibility = View.GONE
                     empty_text.visibility = View.VISIBLE
                 }
+                addHeaderIfNeeded(tasksList)
+                taskAdapter = TaskAdapter(tasksList, this)
+                tasks_list.adapter = taskAdapter
             }
             else -> throw IllegalArgumentException("Unknown cursorLoader id")
         }

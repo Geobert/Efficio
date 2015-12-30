@@ -34,7 +34,7 @@ object StoreCompositionTable : BaseTable() {
     val RESTRICT_TO_STORE = "($TABLE_NAME.$COL_STORE_ID = ?)"
     val ORDERING = "$COL_WEIGHT desc"
 
-    fun fetchDepFromStore(activity: Context, storeId: Long): CursorLoader {
+    fun getDepFromStoreLoader(activity: Context, storeId: Long): CursorLoader {
         return CursorLoader(activity, CONTENT_URI, COLS_TO_QUERY, RESTRICT_TO_STORE,
                 arrayOf(storeId.toString()), ORDERING)
     }

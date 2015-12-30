@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import fr.geobert.efficio.R
+import fr.geobert.efficio.misc.convertNonAscii
 import kotlin.properties.Delegates
 
 class DbHelper : SQLiteOpenHelper {
@@ -41,7 +42,8 @@ class DbHelper : SQLiteOpenHelper {
         db.execSQL(StoreTable.CREATE_TRIGGER_ON_STORE_DEL)
         db.execSQL(DepartmentTable.CREATE_TRIGGER_ON_DEP_DELETE)
 
-        db.execSQL("INSERT INTO ${StoreTable.TABLE_NAME} VALUES (1, '${ctx.getString(R.string.store)}')")
+        val name = ctx.getString(R.string.store)
+        db.execSQL("INSERT INTO ${StoreTable.TABLE_NAME} VALUES (1, '${name.convertNonAscii().toLowerCase()}', '$name')")
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {

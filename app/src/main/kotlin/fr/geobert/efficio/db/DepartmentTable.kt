@@ -5,13 +5,16 @@ import android.content.Context
 import android.content.CursorLoader
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Department
+import fr.geobert.efficio.misc.convertNonAscii
 
 object DepartmentTable : BaseTable() {
     override val TABLE_NAME = "departments"
 
     val COL_NAME = "dep_name"
+    val COL_NORM_NAME = "dep_norm"
 
-    override fun CREATE_COLUMNS() = "$COL_NAME TEXT NOT NULL"
+    override fun CREATE_COLUMNS() = "${COL_NORM_NAME} TEXT NOT NULL UNIQUE ON CONFLICT IGNORE, " +
+            "$COL_NAME TEXT NOT NULL"
 
     override val COLS_TO_QUERY: Array<String> = arrayOf(BaseColumns._ID, COL_NAME)
 
@@ -25,16 +28,15 @@ object DepartmentTable : BaseTable() {
                 "END"
     }
 
-    fun fetchAllDep(activity: Context): CursorLoader {
+    fun getAllDepLoader(activity: Context): CursorLoader {
         return CursorLoader(activity, CONTENT_URI, COLS_TO_QUERY, null, null, "dep_name desc")
     }
 
     fun create(ctx: Context, department: Department): Long {
         val v = ContentValues()
+        v.put(COL_NORM_NAME, department.name.convertNonAscii().toLowerCase())
         v.put(COL_NAME, department.name)
-
-        val res = ctx.contentResolver.insert(CONTENT_URI, v)
-        return res.lastPathSegment.toLong()
+        return insert(ctx, v)
     }
 
 

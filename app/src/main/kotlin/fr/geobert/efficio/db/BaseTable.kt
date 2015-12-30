@@ -2,6 +2,8 @@ package fr.geobert.efficio.db
 
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.ContentValues
+import android.content.Context
 import android.net.Uri
 import android.provider.BaseColumns
 
@@ -23,14 +25,21 @@ abstract class BaseTable : BaseColumns {
 
     protected fun leftOuterJoin(alias: String, key: String, foreignTable: String,
                                 foreignKey: String = BaseColumns._ID) =
-            "LEFT OUTER JOIN $foreignTable ON $alias.$key = $foreignTable.$foreignKey"
+            "LEFT JOIN $foreignTable ON $alias.$key = $foreignTable.$foreignKey"
 
     fun buildWithId(id: Long): Uri {
-        return ContentUris.withAppendedId(ItemTable.CONTENT_URI, id)
+        return ContentUris.withAppendedId(CONTENT_URI, id)
     }
 
     fun getIdFromUri(uri: Uri): Long {
         return ContentUris.parseId(uri)
     }
 
+    fun insert(ctx: Context, values: ContentValues): Long {
+        return ctx.contentResolver.insert(CONTENT_URI, values).lastPathSegment.toLong()
+    }
+
+    fun update(ctx: Context, id: Long, values: ContentValues): Int {
+        return ctx.contentResolver.update(buildWithId(id), values, null, null)
+    }
 }

@@ -67,6 +67,7 @@ class DbContentProvider : ContentProvider() {
                 ITEM_WEIGHT -> ItemWeightTable.buildWithId(id)
                 DEP_WEIGHT -> StoreCompositionTable.buildWithId(id)
                 ITEM_DEP -> ItemDepTable.buildWithId(id)
+                TASK -> TaskTable.buildWithId(id)
                 else -> throw IllegalArgumentException("Unknown URI: " + uri)
             }
             context.contentResolver.notifyChange(uri, null)
@@ -79,12 +80,15 @@ class DbContentProvider : ContentProvider() {
         val queryBuilder = SQLiteQueryBuilder()
         val uriType = sURIMatcher.match(uri)
         when (uriType) {
-            ITEM_WITH_ID -> queryBuilder.appendWhere("items.${BaseColumns._ID}=${uri.lastPathSegment}")
-            DEP_WITH_ID -> queryBuilder.appendWhere("${BaseColumns._ID}=${uri.lastPathSegment}")
+            ITEM_WITH_ID ->
+                queryBuilder.appendWhere("items.${BaseColumns._ID}=${uri.lastPathSegment}")
+            DEP_WITH_ID, STORE_WITH_ID, TASK_WITH_ID ->
+                queryBuilder.appendWhere("${BaseColumns._ID}=${uri.lastPathSegment}")
             else -> {
             }
         }
         queryBuilder.tables = switchToTableRead(uriType, uri)
+        queryBuilder.setDistinct(true)
         val c = queryBuilder.query(mDbHelper!!.readableDatabase, projection, selection,
                 selectionArgs, null, null, sortOrder)
         c.setNotificationUri(context.contentResolver, uri)
