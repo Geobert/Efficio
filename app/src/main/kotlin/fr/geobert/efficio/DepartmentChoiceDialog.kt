@@ -18,7 +18,7 @@ import fr.geobert.efficio.adapter.DepartmentViewHolder
 import fr.geobert.efficio.data.Department
 import fr.geobert.efficio.db.DepartmentTable
 import fr.geobert.efficio.db.StoreCompositionTable
-import fr.geobert.efficio.misc.SpaceItemDecoration
+import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
 import fr.geobert.efficio.misc.map
 import kotlinx.android.synthetic.main.department_chooser_dialog.view.*
 import java.util.*
@@ -56,7 +56,7 @@ class DepartmentChoiceDialog : DialogFragment(), LoaderManager.LoaderCallbacks<C
     fun init() {
         customView.dep_list.layoutManager = LinearLayoutManager(activity)
         customView.dep_list.itemAnimator = DefaultItemAnimator()
-        customView.dep_list.addItemDecoration(SpaceItemDecoration(10, true))
+        customView.dep_list.addItemDecoration(TopBottomSpaceItemDecoration(10))
         customView.dep_list.setHasFixedSize(true)
         customView.add_dep_btn.setOnClickListener {
             onAddDepClicked()
@@ -81,10 +81,10 @@ class DepartmentChoiceDialog : DialogFragment(), LoaderManager.LoaderCallbacks<C
             }
 
             if (existingDep != null) {
-//                if (existingDep.weight == -1) {
-//                    // department comes from another store, so add it to StoreCompositionTable
-//                    StoreCompositionTable.create(activity, arguments.getLong("storeId"), existingDep)
-//                }
+                //                if (existingDep.weight == -1) {
+                //                    // department comes from another store, so add it to StoreCompositionTable
+                //                    StoreCompositionTable.create(activity, arguments.getLong("storeId"), existingDep)
+                //                }
                 onDepartmentChosen(existingDep)
             } else {
                 val d = Department(t)

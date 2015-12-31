@@ -27,7 +27,7 @@ import fr.geobert.efficio.db.ItemDepTable
 import fr.geobert.efficio.db.ItemTable
 import fr.geobert.efficio.db.ItemWeightTable
 import fr.geobert.efficio.db.TaskTable
-import fr.geobert.efficio.misc.SpaceItemDecoration
+import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
 import fr.geobert.efficio.misc.map
 import kotlinx.android.synthetic.main.item_list_fragment.*
 import java.util.*
@@ -49,7 +49,8 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     private val taskItemTouchCbk =
             object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
-                var lastDragTask: Task? = null
+                var lastDragTask: TaskViewHolder? = null
+
                 override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
                                     target: RecyclerView.ViewHolder): Boolean {
                     Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
@@ -62,15 +63,22 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                     // nothing
                 }
 
+                private var orig: Float = 0f
+
                 override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
                     super.onSelectedChanged(viewHolder, actionState)
                     // end of drag n drop, adapter is correctly ordered but not our representation here
-                    if (viewHolder == null) {
+                    val vh = viewHolder as TaskViewHolder?
+                    if (vh == null) {
+                        lastDragTask!!.cardView.cardElevation = orig
                         Log.d(TAG, "end of drag n drop, sort the list")
-                        ItemWeightTable.updateWeight(activity, lastDragTask!!.item)
+                        ItemWeightTable.updateWeight(activity, lastDragTask!!.task.item)
                         tasksList.sort()
+                    } else {
+                        orig = vh.cardView.cardElevation
+                        vh.cardView.cardElevation = 20.0f
                     }
-                    lastDragTask = (viewHolder as TaskViewHolder?)?.task
+                    lastDragTask = vh
                 }
             }
 
@@ -124,7 +132,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         tasks_list.layoutManager = LinearLayoutManager(this.activity)
         tasks_list.itemAnimator = DefaultItemAnimator()
         tasks_list.setHasFixedSize(true)
-        tasks_list.addItemDecoration(SpaceItemDecoration(10, true))
+        tasks_list.addItemDecoration(TopBottomSpaceItemDecoration(10))
         taskItemTouchHlp.attachToRecyclerView(tasks_list)
 
         quick_add_btn.setOnClickListener {

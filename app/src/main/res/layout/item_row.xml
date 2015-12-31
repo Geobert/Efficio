@@ -15,7 +15,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginStart="10dp"
-        card_view:cardCornerRadius="2dp">
+        card_view:cardCornerRadius="2dp"
+        card_view:cardUseCompatPadding="true">
 
         <FrameLayout
             android:id="@+id/card_content"

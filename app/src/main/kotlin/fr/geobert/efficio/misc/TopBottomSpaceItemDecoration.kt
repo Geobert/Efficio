@@ -5,7 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 
-class SpaceItemDecoration @JvmOverloads constructor(private val space: Int, private val addSpaceFirstItem: Boolean = false, private val addSpaceLastItem: Boolean = false) : RecyclerView.ItemDecoration() {
+class TopBottomSpaceItemDecoration constructor(private val space: Int) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
         super.getItemOffsets(outRect, view, parent, state)
@@ -13,7 +13,7 @@ class SpaceItemDecoration @JvmOverloads constructor(private val space: Int, priv
             return
         }
 
-        if (addSpaceFirstItem && parent.getChildLayoutPosition(view) < 1 || parent.getChildLayoutPosition(view) >= 1) {
+        if (parent.getChildLayoutPosition(view) < 1) {
             if (getOrientation(parent) == LinearLayoutManager.VERTICAL) {
                 outRect.top = space
             } else {
@@ -21,7 +21,7 @@ class SpaceItemDecoration @JvmOverloads constructor(private val space: Int, priv
             }
         }
 
-        if (addSpaceLastItem && parent.getChildAdapterPosition(view) == getTotalItemCount(parent) - 1) {
+        if (parent.getChildAdapterPosition(view) == getTotalItemCount(parent) - 1) {
             if (getOrientation(parent) == LinearLayoutManager.VERTICAL) {
                 outRect.bottom = space
             } else {
