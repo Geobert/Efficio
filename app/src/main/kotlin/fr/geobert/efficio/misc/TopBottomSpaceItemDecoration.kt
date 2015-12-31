@@ -16,6 +16,7 @@ class TopBottomSpaceItemDecoration constructor(private val space: Int) : Recycle
         if (parent.getChildLayoutPosition(view) < 1) {
             if (getOrientation(parent) == LinearLayoutManager.VERTICAL) {
                 outRect.top = space
+                outRect.bottom = 0
             } else {
                 outRect.left = space
             }
@@ -23,6 +24,7 @@ class TopBottomSpaceItemDecoration constructor(private val space: Int) : Recycle
 
         if (parent.getChildAdapterPosition(view) == getTotalItemCount(parent) - 1) {
             if (getOrientation(parent) == LinearLayoutManager.VERTICAL) {
+                outRect.top = 0
                 outRect.bottom = space
             } else {
                 outRect.right = space

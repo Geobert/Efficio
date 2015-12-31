@@ -23,10 +23,7 @@ import fr.geobert.efficio.data.Department
 import fr.geobert.efficio.data.Item
 import fr.geobert.efficio.data.Store
 import fr.geobert.efficio.data.Task
-import fr.geobert.efficio.db.ItemDepTable
-import fr.geobert.efficio.db.ItemTable
-import fr.geobert.efficio.db.ItemWeightTable
-import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.db.*
 import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
 import fr.geobert.efficio.misc.map
 import kotlinx.android.synthetic.main.item_list_fragment.*
@@ -50,12 +47,14 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     private val taskItemTouchCbk =
             object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
                 var lastDragTask: TaskViewHolder? = null
+                var needAdapterSort: Boolean = false
 
                 override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
                                     target: RecyclerView.ViewHolder): Boolean {
                     Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
                     taskAdapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
-                    updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
+                    val r = updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
+                    if (!needAdapterSort) needAdapterSort = r
                     return true
                 }
 
@@ -72,8 +71,14 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                     if (vh == null) {
                         lastDragTask!!.cardView.cardElevation = orig
                         Log.d(TAG, "end of drag n drop, sort the list")
+                        StoreCompositionTable.updateDepWeight(activity, lastDragTask!!.task.item.department)
                         ItemWeightTable.updateWeight(activity, lastDragTask!!.task.item)
                         tasksList.sort()
+                        if (needAdapterSort) {
+                            val f = quick_add_text.text.trim().toString()
+                            val l = if (f.length > 0) filter(tasksList, f) else tasksList
+                            taskAdapter.animateTo(l)
+                        }
                     } else {
                         orig = vh.cardView.cardElevation
                         vh.cardView.cardElevation = 20.0f
@@ -84,13 +89,14 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     private val taskItemTouchHlp = ItemTouchHelper(taskItemTouchCbk)
 
-    private fun updateTaskWeight(dragged: TaskViewHolder, target: TaskViewHolder) {
+    private fun updateTaskWeight(dragged: TaskViewHolder, target: TaskViewHolder): Boolean {
         val dTask = dragged.task
         val tTask = target.task
         val dItem = dTask.item
         val tItem = tTask.item
         val dDep = dItem.department
         val tDep = tItem.department
+        var res: Boolean = false
         if (dragged.adapterPosition < target.adapterPosition) {
             // item goes up
             if (dDep.id == tDep.id) {
@@ -102,7 +108,13 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                     }
                 }
             } else {
-                // todo
+                if (dDep.weight == tDep.weight) {
+                    dDep.weight++
+                    res = true
+                } else if (dDep.weight < tDep.weight) {
+                    dDep.weight = tDep.weight + 1
+                    res = true
+                }
             }
         } else if (dragged.adapterPosition > target.adapterPosition) {
             // item goes down
@@ -115,9 +127,16 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                     }
                 }
             } else {
-                // todo
+                if (dDep.weight == tDep.weight) {
+                    dDep.weight--
+                    res = true
+                } else if (dDep.weight > tDep.weight) {
+                    dDep.weight = tDep.weight - 1
+                    res = true
+                }
             }
         }
+        return res
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup,
@@ -215,16 +234,16 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun afterTextChanged(s: Editable) {
         quick_add_btn.isEnabled = s.trim().length > 0
-        if (tasksList.count() > 0) {
-            val filteredList = filter(tasksList, s)
+        if (tasksList.count() > 0 && quick_add_btn.isEnabled) {
+            val filteredList = filter(tasksList, s.toString())
             addHeaderIfNeeded(filteredList)
             taskAdapter.animateTo(filteredList)
             tasks_list.scrollToPosition(0)
         }
     }
 
-    private fun filter(list: MutableList<Task>, s: Editable): MutableList<Task> {
-        val f = s.toString().toLowerCase()
+    private fun filter(list: MutableList<Task>, s: String): MutableList<Task> {
+        val f = s.toLowerCase()
         val filtered = LinkedList<Task>()
         for (t in list) {
             if ((t.type == TaskAdapter.VIEW_TYPES.Normal && t.item.name.toLowerCase().contains(f)) ||

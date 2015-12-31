@@ -1,6 +1,7 @@
 package fr.geobert.efficio.db
 
 
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.CursorLoader
@@ -47,5 +48,11 @@ object StoreCompositionTable : BaseTable() {
 
         val res = ctx.contentResolver.insert(CONTENT_URI, v)
         return res.lastPathSegment.toLong()
+    }
+
+    fun updateDepWeight(activity: Activity, department: Department): Int {
+        val v = ContentValues()
+        v.put(COL_WEIGHT, department.weight)
+        return update(activity, department.id, v)
     }
 }
