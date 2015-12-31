@@ -3,11 +3,13 @@ package fr.geobert.efficio.data
 import android.database.Cursor
 import android.os.Bundle
 import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.misc.normalize
 import kotlin.properties.Delegates
 
 class Item {
     var id: Long by Delegates.notNull()
     var name: String by Delegates.notNull()
+    val normName: String by lazy { name.normalize() }
     var weight: Int by Delegates.notNull()
     var department: Department by Delegates.notNull()
 

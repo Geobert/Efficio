@@ -32,3 +32,7 @@ public fun String.convertNonAscii(): String {
     }
     return sb.toString()
 }
+
+fun String.normalize(): String {
+    return this.convertNonAscii().toLowerCase()
+}

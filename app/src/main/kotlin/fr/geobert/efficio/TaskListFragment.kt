@@ -142,10 +142,14 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     private fun onAddTaskClicked() {
-        // todo case where item already exists
-
-        // case item does not exists yet
-        createNewTask()
+        val (t, pos) = taskAdapter.getTaskByName(quick_add_text.text.trim().toString())
+        if (t != null) {
+            t.isDone = false
+            taskAdapter.notifyItemChanged(pos)
+        } else {
+            // case item does not exists yet
+            createNewTask()
+        }
     }
 
     private fun createNewTask() {
@@ -202,7 +206,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     /// TextWatcher
 
     override fun afterTextChanged(s: Editable) {
-        quick_add_btn.isEnabled = s.length > 0
+        quick_add_btn.isEnabled = s.trim().length > 0
         if (tasksList.count() > 0) {
             val filteredList = filter(tasksList, s)
             addHeaderIfNeeded(filteredList)

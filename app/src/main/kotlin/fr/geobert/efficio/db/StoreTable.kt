@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Store
-import fr.geobert.efficio.misc.convertNonAscii
+import fr.geobert.efficio.misc.normalize
 
 object StoreTable : BaseTable() {
     override val TABLE_NAME = "stores"
@@ -32,7 +32,7 @@ object StoreTable : BaseTable() {
     fun create(ctx: Context, store: Store): Long {
         val v = ContentValues()
         v.put(COL_NAME, store.name)
-        v.put(COL_NORM_NAME, store.name.convertNonAscii().toLowerCase())
+        v.put(COL_NORM_NAME, store.name.normalize())
         return insert(ctx, v)
     }
 

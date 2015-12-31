@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.CursorLoader
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Department
-import fr.geobert.efficio.misc.convertNonAscii
+import fr.geobert.efficio.misc.normalize
 
 object DepartmentTable : BaseTable() {
     override val TABLE_NAME = "departments"
@@ -34,7 +34,7 @@ object DepartmentTable : BaseTable() {
 
     fun create(ctx: Context, department: Department): Long {
         val v = ContentValues()
-        v.put(COL_NORM_NAME, department.name.convertNonAscii().toLowerCase())
+        v.put(COL_NORM_NAME, department.name.normalize())
         v.put(COL_NAME, department.name)
         return insert(ctx, v)
     }

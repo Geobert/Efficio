@@ -1,6 +1,5 @@
 package fr.geobert.efficio.adapter
 
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.View
@@ -19,7 +18,7 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: OnDoneStat
 
     var name: TextView by Delegates.notNull()
     var checkbox: CheckBox by Delegates.notNull()
-    var layout: CardView by Delegates.notNull()
+    var cardView: CardView by Delegates.notNull()
     var content: View by Delegates.notNull()
     var task: Task by Delegates.notNull()
     private var isListenerActive: Boolean = true
@@ -28,7 +27,7 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: OnDoneStat
         if (!isHeader) {
             name = view.findViewById(R.id.name) as TextView
             checkbox = view.findViewById(R.id.checkbox) as CheckBox
-            layout = view.findViewById(R.id.item_row_layout) as CardView
+            cardView = view.findViewById(R.id.item_row_layout) as CardView
             content = view.findViewById(R.id.card_content)
             checkbox.setOnCheckedChangeListener(this)
         }
@@ -38,14 +37,13 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: OnDoneStat
         if (isListenerActive) {
             task.isDone = isChecked
             listener.onDoneStateChanged(task)
-            layout.isSelected = isChecked
+            cardView.isSelected = isChecked
             setBgColor(isChecked)
         }
     }
 
     fun setBgColor(isChecked: Boolean) {
-        layout.setCardBackgroundColor(ContextCompat.getColor(view.context,
-                if (isChecked) R.color.colorDivider else android.R.color.white))
+        cardView.alpha = if (isChecked) 0.5f else 1.0f
     }
 
     fun bind(task: Task) {
@@ -55,7 +53,7 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: OnDoneStat
                 isListenerActive = false
                 checkbox.isChecked = task.isDone
                 name.text = task.item.name
-                layout.isSelected = task.isDone
+                cardView.isSelected = task.isDone
                 setBgColor(task.isDone)
                 isListenerActive = true
             }

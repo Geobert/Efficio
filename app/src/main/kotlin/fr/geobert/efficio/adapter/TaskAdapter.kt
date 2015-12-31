@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
+import fr.geobert.efficio.misc.normalize
 import java.util.*
 
 class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.OnDoneStateChangeListener) :
@@ -37,6 +38,15 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.OnDoneSt
 
     override fun getItemViewType(position: Int): Int {
         return taskList[position].type.ordinal
+    }
+
+    fun getTaskByName(name: String): Pair<Task?, Int> {
+        for (t in taskList) {
+            if (t.type == VIEW_TYPES.Normal &&
+                    t.item.normName == name.normalize())
+                return Pair(t, taskList.indexOf(t))
+        }
+        return Pair(null, 0)
     }
 
     fun removeItem(pos: Int): Task {
