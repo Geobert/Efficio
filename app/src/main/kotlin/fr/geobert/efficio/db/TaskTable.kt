@@ -59,4 +59,11 @@ object TaskTable : BaseTable() {
         v.put(COL_IS_DONE, task.isDone)
         return update(activity, task.id, v)
     }
+
+    fun updateTask(activity: Activity, task: Task): Int {
+        if (ItemDepTable.updateItemDep(activity, task.item.id, task.item.department.id) > 0) {
+            return ItemTable.updateItem(activity, task.item)
+        }
+        return 0
+    }
 }

@@ -20,40 +20,56 @@ import fr.geobert.efficio.db.DepartmentTable
 import fr.geobert.efficio.db.StoreCompositionTable
 import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
 import fr.geobert.efficio.misc.map
+import fr.geobert.efficio.misc.normalize
 import kotlinx.android.synthetic.main.department_chooser_dialog.view.*
 import java.util.*
 import kotlin.properties.Delegates
 
-class DepartmentChoiceDialog : DialogFragment(), LoaderManager.LoaderCallbacks<Cursor>,
+open class DepartmentChoiceDialog : DialogFragment(), LoaderManager.LoaderCallbacks<Cursor>,
         TextWatcher, DepartmentViewHolder.OnClickListener {
     interface DepartmentChoiceListener {
         fun onDepartmentChosen(d: Department)
         fun onChoiceCanceled()
     }
 
+    companion object {
+        fun newInstance(storeId: Long, listener: DepartmentChoiceListener): DepartmentChoiceDialog {
+            val d = DepartmentChoiceDialog()
+            d.listener = listener
+            val b = Bundle()
+            b.putLong("storeId", storeId)
+            d.arguments = b
+            return d
+        }
+    }
+
     private val TAG = "DepartmentChoiceDialog"
     private val GET_DEP_FROM_STORE = 200
     //private val GET_ALL_DEP = 210
 
-    private var customView: View by Delegates.notNull()
+    protected var customView: View by Delegates.notNull()
     private var depAdapter: DepartmentAdapter by Delegates.notNull()
     private var depsList: MutableList<Department> by Delegates.notNull()
     var listener: DepartmentChoiceListener by Delegates.notNull()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        super.onCreateDialog(savedInstanceState)
+        val b = createDialogBuilder(R.layout.department_chooser_dialog, savedInstanceState)
+        b.setTitle(R.string.choose_or_create_dep)
+        return b.create()
+    }
+
+    protected fun createDialogBuilder(layoutId: Int, savedInstanceState: Bundle?): AlertDialog.Builder {
         val builder = AlertDialog.Builder(activity)
-        customView = activity.layoutInflater.inflate(R.layout.department_chooser_dialog, null)
-        builder.setTitle(R.string.choose_or_create_dep)
-                .setView(customView)
+        customView = activity.layoutInflater.inflate(layoutId, null)
+        builder.setView(customView)
                 .setNegativeButton(android.R.string.cancel, { d, i ->
                     d.cancel()
                 })
 
-        return builder.create()
+        return builder
     }
 
-    fun init() {
+    open fun init() {
         customView.dep_list.layoutManager = LinearLayoutManager(activity)
         customView.dep_list.itemAnimator = DefaultItemAnimator()
         customView.dep_list.addItemDecoration(TopBottomSpaceItemDecoration(10))
@@ -64,17 +80,18 @@ class DepartmentChoiceDialog : DialogFragment(), LoaderManager.LoaderCallbacks<C
         customView.add_dep_text.addTextChangedListener(this)
     }
 
-    private fun onDepartmentChosen(d: Department) {
+    protected open fun onDepartmentChosen(d: Department) {
         listener.onDepartmentChosen(d)
         dialog.cancel()
     }
 
     private fun onAddDepClicked() {
-        val t = customView.add_dep_text.text.toString()
-        if (t.trim().length > 0) {
+        val t = customView.add_dep_text.text.trim().toString()
+        if (t.length > 0) {
+            val n = t.normalize()
             var existingDep: Department? = null
             for (d in depsList) {
-                if (d.name == t) {
+                if (d.name.normalize() == n) {
                     existingDep = d
                     break
                 }

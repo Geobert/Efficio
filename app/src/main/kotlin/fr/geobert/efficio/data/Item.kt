@@ -4,14 +4,14 @@ import android.database.Cursor
 import android.os.Bundle
 import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.misc.normalize
-import kotlin.properties.Delegates
 
-class Item {
-    var id: Long by Delegates.notNull()
-    var name: String by Delegates.notNull()
-    val normName: String by lazy { name.normalize() }
-    var weight: Int by Delegates.notNull()
-    var department: Department by Delegates.notNull()
+class Item : ImplParcelable {
+    override val parcels = hashMapOf<String, Any?>()
+    var id: Long by parcels
+    var name: String by parcels
+    fun normName(): String = name.normalize()
+    var weight: Int by parcels
+    var department: Department by parcels
 
     constructor(cursor: Cursor) {
         // from TaskTable query
@@ -30,5 +30,31 @@ class Item {
         this.name = name
         weight = 0
         department = dep
+    }
+
+    constructor() {
+        id = 0
+        this.name = ""
+        weight = 0
+        department = Department()
+    }
+
+    constructor(item: Item) {
+        id = item.id
+        name = item.name
+        weight = item.weight
+        department = Department(item.department)
+    }
+
+    override fun getClassLoaderOf(name: String): ClassLoader? {
+        return when (name) {
+            "department" -> department.javaClass.classLoader
+            else -> null
+        }
+    }
+
+    fun isEquals(item: Item): Boolean {
+        return weight == item.weight && name.equals(item.name) &&
+                department.isEquals(item.department)
     }
 }

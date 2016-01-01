@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="?android:attr/selectableItemBackground"
-            android:longClickable="true">
+            android:clickable="true">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -37,17 +37,33 @@
 
                 <TextView
                     android:id="@+id/name"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/checkbox"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_alignTop="@+id/checkbox"
-                    android:layout_toLeftOf="@+id/checkbox"
-                    android:layout_toStartOf="@+id/checkbox"
                     android:gravity="center_vertical"
                     android:text="Test"
                     android:textSize="21sp"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/dep_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/checkbox"
+                    android:layout_alignTop="@+id/checkbox"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/name"
+                    android:layout_toLeftOf="@+id/checkbox"
+                    android:layout_toRightOf="@+id/name"
+                    android:layout_toStartOf="@+id/checkbox"
+                    android:gravity="center_vertical"
+                    android:text="Department"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:textSize="16sp"
                     tools:ignore="HardcodedText" />
 
                 <CheckBox

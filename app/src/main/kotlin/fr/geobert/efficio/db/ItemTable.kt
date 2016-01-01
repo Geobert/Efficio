@@ -30,16 +30,15 @@ object ItemTable : BaseTable() {
 
     fun create(ctx: Context, item: Item): Long {
         val v = ContentValues()
-        v.put(COL_NORM_NAME, item.normName)
+        v.put(COL_NORM_NAME, item.normName())
         v.put(COL_NAME, item.name)
         return insert(ctx, v)
     }
 
-    fun update() {
-
-    }
-
-    fun delete() {
-
+    fun updateItem(activity: Context, item: Item): Int {
+        val v = ContentValues()
+        v.put(COL_NAME, item.name)
+        v.put(COL_NORM_NAME, item.normName())
+        return update(activity, item.id, v)
     }
 }

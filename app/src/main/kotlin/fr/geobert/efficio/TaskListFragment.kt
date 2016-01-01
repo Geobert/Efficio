@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.Editable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
@@ -28,18 +29,17 @@ import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
 import fr.geobert.efficio.misc.map
 import kotlinx.android.synthetic.main.item_list_fragment.*
 import java.util.*
-import kotlin.properties.Delegates
 
 class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, TextWatcher,
-        DepartmentChoiceDialog.DepartmentChoiceListener,
-        TaskViewHolder.OnDoneStateChangeListener {
+        DepartmentChoiceDialog.DepartmentChoiceListener, TaskViewHolder.TaskViewHolderListener,
+        ItemEditorDialog.ItemEditorListener {
     private val GET_TASKS_OF_STORE = 100
     private val TAG = "TaskListFragment"
 
     var lastStoreId: Long = 1 // todo get it from prefs
     var currentStore: Store? = null
     var cursorLoader: CursorLoader? = null
-    var taskAdapter: TaskAdapter by Delegates.notNull()
+    var taskAdapter: TaskAdapter? = null
     var tasksList: MutableList<Task> = LinkedList()
 
     private val header = Task()
@@ -52,7 +52,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                 override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
                                     target: RecyclerView.ViewHolder): Boolean {
                     Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
-                    taskAdapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
+                    taskAdapter!!.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
                     val r = updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
                     if (!needAdapterSort) needAdapterSort = r
                     return true
@@ -77,7 +77,10 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                         if (needAdapterSort) {
                             val f = quick_add_text.text.trim().toString()
                             val l = if (f.length > 0) filter(tasksList, f) else tasksList
-                            taskAdapter.animateTo(l)
+                            taskAdapter!!.animateTo(l)
+                            tasks_list.post {
+                                tasks_list.invalidateItemDecorations()
+                            }
                         }
                     } else {
                         orig = vh.cardView.cardElevation
@@ -169,10 +172,10 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     private fun onAddTaskClicked() {
-        val (t, pos) = taskAdapter.getTaskByName(quick_add_text.text.trim().toString())
+        val (t, pos) = taskAdapter!!.getTaskByName(quick_add_text.text.trim().toString())
         if (t != null) {
             t.isDone = false
-            taskAdapter.notifyItemChanged(pos)
+            taskAdapter!!.notifyItemChanged(pos)
         } else {
             // case item does not exists yet
             createNewTask()
@@ -180,12 +183,18 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     private fun createNewTask() {
-        val d = DepartmentChoiceDialog()
-        d.listener = this
-        val b = Bundle()
-        b.putLong("storeId", lastStoreId)
-        d.arguments = b
+        val d = DepartmentChoiceDialog.newInstance(lastStoreId, this)
         d.show(fragmentManager, "DepChoiceDialog")
+    }
+
+    override fun onItemEditFinished(needUpdate: Boolean) {
+        if (needUpdate) {
+            quick_add_text.text = SpannableStringBuilder("")
+            //fetchStore(this, lastStoreId)
+            tasksList.sort()
+            taskAdapter!!.animateTo(tasksList)
+            taskAdapter?.notifyDataSetChanged()
+        }
     }
 
     //
@@ -206,7 +215,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                         // add to adapter, but need to find the right position
                         tasksList.add(t)
                         tasksList.sort()
-                        taskAdapter.animateTo(tasksList)
+                        taskAdapter!!.animateTo(tasksList)
                         quick_add_text.text.clear()
                     }
                 }
@@ -227,17 +236,22 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         TaskTable.updateDoneState(activity, task)
         tasksList.sort()
         addHeaderIfNeeded(tasksList)
-        taskAdapter.animateTo(tasksList)
+        taskAdapter!!.animateTo(tasksList)
+    }
+
+    override fun onItemClicked(task: Task) {
+        val d = ItemEditorDialog.newInstance(lastStoreId, task, this)
+        d.show(fragmentManager, "ItemEditor")
     }
 
     /// TextWatcher
 
     override fun afterTextChanged(s: Editable) {
         quick_add_btn.isEnabled = s.trim().length > 0
-        if (tasksList.count() > 0 && quick_add_btn.isEnabled) {
+        if (tasksList.count() > 0) {
             val filteredList = filter(tasksList, s.toString())
             addHeaderIfNeeded(filteredList)
-            taskAdapter.animateTo(filteredList)
+            taskAdapter!!.animateTo(filteredList)
             tasks_list.scrollToPosition(0)
         }
     }
@@ -318,7 +332,10 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                     empty_text.visibility = View.VISIBLE
                 }
                 addHeaderIfNeeded(tasksList)
-                taskAdapter = TaskAdapter(tasksList, this)
+                if (taskAdapter == null)
+                    taskAdapter = TaskAdapter(tasksList, this)
+                else
+                    taskAdapter!!.animateTo(tasksList)
                 tasks_list.adapter = taskAdapter
             }
             else -> throw IllegalArgumentException("Unknown cursorLoader id")

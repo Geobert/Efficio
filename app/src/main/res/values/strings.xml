@@ -5,4 +5,9 @@
     <string name="choose_or_create_dep">Choose or Create Department</string>
     <string name="no_dep">No existing department,\nplease create one above</string>
     <string name="completed">Completed</string>
+    <string name="current_department">Current department: %s</string>
+    <string name="item_s_name">Item\'s name</string>
+    <string name="change_item_name_and_dep">Edit Item</string>
+    <string name="filter_or_create_new_department">Filter/Create department</string>
+    <string name="delete_task">Delete task</string>
 </resources>

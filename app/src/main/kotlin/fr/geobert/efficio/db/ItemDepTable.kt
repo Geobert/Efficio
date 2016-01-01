@@ -29,4 +29,10 @@ object ItemDepTable : BaseTable() {
         return insert(activity, v)
     }
 
+    fun updateItemDep(activity: Activity, itemId: Long, depId: Long): Int {
+        val v = ContentValues()
+        v.put(COL_DEP_ID, depId)
+        return update(activity, itemId, v)
+    }
+
 }

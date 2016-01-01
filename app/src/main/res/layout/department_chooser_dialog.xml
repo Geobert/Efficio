@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <ImageButton
@@ -25,7 +25,10 @@
         android:layout_marginLeft="15dp"
         android:layout_marginStart="15dp"
         android:layout_toLeftOf="@id/add_dep_btn"
-        android:layout_toStartOf="@id/add_dep_btn" />
+        android:layout_toStartOf="@id/add_dep_btn"
+        android:textColorHint="@color/hint"
+        android:hint="@string/filter_or_create_new_department"
+        android:inputType="textAutoCorrect" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/dep_list"

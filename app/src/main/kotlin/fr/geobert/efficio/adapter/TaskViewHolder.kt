@@ -10,17 +10,20 @@ import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
 import kotlin.properties.Delegates
 
-class TaskViewHolder(val view: View, isHeader: Boolean, val listener: OnDoneStateChangeListener) :
+class TaskViewHolder(val view: View, isHeader: Boolean, val listener: TaskViewHolderListener) :
         RecyclerView.ViewHolder(view), CompoundButton.OnCheckedChangeListener {
-    interface OnDoneStateChangeListener {
+    interface TaskViewHolderListener {
         fun onDoneStateChanged(task: Task)
+        fun onItemClicked(task: Task)
     }
 
     var name: TextView by Delegates.notNull()
+    var depName: TextView by Delegates.notNull()
     var checkbox: CheckBox by Delegates.notNull()
     var cardView: CardView by Delegates.notNull()
     var content: View by Delegates.notNull()
     var task: Task by Delegates.notNull()
+
     private var isListenerActive: Boolean = true
 
     init {
@@ -29,8 +32,16 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: OnDoneStat
             checkbox = view.findViewById(R.id.checkbox) as CheckBox
             cardView = view.findViewById(R.id.item_row_layout) as CardView
             content = view.findViewById(R.id.card_content)
+            depName = view.findViewById(R.id.dep_name) as TextView
             checkbox.setOnCheckedChangeListener(this)
+            content.setOnClickListener { v ->
+                onClicked(v)
+            }
         }
+    }
+
+    private fun onClicked(v: View) {
+        listener.onItemClicked(task)
     }
 
     override fun onCheckedChanged(p0: CompoundButton?, isChecked: Boolean) {
@@ -53,6 +64,7 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: OnDoneStat
                 isListenerActive = false
                 checkbox.isChecked = task.isDone
                 name.text = task.item.name
+                depName.text = "(${task.item.department.name})"
                 cardView.isSelected = task.isDone
                 setBgColor(task.isDone)
                 isListenerActive = true
