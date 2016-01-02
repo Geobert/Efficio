@@ -44,7 +44,18 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         depManager = DepartmentManager(this, findViewById(R.id.department_layout),
                 extras.getLong("storeId"), this)
         depManager.request()
+        delete_task_btn.setOnClickListener { onDeleteClicked() }
         fetchTask()
+    }
+
+    private fun onDeleteClicked() {
+        val d = DeleteConfirmationDialog.newInstance(R.string.confirm_delete_task,
+                R.string.delete_task, { d, i ->
+            TaskTable.deleteTask(this@ItemEditorActivity, task.id)
+            setResult(Activity.RESULT_OK)
+            finish()
+        })
+        d.show(fragmentManager, "DeleteConfirmDialog")
     }
 
     private fun fetchTask() {

@@ -9,5 +9,6 @@
     <string name="item_s_name">Item\'s name</string>
     <string name="change_item_name_and_dep">Edit Item</string>
     <string name="filter_or_create_new_department">Filter/Create department</string>
-    <string name="delete_task">Delete task</string>
+    <string name="delete_task">Delete item</string>
+    <string name="confirm_delete_task">Do you want to delete this item?</string>
 </resources>

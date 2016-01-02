@@ -41,6 +41,14 @@ object TaskTable : BaseTable() {
     val RESTRICT_TO_STORE = "(${TaskTable.TABLE_NAME}.$COL_STORE_ID = ?)"
     val ORDERING = "is_done asc, dep_weight desc, item_weight desc, item_name asc"
 
+    val CREATE_TRIGGER_ON_TASK_DEL by lazy {
+        "CREATE TRIGGER on_task_deleted " +
+                "AFTER DELETE ON ${TaskTable.TABLE_NAME} BEGIN " +
+                "DELETE FROM ${ItemTable.TABLE_NAME} WHERE " +
+                "${ItemTable.TABLE_NAME}.${BaseColumns._ID} = old.${BaseColumns._ID};" +
+                "END"
+    }
+
     fun getAllTasksForStoreLoader(ctx: Context, storeId: Long): CursorLoader {
         return CursorLoader(ctx, TaskTable.CONTENT_URI, TaskTable.COLS_TO_QUERY, RESTRICT_TO_STORE,
                 arrayOf(storeId.toString()), ORDERING)
@@ -69,5 +77,9 @@ object TaskTable : BaseTable() {
             return ItemTable.updateItem(activity, task.item)
         }
         return 0
+    }
+
+    fun deleteTask(activity: Activity, taskId: Long) {
+        activity.contentResolver.delete(buildWithId(taskId), null, null)
     }
 }
