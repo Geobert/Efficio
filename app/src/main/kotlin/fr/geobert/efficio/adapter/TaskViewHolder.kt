@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.CheckBox
 import android.widget.CompoundButton
-import android.widget.ImageButton
 import android.widget.TextView
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
@@ -23,7 +22,7 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: TaskViewHo
     var checkbox: CheckBox by Delegates.notNull()
     var cardView: CardView by Delegates.notNull()
     var content: View by Delegates.notNull()
-    var editBtn: ImageButton by Delegates.notNull()
+    //    var editBtn: ImageButton by Delegates.notNull()
     var task: Task by Delegates.notNull()
 
     private var isListenerActive: Boolean = true
@@ -35,9 +34,9 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: TaskViewHo
             cardView = view.findViewById(R.id.item_row_layout) as CardView
             content = view.findViewById(R.id.card_content)
             depName = view.findViewById(R.id.dep_name) as TextView
-            editBtn = view.findViewById(R.id.edit_item_btn) as ImageButton
+            //            editBtn = view.findViewById(R.id.edit_item_btn) as ImageButton
             checkbox.setOnCheckedChangeListener(this)
-            editBtn.setOnClickListener { v -> onClicked(v) }
+            content.setOnClickListener { v -> onClicked(v) }
         }
     }
 
