@@ -29,9 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="10dp"
-                android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_marginStart="10dp"
                 android:gravity="center_vertical"
                 tools:ignore="UselessParent">
 
@@ -40,9 +38,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/checkbox"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
                     android:layout_alignTop="@+id/checkbox"
+                    android:layout_toEndOf="@+id/checkbox"
+                    android:layout_toRightOf="@+id/checkbox"
                     android:gravity="center_vertical"
                     android:text="Test"
                     android:textSize="21sp"
@@ -50,16 +48,14 @@
 
                 <TextView
                     android:id="@+id/dep_name"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/checkbox"
                     android:layout_alignTop="@+id/checkbox"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_toEndOf="@+id/name"
-                    android:layout_toLeftOf="@+id/checkbox"
                     android:layout_toRightOf="@+id/name"
-                    android:layout_toStartOf="@+id/checkbox"
                     android:gravity="center_vertical"
                     android:text="Department"
                     android:textColor="@color/colorPrimaryLight"
@@ -70,8 +66,21 @@
                     android:id="@+id/checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginRight="5dp"
+                    android:layout_marginLeft="2dp" />
+
+                <ImageButton
+                    android:id="@+id/edit_item_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignParentRight="true" />
+                    android:layout_alignParentRight="true"
+                    android:background="@android:color/transparent"
+                    android:src="@android:drawable/ic_menu_edit" />
             </RelativeLayout>
 
         </FrameLayout>
