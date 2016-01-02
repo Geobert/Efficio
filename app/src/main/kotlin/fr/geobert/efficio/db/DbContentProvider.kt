@@ -82,8 +82,10 @@ class DbContentProvider : ContentProvider() {
         when (uriType) {
             ITEM_WITH_ID ->
                 queryBuilder.appendWhere("items.${BaseColumns._ID}=${uri.lastPathSegment}")
-            DEP_WITH_ID, STORE_WITH_ID, TASK_WITH_ID ->
+            DEP_WITH_ID, STORE_WITH_ID ->
                 queryBuilder.appendWhere("${BaseColumns._ID}=${uri.lastPathSegment}")
+            TASK_WITH_ID ->
+                queryBuilder.appendWhere("tasks.${BaseColumns._ID}=${uri.lastPathSegment}")
             else -> {
             }
         }

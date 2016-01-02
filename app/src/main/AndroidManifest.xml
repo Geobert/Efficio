@@ -22,6 +22,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ItemEditorActivity"
+            android:label="@string/change_item_name_and_dep"
+            android:launchMode="singleTop" />
+
         <provider
             android:name=".db.DbContentProvider"
             android:authorities="fr.geobert.efficio"

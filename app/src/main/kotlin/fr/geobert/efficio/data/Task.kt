@@ -3,14 +3,13 @@ package fr.geobert.efficio.data
 import android.database.Cursor
 import fr.geobert.efficio.adapter.TaskAdapter
 import fr.geobert.efficio.db.TaskTable
+import kotlin.properties.Delegates
 
-class Task : Comparable<Task>, ImplParcelable {
-    override val parcels = hashMapOf<String, Any?>()
-
-    var id: Long by parcels
-    var isDone: Boolean by parcels
-    var item: Item by parcels
-    var type: TaskAdapter.VIEW_TYPES by parcels
+class Task : Comparable<Task> {
+    var id: Long by Delegates.notNull()
+    var isDone: Boolean by Delegates.notNull()
+    var item: Item by Delegates.notNull()
+    var type: TaskAdapter.VIEW_TYPES by Delegates.notNull()
 
     constructor() {
         type = TaskAdapter.VIEW_TYPES.Header
@@ -47,10 +46,13 @@ class Task : Comparable<Task>, ImplParcelable {
         } else {
             if (isDone) item.name.compareTo(other.item.name) else
                 if (item.department.weight > other.item.department.weight) 1 else
-                    if (item.department.weight < other.item.department.weight) -1 else
-                        if (item.weight > other.item.weight) 1 else
-                            if (item.weight < other.item.weight) -1 else
-                                item.name.compareTo(other.item.name)
+                    if (item.department.weight < other.item.department.weight) -1 else {
+                        val r = item.department.name.compareTo(other.item.department.name)
+                        if (r != 0) r else
+                            if (item.weight > other.item.weight) 1 else
+                                if (item.weight < other.item.weight) -1 else
+                                    item.name.compareTo(other.item.name)
+                    }
         }
     }
 

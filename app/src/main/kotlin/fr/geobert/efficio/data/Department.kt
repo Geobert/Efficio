@@ -2,13 +2,12 @@ package fr.geobert.efficio.data
 
 import android.database.Cursor
 import android.os.Bundle
+import kotlin.properties.Delegates
 
-class Department : Comparable<Department>, ImplParcelable {
-    override val parcels = hashMapOf<String, Any?>()
-
-    var id: Long by parcels
-    var name: String by parcels
-    var weight: Int by parcels
+class Department : Comparable<Department> {
+    var id: Long by Delegates.notNull()
+    var name: String by Delegates.notNull()
+    var weight: Int by Delegates.notNull()
 
     constructor(cursor: Cursor, b: Bundle) {
         id = cursor.getLong(b.getInt("id"))

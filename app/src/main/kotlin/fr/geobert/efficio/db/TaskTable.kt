@@ -46,6 +46,10 @@ object TaskTable : BaseTable() {
                 arrayOf(storeId.toString()), ORDERING)
     }
 
+    fun getTaskByIdLoader(ctx: Context, taskId: Long): CursorLoader {
+        return CursorLoader(ctx, buildWithId(taskId), COLS_TO_QUERY, null, null, null)
+    }
+
     fun create(activity: Activity, t: Task, storeId: Long): Long {
         val v = ContentValues()
         v.put(COL_STORE_ID, storeId)

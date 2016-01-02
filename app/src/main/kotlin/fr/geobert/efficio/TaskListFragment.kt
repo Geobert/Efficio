@@ -1,9 +1,11 @@
 package fr.geobert.efficio
 
 
+import android.app.Activity
 import android.app.Fragment
 import android.app.LoaderManager
 import android.content.CursorLoader
+import android.content.Intent
 import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
@@ -31,8 +33,7 @@ import kotlinx.android.synthetic.main.item_list_fragment.*
 import java.util.*
 
 class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, TextWatcher,
-        DepartmentChoiceDialog.DepartmentChoiceListener, TaskViewHolder.TaskViewHolderListener,
-        ItemEditorDialog.ItemEditorListener {
+        DepartmentManager.DepartmentChoiceListener, TaskViewHolder.TaskViewHolderListener {
     private val GET_TASKS_OF_STORE = 100
     private val TAG = "TaskListFragment"
 
@@ -187,13 +188,18 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         d.show(fragmentManager, "DepChoiceDialog")
     }
 
-    override fun onItemEditFinished(needUpdate: Boolean) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        onItemEditFinished(resultCode == Activity.RESULT_OK)
+    }
+
+    fun onItemEditFinished(needUpdate: Boolean) {
         if (needUpdate) {
             quick_add_text.text = SpannableStringBuilder("")
-            //fetchStore(this, lastStoreId)
-            tasksList.sort()
-            taskAdapter!!.animateTo(tasksList)
-            taskAdapter?.notifyDataSetChanged()
+            fetchStore(this, lastStoreId)
+            //            tasksList.sort()
+            //            taskAdapter!!.animateTo(tasksList)
+            //            taskAdapter?.notifyDataSetChanged()
         }
     }
 
@@ -228,10 +234,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     }
 
-    override fun onChoiceCanceled() {
-        // TODO
-    }
-
     override fun onDoneStateChanged(task: Task) {
         TaskTable.updateDoneState(activity, task)
         tasksList.sort()
@@ -240,8 +242,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     override fun onItemClicked(task: Task) {
-        val d = ItemEditorDialog.newInstance(lastStoreId, task, this)
-        d.show(fragmentManager, "ItemEditor")
+        ItemEditorActivity.callMe(this, lastStoreId, task)
     }
 
     /// TextWatcher
@@ -291,11 +292,12 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     override fun onCreateLoader(i: Int, bundle: Bundle?): Loader<Cursor>? {
-        return when (i) {
+        cursorLoader = when (i) {
             GET_TASKS_OF_STORE -> TaskTable.getAllTasksForStoreLoader(this.activity,
                     bundle?.getLong("storeId") ?: 0)
             else -> null
         }
+        return cursorLoader
     }
 
     private fun addHeaderIfNeeded(list: MutableList<Task>) {
