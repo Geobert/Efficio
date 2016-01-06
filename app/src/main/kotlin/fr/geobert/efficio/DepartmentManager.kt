@@ -40,12 +40,13 @@ class DepartmentManager(val activity: Activity,
     private var addDepBtn: ImageButton by Delegates.notNull()
     private var addDepEdt: EditText by Delegates.notNull()
     private var emptyTxt: TextView by Delegates.notNull()
+    private var cursorLoader: Loader<Cursor>? = null
 
     interface DepartmentChoiceListener {
         fun onDepartmentChosen(d: Department)
     }
 
-    private var depAdapter: DepartmentAdapter by Delegates.notNull()
+    var depAdapter: DepartmentAdapter by Delegates.notNull()
     var departmentsList: MutableList<Department> by Delegates.notNull()
 
     init {
@@ -61,6 +62,17 @@ class DepartmentManager(val activity: Activity,
         list.setHasFixedSize(true)
         addDepBtn.setOnClickListener { onAddDepClicked() }
         addDepEdt.addTextChangedListener(this)
+    }
+
+    fun setEditMode(isEdit: Boolean) {
+        if (isEdit) {
+            addDepBtn.visibility = View.GONE
+            addDepEdt.visibility = View.GONE
+            // todo drag n drop management
+        } else {
+            addDepEdt.visibility = View.VISIBLE
+            addDepBtn.visibility = View.VISIBLE
+        }
     }
 
     private fun onAddDepClicked() {
@@ -114,6 +126,7 @@ class DepartmentManager(val activity: Activity,
 
         when (loader.id) {
             GET_DEP_FROM_STORE -> {
+                cursorLoader = loader
                 if (data.count > 0) {
                     val b = Bundle()
                     b.putInt("id", data.getColumnIndex(StoreCompositionTable.COL_DEP_ID))
@@ -146,7 +159,11 @@ class DepartmentManager(val activity: Activity,
     fun request() {
         val b = Bundle()
         b.putLong("storeId", storeId)
-        activity.loaderManager.initLoader(GET_DEP_FROM_STORE, b, this)
+        if (cursorLoader == null) {
+            activity.loaderManager.initLoader(GET_DEP_FROM_STORE, b, this)
+        } else {
+            activity.loaderManager.restartLoader(GET_DEP_FROM_STORE, b, this)
+        }
     }
 
     //

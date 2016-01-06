@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item android:title="@string/departments">
+            <menu>
+                <item
+                    android:id="@+id/edit_departments"
+                    android:title="@string/edit_departments" />
+            </menu>
+        </item>
+        <item android:title="@string/store">
+            <menu>
+                <item
+                    android:id="@+id/create_new_store"
+                    android:title="@string/create_new_store" />
+                <item
+                    android:id="@+id/rename_store"
+                    android:title="@string/rename_current_store" />
+                <item
+                    android:id="@+id/delete_current_store"
+                    android:title="@string/delete_current_store" />
+            </menu>
+        </item>
+    </group>
+</menu>

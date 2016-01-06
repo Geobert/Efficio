@@ -1,5 +1,6 @@
 package fr.geobert.efficio.db
 
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.CursorLoader
@@ -39,5 +40,10 @@ object DepartmentTable : BaseTable() {
         return insert(ctx, v)
     }
 
-
+    fun updateDepartment(activity: Activity, depId: Long, s: String): Int {
+        val v = ContentValues()
+        v.put(COL_NAME, s)
+        v.put(COL_NORM_NAME, s.normalize())
+        return update(activity, depId, v)
+    }
 }

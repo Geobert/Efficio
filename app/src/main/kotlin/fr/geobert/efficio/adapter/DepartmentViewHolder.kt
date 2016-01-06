@@ -1,5 +1,6 @@
 package fr.geobert.efficio.adapter
 
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.TextView
@@ -14,6 +15,7 @@ class DepartmentViewHolder(val l: View, val listener: OnClickListener) :
 
     val name = l.findViewById(R.id.dep_name) as TextView
     var dep: Department? = null
+    val cardView: CardView = l.findViewById(R.id.card_view) as CardView
 
     init {
         l.setOnClickListener(this)

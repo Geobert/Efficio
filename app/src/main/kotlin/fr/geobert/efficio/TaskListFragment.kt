@@ -190,16 +190,21 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        onItemEditFinished(resultCode == Activity.RESULT_OK)
+        when (requestCode) {
+            0 -> onItemEditFinished(resultCode == Activity.RESULT_OK)
+            1 -> onDepEditFinished()
+        }
+
+    }
+
+    private fun onDepEditFinished() {
+        fetchStore(this, lastStoreId)
     }
 
     fun onItemEditFinished(needUpdate: Boolean) {
         if (needUpdate) {
             quick_add_text.text = SpannableStringBuilder("")
             fetchStore(this, lastStoreId)
-            //            tasksList.sort()
-            //            taskAdapter!!.animateTo(tasksList)
-            //            taskAdapter?.notifyDataSetChanged()
         }
     }
 

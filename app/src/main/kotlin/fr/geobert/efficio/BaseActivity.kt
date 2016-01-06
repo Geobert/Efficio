@@ -5,7 +5,7 @@ import android.support.v7.widget.Toolbar
 import android.view.View
 
 public abstract class BaseActivity : AppCompatActivity() {
-    public val mToolbar: Toolbar by lazy(LazyThreadSafetyMode.NONE) { findViewById(R.id.my_toolbar) as Toolbar }
+    public val mToolbar: Toolbar by lazy { findViewById(R.id.my_toolbar) as Toolbar }
 
     public fun setIcon(id: Int) {
         mToolbar.setNavigationIcon(id)

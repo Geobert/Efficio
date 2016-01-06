@@ -27,6 +27,11 @@
             android:label="@string/change_item_name_and_dep"
             android:launchMode="singleTop" />
 
+        <activity
+            android:name=".EditDepartmentsActivity"
+            android:label="@string/manage_departments"
+            android:launchMode="singleTop" />
+
         <provider
             android:name=".db.DbContentProvider"
             android:authorities="fr.geobert.efficio"
