@@ -14,7 +14,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.Editable
-import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
@@ -203,7 +202,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     fun onItemEditFinished(needUpdate: Boolean) {
         if (needUpdate) {
-            quick_add_text.text = SpannableStringBuilder("")
+            quick_add_text.text.clear()
             fetchStore(this, lastStoreId)
         }
     }
