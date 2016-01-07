@@ -37,8 +37,10 @@ public class MainActivity : BaseActivity() {
         setContentView(R.layout.main_activity)
         setTitle(R.string.app_name)
         titleColor = ContextCompat.getColor(this, android.R.color.primary_text_dark)
-        taskListFrag = TaskListFragment()
-        fragmentManager.beginTransaction().replace(R.id.flContent, taskListFrag).commit()
+        if(savedInstanceState==null) {
+            taskListFrag = TaskListFragment()
+            fragmentManager.beginTransaction().replace(R.id.flContent, taskListFrag).commit()
+        }
         setSupportActionBar(mToolbar)
         setUpDrawerToggle()
         setupDrawerContent()
