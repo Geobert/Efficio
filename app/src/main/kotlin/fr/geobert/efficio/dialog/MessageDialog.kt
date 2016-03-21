@@ -1,5 +1,6 @@
-package fr.geobert.efficio
+package fr.geobert.efficio.dialog
 
+import android.R
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.DialogFragment
@@ -20,7 +21,7 @@ class MessageDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog? {
         val b = AlertDialog.Builder(activity)
         b.setTitle(arguments.getInt("title")).setMessage(arguments.getInt("msg")).
-                setPositiveButton(android.R.string.ok, { d, i -> d.cancel() })
+                setPositiveButton(R.string.ok, { d, i -> d.cancel() })
         return b.create()
     }
 }

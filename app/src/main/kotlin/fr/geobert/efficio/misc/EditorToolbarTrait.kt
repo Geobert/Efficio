@@ -6,7 +6,7 @@ import android.view.View
 import fr.geobert.efficio.BaseActivity
 import fr.geobert.efficio.R
 
-public interface EditorToolbarTrait : Toolbar.OnMenuItemClickListener {
+interface EditorToolbarTrait : Toolbar.OnMenuItemClickListener {
     fun initToolbar(activity: BaseActivity) {
         activity.setIcon(android.R.drawable.ic_menu_close_clear_cancel)
         activity.setIconOnClick(View.OnClickListener { activity.onBackPressed() })

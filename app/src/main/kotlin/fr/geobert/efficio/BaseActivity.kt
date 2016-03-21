@@ -4,18 +4,18 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.View
 
-public abstract class BaseActivity : AppCompatActivity() {
-    public val mToolbar: Toolbar by lazy { findViewById(R.id.my_toolbar) as Toolbar }
+abstract class BaseActivity : AppCompatActivity() {
+    val mToolbar: Toolbar by lazy { findViewById(R.id.my_toolbar) as Toolbar }
 
-    public fun setIcon(id: Int) {
+    fun setIcon(id: Int) {
         mToolbar.setNavigationIcon(id)
     }
 
-    public fun setIconOnClick(listener: View.OnClickListener) {
+    fun setIconOnClick(listener: View.OnClickListener) {
         mToolbar.setNavigationOnClickListener(listener)
     }
 
-    public fun setMenu(id: Int) {
+    fun setMenu(id: Int) {
         mToolbar.inflateMenu(id)
     }
 

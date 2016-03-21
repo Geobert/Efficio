@@ -11,9 +11,12 @@ import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.MenuItem
 import fr.geobert.efficio.data.Department
+import fr.geobert.efficio.data.DepartmentManager
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.dialog.DeleteConfirmationDialog
 import fr.geobert.efficio.misc.EditorToolbarTrait
+import fr.geobert.efficio.misc.GET_TASK
 import kotlinx.android.synthetic.main.item_editor.*
 import kotlin.properties.Delegates
 
@@ -23,8 +26,6 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
     private var origTask: Task by Delegates.notNull()
     private var depManager: DepartmentManager by Delegates.notNull()
     private var cursorLoader: CursorLoader? = null
-
-    private val GET_TASK = 300
 
     companion object {
         fun callMe(ctx: Fragment, storeId: Long, task: Task) {
@@ -49,8 +50,8 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
     }
 
     private fun onDeleteClicked() {
-        val d = DeleteConfirmationDialog.newInstance(R.string.confirm_delete_task,
-                R.string.delete_task, { d, i ->
+        val d = DeleteConfirmationDialog.newInstance(getString(R.string.confirm_delete_task),
+                getString(R.string.delete_task), { d, i ->
             TaskTable.deleteTask(this@ItemEditorActivity, task.id)
             setResult(Activity.RESULT_OK)
             finish()

@@ -1,4 +1,4 @@
-package fr.geobert.efficio
+package fr.geobert.efficio.data
 
 import android.app.Activity
 import android.app.LoaderManager
@@ -15,11 +15,13 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import fr.geobert.efficio.R
 import fr.geobert.efficio.adapter.DepartmentAdapter
 import fr.geobert.efficio.adapter.DepartmentViewHolder
 import fr.geobert.efficio.data.Department
 import fr.geobert.efficio.db.DepartmentTable
 import fr.geobert.efficio.db.StoreCompositionTable
+import fr.geobert.efficio.misc.GET_DEP_FROM_STORE
 import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
 import fr.geobert.efficio.misc.map
 import fr.geobert.efficio.misc.normalize
@@ -35,7 +37,6 @@ class DepartmentManager(val activity: Activity,
         LoaderManager.LoaderCallbacks<Cursor>, TextWatcher, DepartmentViewHolder.OnClickListener {
 
     val TAG = "DepartmentManager"
-    private val GET_DEP_FROM_STORE = 200
     private var list: RecyclerView by Delegates.notNull()
     private var addDepBtn: ImageButton by Delegates.notNull()
     private var addDepEdt: EditText by Delegates.notNull()

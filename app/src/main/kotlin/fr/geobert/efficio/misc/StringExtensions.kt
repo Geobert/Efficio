@@ -18,7 +18,7 @@ val UNICODE = "\u00C0\u00E0\u00C8\u00E8\u00CC\u00EC\u00D2\u00F2\u00D9\u00F9" +
         "\u0150\u0151\u0170\u0171"
 
 // remove accentuated from a string and replace with ascii equivalent
-public fun String.convertNonAscii(): String {
+fun String.convertNonAscii(): String {
     val sb = StringBuilder()
     val n = this.length
     for (i in 0..n - 1) {

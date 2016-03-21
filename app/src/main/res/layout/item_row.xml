@@ -66,21 +66,13 @@
                     android:id="@+id/checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginStart="2dp"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginLeft="2dp"
                     android:layout_marginRight="5dp"
-                    android:layout_marginLeft="2dp" />
+                    android:layout_marginStart="2dp" />
 
-                <!--<ImageButton-->
-                    <!--android:id="@+id/edit_item_btn"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:layout_alignParentEnd="true"-->
-                    <!--android:layout_alignParentRight="true"-->
-                    <!--android:background="@android:color/transparent"-->
-                    <!--android:src="@android:drawable/ic_menu_edit" />-->
             </RelativeLayout>
 
         </FrameLayout>

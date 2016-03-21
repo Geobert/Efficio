@@ -24,4 +24,15 @@
     <string name="error_title">Oopsy…</string>
     <string name="error_empty_dep_name">Need a name to update</string>
     <string name="you_can_reorder_and_rename_the_departments">Drag to reorder,\nTap to rename the departments</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="configure">Configure</string>
+    <string name="add_widget">Add widget</string>
+    <string name="empty_widget">No item</string>
+    <string name="choose_store">Choose store</string>
+    <string name="error">Error</string>
+    <string name="error_rename">Problem while renaming store, maybe the name is already taken.</string>
+    <string name="nb_items_format">%1$s (%2$d)</string>
+    <string name="choose_new_store_name">Choose a new name for the store</string>
+    <string name="error_create_store">Problem while creating store</string>
+    <string name="confirm_delete_store">Do you really want to delete the store named: %s</string>
 </resources>

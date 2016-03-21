@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="fr.geobert.efficio">
 
@@ -11,22 +12,18 @@
         android:label="@string/app_name"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ItemEditorActivity"
             android:label="@string/change_item_name_and_dep"
             android:launchMode="singleTop" />
-
         <activity
             android:name=".EditDepartmentsActivity"
             android:label="@string/manage_departments"
@@ -36,9 +33,30 @@
             android:name=".db.DbContentProvider"
             android:authorities="fr.geobert.efficio"
             android:exported="false" />
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="042692be669fee44b81f635e59db4a99012d097f" />
+
+        <receiver android:name=".widget.TaskListWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/task_list_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.TaskListWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <!-- <activity android:name=".TaskListWidgetConfigureActivity"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
     </application>
 
 </manifest>

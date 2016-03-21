@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.CursorLoader
+import android.database.Cursor
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Task
 
@@ -58,6 +59,17 @@ object TaskTable : BaseTable() {
         return CursorLoader(ctx, buildWithId(taskId), COLS_TO_QUERY, null, null, null)
     }
 
+    fun getAllTasksForStore(ctx: Context, storeId: Long): Cursor? {
+        return ctx.contentResolver.query(TaskTable.CONTENT_URI,
+                TaskTable.COLS_TO_QUERY, RESTRICT_TO_STORE, arrayOf(storeId.toString()), ORDERING)
+    }
+
+    fun getAllNotDoneTasksForStore(ctx: Context, storeId: Long): Cursor? {
+        return ctx.contentResolver.query(TaskTable.CONTENT_URI,
+                TaskTable.COLS_TO_QUERY, "$RESTRICT_TO_STORE and $TABLE_NAME.$COL_IS_DONE = 0",
+                arrayOf(storeId.toString()), ORDERING)
+    }
+
     fun create(activity: Activity, t: Task, storeId: Long): Long {
         val v = ContentValues()
         v.put(COL_STORE_ID, storeId)
@@ -66,10 +78,10 @@ object TaskTable : BaseTable() {
         return insert(activity, v)
     }
 
-    fun updateDoneState(activity: Activity, task: Task): Int {
+    fun updateDoneState(activity: Context, taskId: Long, isDone: Boolean): Int {
         val v = ContentValues()
-        v.put(COL_IS_DONE, task.isDone)
-        return update(activity, task.id, v)
+        v.put(COL_IS_DONE, isDone)
+        return update(activity, taskId, v)
     }
 
     fun updateTask(activity: Activity, task: Task): Int {
@@ -79,7 +91,7 @@ object TaskTable : BaseTable() {
         return 0
     }
 
-    fun deleteTask(activity: Activity, taskId: Long) {
-        activity.contentResolver.delete(buildWithId(taskId), null, null)
+    fun deleteTask(activity: Activity, taskId: Long): Int {
+        return delete(activity, taskId)
     }
 }

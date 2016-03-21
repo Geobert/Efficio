@@ -6,4 +6,13 @@
     android:background="?attr/colorPrimaryDark"
     android:fitsSystemWindows="true"
     android:minHeight="?attr/actionBarSize"
-    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+    app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+    <Spinner
+        android:id="@+id/store_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:minWidth="150dp"
+        app:popupTheme="@style/ToolbarSpinner" />
+</android.support.v7.widget.Toolbar>

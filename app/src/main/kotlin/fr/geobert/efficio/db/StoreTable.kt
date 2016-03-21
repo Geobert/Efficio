@@ -2,6 +2,7 @@ package fr.geobert.efficio.db
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.CursorLoader
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Store
 import fr.geobert.efficio.misc.normalize
@@ -36,11 +37,18 @@ object StoreTable : BaseTable() {
         return insert(ctx, v)
     }
 
-    fun update() {
-
+    fun renameStore(ctx: Context, storeId: Long, name: String): Int {
+        val v = ContentValues()
+        v.put(COL_NAME, name)
+        v.put(COL_NORM_NAME, name.normalize())
+        return update(ctx, storeId, v)
     }
 
-    fun delete() {
+    fun getAllStoresLoader(ctx: Context): CursorLoader {
+        return CursorLoader(ctx, StoreTable.CONTENT_URI, StoreTable.COLS_TO_QUERY, null, null, null)
+    }
 
+    fun deleteStore(ctx: Context, currentStore: Store): Int {
+        return delete(ctx, currentStore.id)
     }
 }

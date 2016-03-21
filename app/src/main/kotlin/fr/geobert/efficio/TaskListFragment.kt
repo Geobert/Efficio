@@ -4,9 +4,8 @@ package fr.geobert.efficio
 import android.app.Activity
 import android.app.Fragment
 import android.app.LoaderManager
-import android.content.CursorLoader
-import android.content.Intent
-import android.content.Loader
+import android.appwidget.AppWidgetManager
+import android.content.*
 import android.database.Cursor
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
@@ -21,19 +20,20 @@ import android.view.View
 import android.view.ViewGroup
 import fr.geobert.efficio.adapter.TaskAdapter
 import fr.geobert.efficio.adapter.TaskViewHolder
-import fr.geobert.efficio.data.Department
-import fr.geobert.efficio.data.Item
-import fr.geobert.efficio.data.Store
-import fr.geobert.efficio.data.Task
+import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.*
+import fr.geobert.efficio.dialog.DepartmentChoiceDialog
+import fr.geobert.efficio.misc.GET_TASKS_OF_STORE
+import fr.geobert.efficio.misc.RefreshInterface
 import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
 import fr.geobert.efficio.misc.map
+import fr.geobert.efficio.widget.TaskListWidget
 import kotlinx.android.synthetic.main.item_list_fragment.*
 import java.util.*
 
 class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, TextWatcher,
-        DepartmentManager.DepartmentChoiceListener, TaskViewHolder.TaskViewHolderListener {
-    private val GET_TASKS_OF_STORE = 100
+        DepartmentManager.DepartmentChoiceListener, TaskViewHolder.TaskViewHolderListener,
+        RefreshInterface {
     private val TAG = "TaskListFragment"
 
     var lastStoreId: Long = 1 // todo get it from prefs
@@ -41,6 +41,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     var cursorLoader: CursorLoader? = null
     var taskAdapter: TaskAdapter? = null
     var tasksList: MutableList<Task> = LinkedList()
+    val refreshReceiver = OnRefreshReceiver(this)
 
     private val header = Task()
 
@@ -164,11 +165,18 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         quick_add_text.addTextChangedListener(this)
 
         fetchStore(this, lastStoreId)
+
+        activity.registerReceiver(refreshReceiver, IntentFilter(OnRefreshReceiver.REFRESH_ACTION))
     }
 
     override fun onResume() {
         super.onResume()
         quick_add_btn.isEnabled = quick_add_text.text.length > 0
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        activity.unregisterReceiver(refreshReceiver)
     }
 
     private fun onAddTaskClicked() {
@@ -239,18 +247,34 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     override fun onDoneStateChanged(task: Task) {
-        TaskTable.updateDoneState(activity, task)
+        TaskTable.updateDoneState(activity, task.id, task.isDone)
         tasksList.sort()
         addHeaderIfNeeded(tasksList)
         taskAdapter!!.animateTo(tasksList)
+        updateWidgets()
+    }
+
+    private fun updateWidgets() {
+        Log.d(TAG, "updateWidgets")
+        val appWidgetManager = AppWidgetManager.getInstance(activity);
+
+        val intent = Intent(activity, TaskListWidget::class.java)
+        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+
+        val thisWidget = ComponentName(activity, TaskListWidget::class.java);
+        val ids = appWidgetManager.getAppWidgetIds(thisWidget);
+
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        ids.forEach { appWidgetManager.notifyAppWidgetViewDataChanged(it, R.id.tasks_list_widget) }
     }
 
     override fun onItemClicked(task: Task) {
         ItemEditorActivity.callMe(this, lastStoreId, task)
     }
 
-    /// TextWatcher
-
+    //
+    // TextWatcher
+    //
     override fun afterTextChanged(s: Editable) {
         quick_add_btn.isEnabled = s.trim().length > 0
         if (tasksList.count() > 0) {
@@ -279,6 +303,15 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 
+    }
+
+    override fun onRefresh(intent: Intent) {
+        val extras = intent.extras
+        //        val storeId = extras.getLong("storeId")
+        //        if (storeId == lastStoreId) {
+        //
+        //        }
+        fetchStore(this, lastStoreId)
     }
 
     //

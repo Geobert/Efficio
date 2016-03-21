@@ -14,8 +14,10 @@ import android.view.View
 import android.widget.LinearLayout
 import fr.geobert.efficio.adapter.DepartmentViewHolder
 import fr.geobert.efficio.data.Department
+import fr.geobert.efficio.data.DepartmentManager
 import fr.geobert.efficio.db.DepartmentTable
 import fr.geobert.efficio.db.StoreCompositionTable
+import fr.geobert.efficio.dialog.MessageDialog
 import kotlinx.android.synthetic.main.department_chooser_dialog.*
 import kotlinx.android.synthetic.main.edit_dep_text.view.*
 import java.util.*
