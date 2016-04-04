@@ -30,11 +30,16 @@ object StoreTable : BaseTable() {
                 "END"
     }
 
-    fun create(ctx: Context, store: Store): Long {
+
+    fun create(ctx: Context, name: String): Long {
         val v = ContentValues()
-        v.put(COL_NAME, store.name)
-        v.put(COL_NORM_NAME, store.name.normalize())
+        v.put(COL_NAME, name)
+        v.put(COL_NORM_NAME, name.normalize())
         return insert(ctx, v)
+    }
+
+    fun create(ctx: Context, store: Store): Long {
+        return create(ctx, store.name)
     }
 
     fun renameStore(ctx: Context, storeId: Long, name: String): Int {

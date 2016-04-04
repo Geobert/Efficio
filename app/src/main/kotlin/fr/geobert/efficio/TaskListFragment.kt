@@ -23,10 +23,7 @@ import fr.geobert.efficio.adapter.TaskViewHolder
 import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.*
 import fr.geobert.efficio.dialog.DepartmentChoiceDialog
-import fr.geobert.efficio.misc.GET_TASKS_OF_STORE
-import fr.geobert.efficio.misc.RefreshInterface
-import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
-import fr.geobert.efficio.misc.map
+import fr.geobert.efficio.misc.*
 import fr.geobert.efficio.widget.TaskListWidget
 import kotlinx.android.synthetic.main.item_list_fragment.*
 import java.util.*
@@ -191,7 +188,8 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     private fun createNewTask() {
-        val d = DepartmentChoiceDialog.newInstance(lastStoreId, this)
+        val d = DepartmentChoiceDialog.newInstance(lastStoreId)
+        d.setTargetFragment(this, CREATE_TASK)
         d.show(fragmentManager, "DepChoiceDialog")
     }
 
@@ -307,11 +305,12 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun onRefresh(intent: Intent) {
         val extras = intent.extras
-        //        val storeId = extras.getLong("storeId")
-        //        if (storeId == lastStoreId) {
-        //
-        //        }
-        fetchStore(this, lastStoreId)
+        val storeId = extras.getLong("storeId", -1)
+        val newStoreId = extras.getLong("newStoreId", -1)
+        if (newStoreId > 0) lastStoreId = newStoreId
+        if (storeId == lastStoreId || storeId < 0L) {
+            fetchStore(this, lastStoreId)
+        }
     }
 
     //

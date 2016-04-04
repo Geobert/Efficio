@@ -157,9 +157,13 @@ class DbContentProvider : ContentProvider() {
         val uriType = sURIMatcher.match(uri)
         val db = mDbHelper!!.writableDatabase
 
-        var customSelection = selection ?: "1"
-
-        var deleted = db!!.delete(switchToTableWrite(uriType, uri), customSelection, selectionArgs)
+        var id: String? = uri.lastPathSegment
+        val deleted = if (id != null) {
+            db!!.delete(switchToTableWrite(uriType, uri), "${BaseColumns._ID}=?", arrayOf(id))
+        } else {
+            var customSelection = selection ?: "1"
+            db!!.delete(switchToTableWrite(uriType, uri), customSelection, selectionArgs)
+        }
 
         if (deleted > 0) {
             context.contentResolver.notifyChange(uri, null)

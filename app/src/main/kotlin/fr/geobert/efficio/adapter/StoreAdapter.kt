@@ -47,4 +47,10 @@ class StoreAdapter(val activity: FragmentActivity, list: MutableList<Store>) : B
         s!!.name = name
         notifyDataSetChanged()
     }
+
+    fun deleteStore(storeId: Long) {
+        val s = storeList.find { it.id == storeId }
+        storeList.remove(s)
+        notifyDataSetChanged()
+    }
 }

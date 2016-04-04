@@ -15,13 +15,15 @@ import fr.geobert.efficio.data.DepartmentManager
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.dialog.DeleteConfirmationDialog
+import fr.geobert.efficio.misc.DELETE_TASK
+import fr.geobert.efficio.misc.DeleteDialogInterface
 import fr.geobert.efficio.misc.EditorToolbarTrait
 import fr.geobert.efficio.misc.GET_TASK
 import kotlinx.android.synthetic.main.item_editor.*
 import kotlin.properties.Delegates
 
 class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceListener,
-        LoaderManager.LoaderCallbacks<Cursor>, EditorToolbarTrait {
+        LoaderManager.LoaderCallbacks<Cursor>, EditorToolbarTrait, DeleteDialogInterface {
     private var task: Task by Delegates.notNull()
     private var origTask: Task by Delegates.notNull()
     private var depManager: DepartmentManager by Delegates.notNull()
@@ -49,13 +51,15 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         fetchTask()
     }
 
+    override fun onDeletedConfirmed() {
+        TaskTable.deleteTask(this, task.id)
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+
     private fun onDeleteClicked() {
         val d = DeleteConfirmationDialog.newInstance(getString(R.string.confirm_delete_task),
-                getString(R.string.delete_task), { d, i ->
-            TaskTable.deleteTask(this@ItemEditorActivity, task.id)
-            setResult(Activity.RESULT_OK)
-            finish()
-        })
+                getString(R.string.delete_task), DELETE_TASK)
         d.show(fragmentManager, "DeleteConfirmDialog")
     }
 

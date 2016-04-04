@@ -5,21 +5,18 @@ import android.app.Dialog
 import android.app.DialogFragment
 import android.os.Bundle
 import android.view.View
-import fr.geobert.efficio.data.DepartmentManager
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Department
+import fr.geobert.efficio.data.DepartmentManager
 import kotlin.properties.Delegates
 
 
 open class DepartmentChoiceDialog : DialogFragment(), DepartmentManager.DepartmentChoiceListener {
-
-    private var listener: DepartmentManager.DepartmentChoiceListener by Delegates.notNull()
     private var manager: DepartmentManager by Delegates.notNull()
 
     companion object {
-        fun newInstance(storeId: Long, listener: DepartmentManager.DepartmentChoiceListener): DepartmentChoiceDialog {
+        fun newInstance(storeId: Long): DepartmentChoiceDialog {
             val d = DepartmentChoiceDialog()
-            d.listener = listener
             val b = Bundle()
             b.putLong("storeId", storeId)
             d.arguments = b
@@ -48,7 +45,8 @@ open class DepartmentChoiceDialog : DialogFragment(), DepartmentManager.Departme
     }
 
     override fun onDepartmentChosen(d: Department) {
-        listener.onDepartmentChosen(d)
+        val f = targetFragment
+        if (f is DepartmentManager.DepartmentChoiceListener) f.onDepartmentChosen(d)
         dialog.cancel()
     }
 
