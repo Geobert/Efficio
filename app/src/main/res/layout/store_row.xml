@@ -10,6 +10,9 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical"
+        android:minHeight="34dp"
         android:text="Store 1"
         android:textColor="@drawable/toolbar_spinner_row_selector"
         android:textSize="18sp" />
