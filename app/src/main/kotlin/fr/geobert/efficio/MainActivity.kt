@@ -1,37 +1,26 @@
 package fr.geobert.efficio
 
-import android.app.LoaderManager
-import android.content.Context
-import android.content.Intent
-import android.content.Loader
-import android.content.SharedPreferences
-import android.database.Cursor
-import android.os.Bundle
-import android.support.v4.content.CursorLoader
+import android.content.*
+import android.os.*
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.View
 import android.widget.AdapterView
 import com.crashlytics.android.Crashlytics
-import fr.geobert.efficio.adapter.StoreAdapter
-import fr.geobert.efficio.data.Store
-import fr.geobert.efficio.db.StoreTable
-import fr.geobert.efficio.dialog.DeleteConfirmationDialog
-import fr.geobert.efficio.dialog.StoreNameDialog
+import fr.geobert.efficio.data.*
+import fr.geobert.efficio.db.*
+import fr.geobert.efficio.dialog.*
 import fr.geobert.efficio.misc.*
 import io.fabric.sdk.android.Fabric
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.toolbar.*
-import java.util.*
 import kotlin.properties.Delegates
 
-class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<Cursor>,
-        DeleteDialogInterface {
+class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener {
     private var lastStoreId: Long by Delegates.notNull()
     private var taskListFrag: TaskListFragment by Delegates.notNull()
-    private var storeLoader: CursorLoader? = null
-    private var storesList: MutableList<Store> = LinkedList()
     private var currentStore: Store by Delegates.notNull()
-    private var storeAdapter: StoreAdapter by Delegates.notNull()
+    private var storeManager: StoreManager = StoreManager(this, this)
+
     private val prefs: SharedPreferences by lazy { getPreferences(Context.MODE_PRIVATE) }
 
     private val mDrawerToggle: ActionBarDrawerToggle by lazy {
@@ -52,9 +41,22 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<Cursor>,
         }
     }
 
+    private fun cleanDatabaseIfTestingMode() {
+        // if run by espresso, delete database, can't do it from test, doesn't work
+        // see https://stackoverflow.com/questions/33059307/google-espresso-delete-user-data-on-each-test
+        if (TEST_MODE) {
+            //DBPrefsManager.getInstance(this).resetAll()
+            val client = contentResolver.acquireContentProviderClient("fr.geobert.efficio")
+            val provider = client.localContentProvider as DbContentProvider
+            provider.deleteDatabase(this)
+            if (Build.VERSION.SDK_INT < 24) client.release() else client.close()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!BuildConfig.DEBUG) Fabric.with(this, Crashlytics());
+        cleanDatabaseIfTestingMode()
+        if (!BuildConfig.DEBUG) Fabric.with(this, Crashlytics())
         setContentView(R.layout.main_activity)
         title = ""
         if (savedInstanceState == null) {
@@ -70,7 +72,7 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<Cursor>,
         super.onResume()
         store_spinner.onItemSelectedListener = null
         lastStoreId = prefs.getLong("lastStoreId", 1)
-        fetchAllStores()
+        storeManager.fetchAllStores()
         store_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // nothing
@@ -79,7 +81,7 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<Cursor>,
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 lastStoreId = id
                 prefs.edit().putLong("lastStoreId", id).commit()
-                currentStore = storesList[position]
+                currentStore = storeManager.storesList[position]
                 refreshTaskList(id)
             }
 
@@ -89,16 +91,16 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<Cursor>,
     override fun onDeletedConfirmed() {
         StoreTable.deleteStore(this, currentStore)
         // now that currentStore is deleted, select another one, in none, create a default one
-        storesList.remove(currentStore)
-        storeAdapter.deleteStore(lastStoreId)
-        if (storesList.count() > 0) {
-            currentStore = storesList[0]
+        storeManager.storesList.remove(currentStore)
+        storeManager.storeAdapter.deleteStore(lastStoreId)
+        if (storeManager.storesList.count() > 0) {
+            currentStore = storeManager.storesList[0]
             lastStoreId = currentStore.id
             prefs.edit().putLong("lastStoreId", lastStoreId).commit()
             refreshTaskList(lastStoreId)
         } else {
             StoreTable.create(this, getString(R.string.store))
-            fetchAllStores()
+            storeManager.fetchAllStores()
         }
     }
 
@@ -106,14 +108,6 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<Cursor>,
         val intent = Intent(OnRefreshReceiver.REFRESH_ACTION)
         intent.putExtra("newStoreId", id)
         sendBroadcast(intent)
-    }
-
-    private fun fetchAllStores() {
-        if (storeLoader == null) {
-            loaderManager.initLoader(GET_ALL_STORES, Bundle(), this)
-        } else {
-            loaderManager.restartLoader(GET_ALL_STORES, Bundle(), this)
-        }
     }
 
     private fun setUpDrawerToggle() {
@@ -151,7 +145,7 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<Cursor>,
 
     fun storeRenamed(name: String) {
         currentStore.name = name
-        storeAdapter.renameStore(name, lastStoreId)
+        storeManager.storeAdapter.renameStore(name, lastStoreId)
     }
 
     private fun callCreateNewStore() {
@@ -161,39 +155,24 @@ class MainActivity : BaseActivity(), LoaderManager.LoaderCallbacks<Cursor>,
     }
 
     fun storeCreated(store: Store) {
-        fetchAllStores()
+        storeManager.fetchAllStores()
     }
 
     private fun callEditDepartment() {
         EditDepartmentsActivity.callMe(taskListFrag, lastStoreId)
     }
 
-    // cursor loading
-    override fun onLoadFinished(loader: Loader<Cursor>, cursor: Cursor) {
-        when (loader.id) {
-            GET_ALL_STORES -> {
-                if (cursor.count > 0) {
-                    storesList = cursor.map { Store(it) }
-                } else {
-                    storesList.clear();
-                }
-                storeAdapter = StoreAdapter(this, storesList)
-                store_spinner.adapter = storeAdapter
-                if (storesList.count() == 1) {
-                    currentStore = storesList[0]
-                    lastStoreId = currentStore.id
-                } else {
-                    currentStore = storesList.find { it.id == lastStoreId } as Store
-                }
-            }
+    override fun onStoreLoaded() {
+        store_spinner.adapter = storeManager.storeAdapter
+        if (storeManager.storesList.count() == 1) {
+            currentStore = storeManager.storesList[0]
+            lastStoreId = currentStore.id
+        } else {
+            currentStore = storeManager.storesList.find { it.id == lastStoreId } as Store
         }
     }
 
-    override fun onLoaderReset(p0: Loader<Cursor>?) {
-
-    }
-
-    override fun onCreateLoader(p0: Int, p1: Bundle?): Loader<Cursor>? {
-        return StoreTable.getAllStoresLoader(this)
+    companion object {
+        var TEST_MODE: Boolean = false
     }
 }

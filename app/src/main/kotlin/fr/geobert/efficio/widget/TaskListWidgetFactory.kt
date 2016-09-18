@@ -10,6 +10,7 @@ import android.widget.RemoteViewsService
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.db.WidgetTable
 import fr.geobert.efficio.misc.map
 import java.util.*
 import kotlin.properties.Delegates
@@ -20,7 +21,9 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
             AppWidgetManager.INVALID_APPWIDGET_ID)
     var tasksList: MutableList<Task> by Delegates.notNull()
 
-    val storeId = 1L // todo use widgetId to get storeID
+    var storeId: Long by Delegates.notNull()
+    var opacity: Float by Delegates.notNull()
+    var storeName: String by Delegates.notNull()
 
     override fun getLoadingView(): RemoteViews? {
         return null // todo a true loading view?
@@ -48,13 +51,22 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
 
     override fun onCreate() {
         Log.d(TAG, "onCreate")
-        //fetchStoreTask(storeId)
+    }
+
+    private fun fetchWidgetInfo(widgetId: Int) {
+        val cursor = WidgetTable.getWidgetInfo(ctx, widgetId)
+        if (cursor != null && cursor.count > 0 && cursor.moveToFirst()) {
+            storeId = cursor.getLong(0)
+            opacity = cursor.getFloat(1)
+            storeName = cursor.getString(2)
+
+            Log.d(TAG, "fetchWidgetInfo: storeId:$storeId, opacity:$opacity")
+        }
     }
 
     private fun fetchStoreTask(storeId: Long) {
-        Log.d(TAG, "fetchStoreTask")
+        Log.d(TAG, "fetchStoreTask, store:$storeId")
         val token = Binder.clearCallingIdentity();
-        // todo : use widgetId here
         try {
             val cursor = TaskTable.getAllNotDoneTasksForStore(ctx, storeId)
             Log.d(TAG, "cursor count : ${cursor?.count}")
@@ -76,6 +88,7 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
 
     override fun onDataSetChanged() {
         Log.d(TAG, "onDataSetChanged")
+        fetchWidgetInfo(widgetId)
         fetchStoreTask(storeId)
     }
 

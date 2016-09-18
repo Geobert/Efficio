@@ -27,6 +27,8 @@ object StoreTable : BaseTable() {
                 "${ItemWeightTable.COL_STORE_ID} = old.${BaseColumns._ID};" +
                 "DELETE FROM ${ItemDepTable.TABLE_NAME} WHERE " +
                 "${ItemDepTable.COL_STORE_ID} = old.${BaseColumns._ID};" +
+                "DELETE FROM ${WidgetTable.TABLE_NAME} WHERE " +
+                "${WidgetTable.COL_STORE_ID} = old.${BaseColumns._ID};" +
                 "END"
     }
 

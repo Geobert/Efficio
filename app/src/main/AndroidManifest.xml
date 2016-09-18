@@ -17,6 +17,7 @@
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -32,7 +33,7 @@
         <provider
             android:name=".db.DbContentProvider"
             android:authorities="fr.geobert.efficio"
-            android:exported="false" />
+            android:exported="true" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
@@ -52,11 +53,14 @@
             android:name=".widget.TaskListWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
-        <!-- <activity android:name=".TaskListWidgetConfigureActivity"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" /> -->
-        <!-- </intent-filter> -->
-        <!-- </activity> -->
+        <activity
+            android:name=".widget.WidgetSettingsActivity"
+            android:label="@string/title_activity_widget_settings">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

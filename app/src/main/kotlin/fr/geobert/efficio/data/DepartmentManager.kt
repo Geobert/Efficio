@@ -18,7 +18,6 @@ import android.widget.TextView
 import fr.geobert.efficio.R
 import fr.geobert.efficio.adapter.DepartmentAdapter
 import fr.geobert.efficio.adapter.DepartmentViewHolder
-import fr.geobert.efficio.data.Department
 import fr.geobert.efficio.db.DepartmentTable
 import fr.geobert.efficio.db.StoreCompositionTable
 import fr.geobert.efficio.misc.GET_DEP_FROM_STORE
@@ -147,8 +146,7 @@ class DepartmentManager(val activity: Activity,
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor>? {
         return when (id) {
-            GET_DEP_FROM_STORE -> StoreCompositionTable.getDepFromStoreLoader(activity,
-                    args?.getLong("storeId") ?: 0)
+            GET_DEP_FROM_STORE -> StoreCompositionTable.getDepFromStoreLoader(activity, storeId)
             else -> null
         }
     }
@@ -160,11 +158,8 @@ class DepartmentManager(val activity: Activity,
     fun request() {
         val b = Bundle()
         b.putLong("storeId", storeId)
-        if (cursorLoader == null) {
-            activity.loaderManager.initLoader(GET_DEP_FROM_STORE, b, this)
-        } else {
-            activity.loaderManager.restartLoader(GET_DEP_FROM_STORE, b, this)
-        }
+        activity.loaderManager.destroyLoader(GET_DEP_FROM_STORE)
+        activity.loaderManager.initLoader(GET_DEP_FROM_STORE, b, this)
     }
 
     //

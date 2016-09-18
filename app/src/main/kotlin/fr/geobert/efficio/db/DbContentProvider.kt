@@ -1,8 +1,6 @@
 package fr.geobert.efficio.db
 
-import android.content.ContentProvider
-import android.content.ContentValues
-import android.content.UriMatcher
+import android.content.*
 import android.database.Cursor
 import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
@@ -12,6 +10,7 @@ import java.util.*
 
 
 class DbContentProvider : ContentProvider() {
+
     companion object {
         val CONTENT_AUTHORITY = "fr.geobert.efficio"
         val BASE_CONTENT_URI = Uri.parse("content://$CONTENT_AUTHORITY")
@@ -30,9 +29,11 @@ class DbContentProvider : ContentProvider() {
         val ITEM_DEP_WITH_ID = 601
         val TASK = 700
         val TASK_WITH_ID = 701
+        val WIDGET = 800
+        val WIDGET_WITH_ID = 801
 
         fun createUriMatcher(): UriMatcher {
-            var matcher: UriMatcher = UriMatcher(UriMatcher.NO_MATCH)
+            val matcher: UriMatcher = UriMatcher(UriMatcher.NO_MATCH)
             val authority = CONTENT_AUTHORITY
 
             fun addUri(path: String, noId: Int, withId: Int) {
@@ -47,12 +48,21 @@ class DbContentProvider : ContentProvider() {
             addUri(StoreCompositionTable.PATH, DEP_WEIGHT, DEP_WEIGHT_WITH_ID)
             addUri(ItemDepTable.PATH, ITEM_DEP, ITEM_DEP_WITH_ID)
             addUri(TaskTable.PATH, TASK, TASK_WITH_ID)
+            addUri(WidgetTable.PATH, WIDGET, WIDGET_WITH_ID)
 
             return matcher
         }
 
         private val sURIMatcher = createUriMatcher()
         private var mDbHelper: DbHelper? = null
+    }
+
+    fun deleteDatabase(ctx: Context): Boolean {
+        Log.d("DbContentProvider", "deleteDatabase from ContentProvider")
+        DbHelper.delete()
+        val res = ctx.deleteDatabase(DbHelper.DATABASE_NAME)
+        mDbHelper = DbHelper.getInstance(ctx)
+        return res
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
@@ -68,6 +78,7 @@ class DbContentProvider : ContentProvider() {
                 DEP_WEIGHT -> StoreCompositionTable.buildWithId(id)
                 ITEM_DEP -> ItemDepTable.buildWithId(id)
                 TASK -> TaskTable.buildWithId(id)
+                WIDGET -> WidgetTable.buildWithId(id)
                 else -> throw IllegalArgumentException("Unknown URI: " + uri)
             }
             context.contentResolver.notifyChange(uri, null)
@@ -86,11 +97,14 @@ class DbContentProvider : ContentProvider() {
                 queryBuilder.appendWhere("${BaseColumns._ID}=${uri.lastPathSegment}")
             TASK_WITH_ID ->
                 queryBuilder.appendWhere("tasks.${BaseColumns._ID}=${uri.lastPathSegment}")
+            WIDGET_WITH_ID ->
+                queryBuilder.appendWhere("widgets.${BaseColumns._ID}=${uri.lastPathSegment}")
             else -> {
             }
         }
         queryBuilder.tables = switchToTableRead(uriType, uri)
         queryBuilder.setDistinct(true)
+        Log.d("DbContentProvider", "QUERY: ${queryBuilder.buildQuery(projection, selection, null, null, sortOrder, null)}")
         val c = queryBuilder.query(mDbHelper!!.readableDatabase, projection, selection,
                 selectionArgs, null, null, sortOrder)
         c.setNotificationUri(context.contentResolver, uri)
@@ -106,6 +120,7 @@ class DbContentProvider : ContentProvider() {
             DEP_WEIGHT, DEP_WEIGHT_WITH_ID -> StoreCompositionTable.TABLE_JOINED
             ITEM_DEP, ITEM_DEP_WITH_ID -> ItemDepTable.TABLE_NAME
             TASK, TASK_WITH_ID -> TaskTable.TABLE_JOINED
+            WIDGET, WIDGET_WITH_ID -> WidgetTable.TABLE_JOINED
             else -> throw IllegalArgumentException("Unknown URI: " + uri)
         }
     }
@@ -119,6 +134,7 @@ class DbContentProvider : ContentProvider() {
             DEP_WEIGHT, DEP_WEIGHT_WITH_ID -> StoreCompositionTable.TABLE_NAME
             ITEM_DEP, ITEM_DEP_WITH_ID -> ItemDepTable.TABLE_NAME
             TASK, TASK_WITH_ID -> TaskTable.TABLE_NAME
+            WIDGET, WIDGET_WITH_ID -> WidgetTable.TABLE_NAME
             else -> throw IllegalArgumentException("Unknown URI: " + uri)
         }
     }
@@ -157,11 +173,11 @@ class DbContentProvider : ContentProvider() {
         val uriType = sURIMatcher.match(uri)
         val db = mDbHelper!!.writableDatabase
 
-        var id: String? = uri.lastPathSegment
+        val id: String? = uri.lastPathSegment
         val deleted = if (id != null) {
             db!!.delete(switchToTableWrite(uriType, uri), "${BaseColumns._ID}=?", arrayOf(id))
         } else {
-            var customSelection = selection ?: "1"
+            val customSelection = selection ?: "1"
             db!!.delete(switchToTableWrite(uriType, uri), customSelection, selectionArgs)
         }
 

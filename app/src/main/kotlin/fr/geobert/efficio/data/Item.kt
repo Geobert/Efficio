@@ -17,11 +17,20 @@ class Item {
         // from TaskTable query
         id = cursor.getLong(cursor.getColumnIndex(TaskTable.COL_ITEM_ID))
         weight = cursor.getInt(cursor.getColumnIndex("item_weight"))
-        val b = Bundle()
-        b.putInt("id", cursor.getColumnIndex("dep_id"))
-        b.putInt("name", cursor.getColumnIndex("dep_name"))
-        b.putInt("weight", cursor.getColumnIndex("dep_weight"))
-        department = Department(cursor, b)
+        val depIdColIdx = cursor.getColumnIndex("dep_id")
+        val depId = cursor.getLong(depIdColIdx)
+        val dep = departmentsList[depId]
+        if (dep == null) {
+            val b = Bundle()
+            b.putInt("id", depIdColIdx)
+            b.putInt("name", cursor.getColumnIndex("dep_name"))
+            b.putInt("weight", cursor.getColumnIndex("dep_weight"))
+            department = Department(cursor, b)
+            departmentsList[depId] = department
+        } else {
+            department = dep
+        }
+
         name = cursor.getString(cursor.getColumnIndex("item_name"))
     }
 
@@ -49,5 +58,9 @@ class Item {
     fun isEquals(item: Item): Boolean {
         return weight == item.weight && name.equals(item.name) &&
                 department.isEquals(item.department)
+    }
+
+    companion object {
+        val departmentsList: MutableMap<Long, Department> = mutableMapOf()
     }
 }

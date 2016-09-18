@@ -1,20 +1,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cardview_dark_background"
     android:orientation="vertical"
     android:padding="@dimen/widget_margin">
 
-    <TextView
-        android:id="@+id/appwidget_text"
+    <Button
+        android:id="@+id/widget_store_chooser_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:contentDescription="@string/appwidget_text"
-        android:text="@string/appwidget_text"
-        android:textColor="#ffffff"
-        android:textSize="24sp"
-        android:textStyle="bold|italic" />
+        android:ellipsize="end"
+        android:gravity="left|center_vertical"
+        android:minWidth="150dp"
+        android:text="Store 1"
+        android:textAllCaps="false" />
 
     <ListView
         android:id="@+id/tasks_list_widget"

@@ -42,15 +42,15 @@ class Task : Comparable<Task> {
     // used for sort()
     override fun compareTo(other: Task): Int {
         return if (isDone != other.isDone) {
-            if (isDone) 1 else -1
-        } else {
-            if (isDone) item.name.compareTo(other.item.name) else
-                if (item.department.weight > other.item.department.weight) 1 else
-                    if (item.department.weight < other.item.department.weight) -1 else {
-                        val r = item.department.name.compareTo(other.item.department.name)
+            if (isDone) 1 else -1 // done task always appears later on list
+        } else { // same task done state
+            if (isDone) item.name.compareTo(other.item.name) else // if task is done, we don't care about weights
+                if (item.department.weight > other.item.department.weight) -1 else // task is not done, compare department
+                    if (item.department.weight < other.item.department.weight) 1 else {
+                        val r = item.department.name.compareTo(other.item.department.name) // same dep weight compare their names
                         if (r != 0) r else
-                            if (item.weight > other.item.weight) 1 else
-                                if (item.weight < other.item.weight) -1 else
+                            if (item.weight > other.item.weight) -1 else // same dep, compare item
+                                if (item.weight < other.item.weight) 1 else
                                     item.name.compareTo(other.item.name)
                     }
         }
@@ -60,5 +60,9 @@ class Task : Comparable<Task> {
         return isDone == other.isDone &&
                 type == other.type &&
                 item.isEquals(other.item)
+    }
+
+    override fun toString(): String {
+        return "[name: ${item.name} / depWeight: ${item.department.weight} / itemWeight: ${item.weight}]"
     }
 }

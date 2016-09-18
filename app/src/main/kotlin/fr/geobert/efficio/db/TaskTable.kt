@@ -1,9 +1,7 @@
 package fr.geobert.efficio.db
 
 import android.app.Activity
-import android.content.ContentValues
-import android.content.Context
-import android.content.CursorLoader
+import android.content.*
 import android.database.Cursor
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Task
@@ -25,7 +23,7 @@ object TaskTable : BaseTable() {
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreTable.TABLE_NAME)} " +
             "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemTable.TABLE_NAME)} " +
             "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemDepTable.TABLE_NAME, ItemDepTable.COL_ITEM_ID)} " +
-            "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreCompositionTable.TABLE_NAME, StoreCompositionTable.COL_STORE_ID)} AND items_dep.dep_id = department_weight._id " +
+            "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreCompositionTable.TABLE_NAME, StoreCompositionTable.COL_STORE_ID)} AND items_dep.dep_id = department_weight.dep_id " +
             "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemWeightTable.TABLE_NAME, ItemWeightTable.COL_ITEM_ID)} " +
             "${leftOuterJoin(StoreCompositionTable.TABLE_NAME, StoreCompositionTable.COL_DEP_ID, DepartmentTable.TABLE_NAME)} "
 
@@ -40,7 +38,7 @@ object TaskTable : BaseTable() {
     )
 
     val RESTRICT_TO_STORE = "(${TaskTable.TABLE_NAME}.$COL_STORE_ID = ?)"
-    val ORDERING = "is_done asc, dep_weight desc, item_weight desc, item_name asc"
+    val ORDERING = "is_done asc, dep_weight desc, dep_name asc, item_weight desc, item_name asc"
 
     val CREATE_TRIGGER_ON_TASK_DEL by lazy {
         "CREATE TRIGGER on_task_deleted " +

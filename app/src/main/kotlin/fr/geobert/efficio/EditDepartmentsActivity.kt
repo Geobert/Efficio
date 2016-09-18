@@ -97,7 +97,7 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         setContentView(R.layout.edit_departments_activity)
         title = getString(R.string.edit_departments)
         storeId = intent.extras.getLong("storeId")
-        depManager = DepartmentManager(this, findViewById(R.id.department_layout), storeId, this)
+        depManager = DepartmentManager(this, findViewById(R.id.department_layout)!!, storeId, this)
         depManager.setEditMode(true)
         depManager.request()
         depTouchHelper.attachToRecyclerView(dep_list)

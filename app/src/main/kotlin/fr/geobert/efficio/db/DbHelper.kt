@@ -1,19 +1,19 @@
 package fr.geobert.efficio.db
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
+import android.database.sqlite.*
 import fr.geobert.efficio.R
 import fr.geobert.efficio.misc.normalize
 import kotlin.properties.Delegates
 
 class DbHelper : SQLiteOpenHelper {
-    private constructor(ctx: Context) : super(ctx, "items.db", null, DbHelper.DB_VERSION) {
+    private constructor(ctx: Context) : super(ctx, DATABASE_NAME, null, DbHelper.DB_VERSION) {
     }
 
     private var ctx: Context by Delegates.notNull()
 
     companion object {
+        val DATABASE_NAME = "items.db"
         val DB_VERSION = 1
         private var instance: DbHelper? = null
 
@@ -26,6 +26,10 @@ class DbHelper : SQLiteOpenHelper {
                 return instance!!
             }
         }
+
+        fun delete() {
+            instance = null
+        }
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -36,6 +40,7 @@ class DbHelper : SQLiteOpenHelper {
         db.execSQL(ItemWeightTable.CREATE_TABLE)
         db.execSQL(ItemDepTable.CREATE_TABLE)
         db.execSQL(TaskTable.CREATE_TABLE)
+        db.execSQL(WidgetTable.CREATE_TABLE)
 
         // triggers
         db.execSQL(ItemTable.CREATE_TRIGGER_ON_ITEM_DEL)

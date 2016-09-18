@@ -15,10 +15,7 @@ import fr.geobert.efficio.data.DepartmentManager
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.dialog.DeleteConfirmationDialog
-import fr.geobert.efficio.misc.DELETE_TASK
-import fr.geobert.efficio.misc.DeleteDialogInterface
-import fr.geobert.efficio.misc.EditorToolbarTrait
-import fr.geobert.efficio.misc.GET_TASK
+import fr.geobert.efficio.misc.*
 import kotlinx.android.synthetic.main.item_editor.*
 import kotlin.properties.Delegates
 
@@ -44,7 +41,7 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         initToolbar(this)
         setTitle(R.string.change_item_name_and_dep)
         val extras = intent.extras
-        depManager = DepartmentManager(this, findViewById(R.id.department_layout),
+        depManager = DepartmentManager(this, findViewById(R.id.department_layout)!!,
                 extras.getLong("storeId"), this)
         depManager.request()
         delete_task_btn.setOnClickListener { onDeleteClicked() }
@@ -90,14 +87,9 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
                 getString(R.string.current_department).format(task.item.department.name)
     }
 
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.confirm -> {
-                onOkClicked()
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
+    override fun onMenuItemClick(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.confirm -> consume { onOkClicked() }
+        else -> super.onOptionsItemSelected(item)
     }
 
     override fun onCreateLoader(p0: Int, b: Bundle): Loader<Cursor>? {

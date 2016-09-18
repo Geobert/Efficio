@@ -1,11 +1,8 @@
 package fr.geobert.efficio.adapter
 
-import android.support.v7.widget.CardView
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.*
 import android.view.View
-import android.widget.CheckBox
-import android.widget.CompoundButton
-import android.widget.TextView
+import android.widget.*
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
 import kotlin.properties.Delegates
@@ -30,7 +27,7 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: TaskViewHo
     init {
         if (!isHeader) {
             name = view.findViewById(R.id.name) as TextView
-            checkbox = view.findViewById(R.id.checkbox) as CheckBox
+            checkbox = view.findViewById(R.id.task_checkbox) as CheckBox
             cardView = view.findViewById(R.id.item_row_layout) as CardView
             content = view.findViewById(R.id.card_content)
             depName = view.findViewById(R.id.dep_name) as TextView

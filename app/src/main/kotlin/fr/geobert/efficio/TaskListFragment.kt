@@ -1,25 +1,17 @@
 package fr.geobert.efficio
 
 
-import android.app.Activity
-import android.app.Fragment
-import android.app.LoaderManager
+import android.app.*
 import android.appwidget.AppWidgetManager
 import android.content.*
 import android.database.Cursor
 import android.os.Bundle
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.text.Editable
-import android.text.TextWatcher
+import android.text.*
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import fr.geobert.efficio.adapter.TaskAdapter
-import fr.geobert.efficio.adapter.TaskViewHolder
+import android.view.*
+import fr.geobert.efficio.adapter.*
 import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.*
 import fr.geobert.efficio.dialog.DepartmentChoiceDialog
@@ -50,8 +42,9 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                 override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
                                     target: RecyclerView.ViewHolder): Boolean {
                     Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
-                    taskAdapter!!.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
                     val r = updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
+                    //taskAdapter!!.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
+                    taskAdapter!!.moveItem(viewHolder.adapterPosition, target.adapterPosition)
                     if (!needAdapterSort) needAdapterSort = r
                     return true
                 }
@@ -64,17 +57,19 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
                 override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
                     super.onSelectedChanged(viewHolder, actionState)
-                    // end of drag n drop, adapter is correctly ordered but not our representation here
                     val vh = viewHolder as TaskViewHolder?
                     if (vh == null) {
+                        // end of drag n drop, adapter is correctly ordered but not our representation here
                         lastDragTask!!.cardView.cardElevation = orig
                         Log.d(TAG, "end of drag n drop, sort the list")
                         StoreCompositionTable.updateDepWeight(activity, lastDragTask!!.task.item.department)
                         ItemWeightTable.updateWeight(activity, lastDragTask!!.task.item)
+                        Log.d(TAG, "before sort : ${tasksList[0]} / ${tasksList[1]}")
                         tasksList.sort()
-                        if (needAdapterSort) {
-                            val f = quick_add_text.text.trim().toString()
-                            val l = if (f.length > 0) filter(tasksList, f) else tasksList
+                        Log.d(TAG, "after sort : ${tasksList[0]} / ${tasksList[1]}")
+                        val f = quick_add_text.text.trim().toString()
+                        if (needAdapterSort || !f.isEmpty()) {
+                            val l = if (!f.isEmpty()) filter(tasksList, f) else tasksList
                             taskAdapter!!.animateTo(l)
                             tasks_list.post {
                                 tasks_list.invalidateItemDecorations()
@@ -84,6 +79,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                         orig = vh.cardView.cardElevation
                         vh.cardView.cardElevation = 20.0f
                     }
+                    if (lastDragTask == null) needAdapterSort = false
                     lastDragTask = vh
                 }
             }
@@ -98,45 +94,35 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         val dDep = dItem.department
         val tDep = tItem.department
         var res: Boolean = false
-        if (dragged.adapterPosition < target.adapterPosition) {
+        Log.d(TAG, "dragged task: $dTask")
+        if (dragged.adapterPosition > target.adapterPosition) {
             // item goes up
+            Log.d(TAG, "item goes up")
             if (dDep.id == tDep.id) {
-                if (dItem.weight == tItem.weight) {
-                    dItem.weight++
-                } else {
-                    if (dItem.weight < tItem.weight) {
-                        dItem.weight = tItem.weight + 1
-                    }
+                if (dItem.weight <= tItem.weight) {
+                    dItem.weight = tItem.weight + 1
                 }
             } else {
-                if (dDep.weight == tDep.weight) {
-                    dDep.weight++
-                    res = true
-                } else if (dDep.weight < tDep.weight) {
+                if (dDep.weight <= tDep.weight) {
                     dDep.weight = tDep.weight + 1
                     res = true
                 }
             }
-        } else if (dragged.adapterPosition > target.adapterPosition) {
+        } else if (dragged.adapterPosition < target.adapterPosition) {
             // item goes down
+            Log.d(TAG, "item goes down")
             if (dDep.id == tDep.id) {
-                if (dItem.weight == tItem.weight) {
-                    dItem.weight--
-                } else {
-                    if (dItem.weight > tItem.weight) {
-                        dItem.weight = tItem.weight - 1
-                    }
+                if (dItem.weight >= tItem.weight) {
+                    dItem.weight = tItem.weight - 1
                 }
             } else {
-                if (dDep.weight == tDep.weight) {
-                    dDep.weight--
-                    res = true
-                } else if (dDep.weight > tDep.weight) {
+                if (dDep.weight >= tDep.weight) {
                     dDep.weight = tDep.weight - 1
                     res = true
                 }
             }
         }
+        Log.d(TAG, "dragged task after: $dTask")
         return res
     }
 
@@ -254,13 +240,13 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     private fun updateWidgets() {
         Log.d(TAG, "updateWidgets")
-        val appWidgetManager = AppWidgetManager.getInstance(activity);
+        val appWidgetManager = AppWidgetManager.getInstance(activity)
 
         val intent = Intent(activity, TaskListWidget::class.java)
         intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
 
-        val thisWidget = ComponentName(activity, TaskListWidget::class.java);
-        val ids = appWidgetManager.getAppWidgetIds(thisWidget);
+        val thisWidget = ComponentName(activity, TaskListWidget::class.java)
+        val ids = appWidgetManager.getAppWidgetIds(thisWidget)
 
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
         ids.forEach { appWidgetManager.notifyAppWidgetViewDataChanged(it, R.id.tasks_list_widget) }

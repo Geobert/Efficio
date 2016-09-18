@@ -35,4 +35,6 @@
     <string name="choose_new_store_name">Choose a new name for the store</string>
     <string name="error_create_store">Problem while creating store</string>
     <string name="confirm_delete_store">Do you really want to delete the store named: %s</string>
+    <string name="title_activity_widget_settings">Widget Settings</string>
+
 </resources>

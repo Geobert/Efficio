@@ -6,14 +6,18 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Store
+import kotlinx.android.synthetic.main.store_row.view.*
 import java.util.*
 
 class StoreAdapter(val activity: FragmentActivity, list: MutableList<Store>) : BaseAdapter() {
     val storeList = LinkedList(list)
+    var darkText = false
 
     override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View? {
         val h: StoreViewHolder = if (p1 == null) {
             val v = activity.layoutInflater.inflate(R.layout.store_row, p2, false)
+            if (darkText)
+                v.store_name_lbl.setTextColor(R.drawable.toolbar_spinner_row_selector_dark)
             val t = StoreViewHolder(v)
             v.tag = t
             t
