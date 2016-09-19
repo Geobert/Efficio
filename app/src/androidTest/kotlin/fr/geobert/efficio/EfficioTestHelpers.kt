@@ -3,8 +3,10 @@ package fr.geobert.efficio
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.replaceText
+import android.support.test.espresso.assertion.ViewAssertions
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions
+import android.support.test.espresso.matcher.ViewMatchers
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import fr.geobert.efficio.adapter.TaskViewHolder
 
@@ -25,3 +27,19 @@ fun checkTaskListSize(expectedSize: Int) {
 fun clickOnTask(pos: Int) {
     onView(withId(R.id.tasks_list)).perform(RecyclerViewActions.actionOnItemAtPosition<TaskViewHolder>(pos, click()))
 }
+
+fun checkTaskListItemAt(pos: Int, text: String) {
+    onView(withRecyclerView(R.id.tasks_list).atPosition(pos)).check(
+            ViewAssertions.matches(ViewMatchers.hasDescendant(ViewMatchers.withText(text))))
+}
+
+fun dragTask(pos: Int, dir: Direction, nbItem: Int = 1) {
+    onView(withId(R.id.tasks_list)).perform(RecyclerViewActions.actionOnItemAtPosition<TaskViewHolder>(pos,
+            dragViewInRecycler(dir, nbItem)))
+}
+
+fun clickTickOfTaskAt(pos: Int) {
+    onView(withRecyclerView(R.id.tasks_list).atPositionOnView(pos, R.id.task_checkbox)).perform(click())
+    pauseTest(500) // animation
+}
+

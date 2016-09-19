@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/department_layout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+                android:id="@+id/department_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
     <ImageButton
         android:id="@+id/add_dep_btn"
@@ -13,7 +13,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginEnd="5dp"
         android:layout_marginRight="5dp"
-        android:src="@android:drawable/ic_input_add" />
+        android:src="@android:drawable/ic_input_add"/>
 
     <EditText
         android:id="@+id/add_dep_text"
@@ -29,13 +29,13 @@
         android:layout_toStartOf="@id/add_dep_btn"
         android:hint="@string/filter_or_create_new_department"
         android:inputType="textAutoCorrect"
-        android:textColorHint="@color/hint" />
+        android:textColorHint="@color/hint"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/dep_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/add_dep_btn" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/add_dep_btn"/>
 
     <TextView
         android:id="@+id/empty_text"
@@ -45,5 +45,5 @@
         android:layout_margin="20dp"
         android:gravity="center"
         android:text="@string/no_dep"
-        android:textSize="22sp" />
+        android:textSize="22sp"/>
 </RelativeLayout>

@@ -13,9 +13,14 @@ import android.view.MenuItem
 import fr.geobert.efficio.data.Department
 import fr.geobert.efficio.data.DepartmentManager
 import fr.geobert.efficio.data.Task
+import fr.geobert.efficio.db.ItemWeightTable
 import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.dialog.DeleteConfirmationDialog
-import fr.geobert.efficio.misc.*
+import fr.geobert.efficio.misc.DELETE_TASK
+import fr.geobert.efficio.misc.DeleteDialogInterface
+import fr.geobert.efficio.misc.EditorToolbarTrait
+import fr.geobert.efficio.misc.GET_TASK
+import fr.geobert.efficio.misc.consume
 import kotlinx.android.synthetic.main.item_editor.*
 import kotlin.properties.Delegates
 
@@ -71,6 +76,11 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         task.item.name = item_name_edt.text.trim().toString()
         val needUpdate = !task.isEquals(origTask)
         if (needUpdate) {
+            // change department, the item's weight is not relevant anymore
+            if (task.item.department.id != origTask.item.department.id) {
+                task.item.weight = 0
+                ItemWeightTable.updateWeight(this, task.item)
+            }
             TaskTable.updateTask(this, task)
             setResult(Activity.RESULT_OK)
         } else setResult(Activity.RESULT_CANCELED)

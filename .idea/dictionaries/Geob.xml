@@ -2,6 +2,7 @@
   <dictionary name="Geob">
     <words>
       <w>coords</w>
+      <w>deps</w>
     </words>
   </dictionary>
 </component>

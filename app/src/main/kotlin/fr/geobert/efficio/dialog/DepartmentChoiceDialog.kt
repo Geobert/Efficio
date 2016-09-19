@@ -1,18 +1,17 @@
 package fr.geobert.efficio.dialog
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.app.DialogFragment
+import android.app.*
 import android.os.Bundle
 import android.view.View
 import fr.geobert.efficio.R
-import fr.geobert.efficio.data.Department
-import fr.geobert.efficio.data.DepartmentManager
+import fr.geobert.efficio.data.*
 import kotlin.properties.Delegates
 
 
 open class DepartmentChoiceDialog : DialogFragment(), DepartmentManager.DepartmentChoiceListener {
     private var manager: DepartmentManager by Delegates.notNull()
+    private val TAG = "DepartmentChoiceDialog"
+    protected var customView: View by Delegates.notNull()
 
     companion object {
         fun newInstance(storeId: Long): DepartmentChoiceDialog {
@@ -23,10 +22,6 @@ open class DepartmentChoiceDialog : DialogFragment(), DepartmentManager.Departme
             return d
         }
     }
-
-    private val TAG = "DepartmentChoiceDialog"
-
-    protected var customView: View by Delegates.notNull()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val b = createDialogBuilder(R.layout.department_chooser_dialog, savedInstanceState)

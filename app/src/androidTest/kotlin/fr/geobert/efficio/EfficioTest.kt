@@ -1,22 +1,25 @@
 package fr.geobert.efficio
 
-import android.app.*
-import android.support.test.InstrumentationRegistry
+import android.app.Activity
+import android.app.Instrumentation
+import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.*
-import android.support.test.espresso.assertion.ViewAssertions
+import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.action.ViewActions.replaceText
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import android.support.test.espresso.core.deps.guava.base.Throwables
 import android.support.test.espresso.core.deps.guava.collect.Sets
-import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
+import android.support.test.espresso.matcher.ViewMatchers.withId
+import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import android.support.test.runner.lifecycle.*
-import fr.geobert.efficio.adapter.TaskViewHolder
-import org.hamcrest.Matchers.allOf
-import org.junit.*
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
+import android.support.test.runner.lifecycle.Stage
+import org.junit.After
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.*
 import java.util.concurrent.Callable
@@ -36,6 +39,13 @@ class EfficioTest {
             ActivityTestRule(MainActivity::class.java)
 
     private fun getActivity() = activityRule.activity
+
+    // consts
+    val ITEM_A = "Item A"
+    val ITEM_B = "Item B"
+    val ITEM_C = "Item C"
+    val DEP_A = "Dep 1"
+    val DEP_B = "Dep 2"
 
     // tearDown helpers
     private fun closeAllActivities(instrumentation: Instrumentation) {
@@ -100,72 +110,145 @@ class EfficioTest {
 
     @After
     fun tearDown() {
-        closeAllActivities(InstrumentationRegistry.getInstrumentation())
-    }
-
-    fun testInitState() {
-        onView(allOf(withId(R.id.store_name_lbl), withText(R.string.store))).
-                check(matches(isDisplayed()))
-        checkTaskListSize(0)
+//        closeAllActivities(InstrumentationRegistry.getInstrumentation())
     }
 
     fun testEnterSameItem() {
-        addItem("Item A", "Department 1")
+        addItem(ITEM_A, DEP_A)
         checkTaskListSize(1)
 
-        addItem("Item A")
+        addItem(ITEM_A)
         checkTaskListSize(1)
     }
 
     fun testEnterTwoItems() {
-        addItem("Item A", "Department 1")
+        addItem(ITEM_A, DEP_A)
         checkTaskListSize(1)
 
-        addItem("Item B", "Department 2")
+        addItem(ITEM_B, DEP_B)
         checkTaskListSize(2)
     }
 
     fun testEditItemName() {
-        addItem("Item A", "Department 1")
+        addItem(ITEM_A, DEP_A)
         clickOnTask(0)
 
-        onView(withId(R.id.item_name_edt)).perform(replaceText("Item B"))
+        onView(withId(R.id.item_name_edt)).perform(replaceText(ITEM_B))
         onView(withId(R.id.confirm)).perform(click())
-        onView(withText("Item B")).check(matches(isDisplayed()))
-
-        onView(withText("Item B")).perform(longClick())
+        onView(withText(ITEM_B)).check(matches(isDisplayed()))
     }
 
-    @Test fun testDragItem() {
-        addItem("Item A", "Department 1")
+    // check the sort after drag an item
+    fun testSort2Items() {
+        addItem(ITEM_A, DEP_B)
         checkTaskListSize(1)
 
-        addItem("Item B", "Department 2")
+        addItem(ITEM_B, DEP_A)
         checkTaskListSize(2)
 
-        onView(withRecyclerView(R.id.tasks_list).atPosition(0)).check(
-                ViewAssertions.matches(hasDescendant(withText("Item A"))))
+        // Item B is in Department 1, no weight yet, should be first
+        checkTaskListItemAt(0, ITEM_B)
 
-        onView(withId(R.id.tasks_list)).perform(actionOnItemAtPosition<TaskViewHolder>(1,
-                dragViewInRecycler(Direction.UP)))
+        // drag A above B
+        dragTask(1, Direction.UP)
+        checkTaskListItemAt(0, ITEM_A)
 
-        onView(withRecyclerView(R.id.tasks_list).atPosition(0)).check(
-                ViewAssertions.matches(hasDescendant(withText("Item B"))))
+        // set A as done
+        clickTickOfTaskAt(0)
 
-        onView(withRecyclerView(R.id.tasks_list).atPositionOnView(0, R.id.task_checkbox)).perform(click())
-        pauseTest(500)
+        // A going to bottom, B should be first
+        checkTaskListItemAt(0, ITEM_B)
 
-        onView(withRecyclerView(R.id.tasks_list).atPosition(0)).check(
-                ViewAssertions.matches(hasDescendant(withText("Item A"))))
+        // uncheck A, position is 2 and not 1 because of header
+        clickTickOfTaskAt(2)
 
-        // position is 2 and not 1 because of header
-        onView(withRecyclerView(R.id.tasks_list).atPositionOnView(2, R.id.task_checkbox)).perform(click())
-        pauseTest(500)
+        // A should go back to first pos because of dep weight
+        checkTaskListItemAt(0, ITEM_A)
 
-        onView(withRecyclerView(R.id.tasks_list).atPosition(0)).check(
-                ViewAssertions.matches(hasDescendant(withText("Item B"))))
+    }
+
+    fun testSort3Items() {
+        addItem(ITEM_A, DEP_B)
+        addItem(ITEM_B, DEP_A)
+        dragTask(1, Direction.UP)
+        // same state as end of testSort2Items
+
+        // add C item same dep as A
+        addItem(ITEM_C, DEP_B)
+        checkTaskListItemAt(0, ITEM_A)
+        checkTaskListItemAt(1, ITEM_C)
+        checkTaskListItemAt(2, ITEM_B)
+
+        // drag C above A
+        dragTask(1, Direction.UP)
+        checkTaskListItemAt(0, ITEM_C)
+        checkTaskListItemAt(1, ITEM_A)
+        checkTaskListItemAt(2, ITEM_B)
+
+        // tick C, should fall at the bottom
+        clickTickOfTaskAt(0)
+        checkTaskListItemAt(0, ITEM_A)
+        checkTaskListItemAt(1, ITEM_B)
+
+        // tick A
+        clickTickOfTaskAt(0)
+        checkTaskListItemAt(0, ITEM_B)
+        // pos 1 = header
+        checkTaskListItemAt(2, ITEM_A)
+        checkTaskListItemAt(3, ITEM_C)
+
+        // untick C
+        clickTickOfTaskAt(3)
+        checkTaskListItemAt(0, ITEM_C)
+        checkTaskListItemAt(1, ITEM_B)
+        // pos 2 = header
+        checkTaskListItemAt(3, ITEM_A)
+
+        // untick A
+        clickTickOfTaskAt(3)
+        checkTaskListItemAt(0, ITEM_C)
+        checkTaskListItemAt(1, ITEM_A)
+        checkTaskListItemAt(2, ITEM_B)
+
+        // drag C under A
+        dragTask(0, Direction.DOWN)
+        checkTaskListItemAt(0, ITEM_A)
+        checkTaskListItemAt(1, ITEM_C)
+        checkTaskListItemAt(2, ITEM_B)
+
+        // tick C
+        clickTickOfTaskAt(1)
+        checkTaskListItemAt(0, ITEM_A)
+        checkTaskListItemAt(1, ITEM_B)
+        // pos 2 = header
+        checkTaskListItemAt(3, ITEM_C)
+
+        // untick C
+        clickTickOfTaskAt(3)
+        checkTaskListItemAt(0, ITEM_A)
+        checkTaskListItemAt(1, ITEM_C)
+        checkTaskListItemAt(2, ITEM_B)
     }
 
 
+    @Test fun testChangeItemDep() {
+        addItem(ITEM_A, DEP_B)
+        addItem(ITEM_B, DEP_A)
+        addItem(ITEM_C, DEP_A)
+        checkTaskListItemAt(0, ITEM_B)
+        checkTaskListItemAt(1, ITEM_C)
+        checkTaskListItemAt(2, ITEM_A)
 
+        // put C above A, so it get some weight
+        dragTask(1, Direction.UP)
+
+        // change C dep to the same as B, should reset item's weight, so under B
+        clickOnTask(0)
+        Espresso.closeSoftKeyboard()
+        onView(withText(DEP_B)).perform(click())
+        onView(withId(R.id.confirm)).perform(click())
+        checkTaskListItemAt(0, ITEM_B)
+        checkTaskListItemAt(1, ITEM_A)
+        checkTaskListItemAt(2, ITEM_C)
+    }
 }
