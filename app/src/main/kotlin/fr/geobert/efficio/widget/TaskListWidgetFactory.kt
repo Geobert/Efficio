@@ -19,7 +19,7 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
     val TAG = "TaskListWidgetFactory"
     val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID)
-    var tasksList: MutableList<Task> by Delegates.notNull()
+    var tasksList: MutableList<Task> = LinkedList()
 
     var storeId: Long by Delegates.notNull()
     var opacity: Float by Delegates.notNull()
@@ -53,7 +53,7 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
         Log.d(TAG, "onCreate")
     }
 
-    private fun fetchWidgetInfo(widgetId: Int) {
+    private fun fetchWidgetInfo(widgetId: Int): Boolean {
         val cursor = WidgetTable.getWidgetInfo(ctx, widgetId)
         if (cursor != null && cursor.count > 0 && cursor.moveToFirst()) {
             storeId = cursor.getLong(0)
@@ -61,23 +61,26 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
             storeName = cursor.getString(2)
 
             Log.d(TAG, "fetchWidgetInfo: storeId:$storeId, opacity:$opacity")
+            return true
         }
+        Log.e(TAG, "fetchWidgetInfo: failed")
+        return false
     }
 
     private fun fetchStoreTask(storeId: Long) {
         Log.d(TAG, "fetchStoreTask, store:$storeId")
-        val token = Binder.clearCallingIdentity();
+        val token = Binder.clearCallingIdentity()
         try {
             val cursor = TaskTable.getAllNotDoneTasksForStore(ctx, storeId)
             Log.d(TAG, "cursor count : ${cursor?.count}")
             if (cursor != null && cursor.count > 0) {
-                tasksList = cursor.map { Task(it) }
+                tasksList = cursor.map(::Task)
             } else {
                 tasksList = LinkedList()
             }
             cursor?.close()
         } finally {
-            Binder.restoreCallingIdentity(token);
+            Binder.restoreCallingIdentity(token)
         }
     }
 
@@ -87,9 +90,9 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
     }
 
     override fun onDataSetChanged() {
-        Log.d(TAG, "onDataSetChanged")
-        fetchWidgetInfo(widgetId)
-        fetchStoreTask(storeId)
+        Log.d(TAG, "onDataSetChanged for widgetId: $widgetId")
+        if (fetchWidgetInfo(widgetId))
+            fetchStoreTask(storeId)
     }
 
     override fun hasStableIds(): Boolean {

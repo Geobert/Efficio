@@ -1,6 +1,9 @@
 package fr.geobert.efficio.db
 
-import android.content.*
+import android.content.ContentProvider
+import android.content.ContentValues
+import android.content.Context
+import android.content.UriMatcher
 import android.database.Cursor
 import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
@@ -13,7 +16,7 @@ class DbContentProvider : ContentProvider() {
 
     companion object {
         val CONTENT_AUTHORITY = "fr.geobert.efficio"
-        val BASE_CONTENT_URI = Uri.parse("content://$CONTENT_AUTHORITY")
+        val BASE_CONTENT_URI: Uri = Uri.parse("content://$CONTENT_AUTHORITY")
 
         val ITEM = 100
         val ITEM_WITH_ID = 101
@@ -104,7 +107,7 @@ class DbContentProvider : ContentProvider() {
         }
         queryBuilder.tables = switchToTableRead(uriType, uri)
         queryBuilder.setDistinct(true)
-        Log.d("DbContentProvider", "QUERY: ${queryBuilder.buildQuery(projection, selection, null, null, sortOrder, null)}")
+        //Log.d("DbContentProvider", "QUERY: ${queryBuilder.buildQuery(projection, selection, null, null, sortOrder, null)}")
         val c = queryBuilder.query(mDbHelper!!.readableDatabase, projection, selection,
                 selectionArgs, null, null, sortOrder)
         c.setNotificationUri(context.contentResolver, uri)
@@ -147,7 +150,7 @@ class DbContentProvider : ContentProvider() {
 
     override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
         val db = mDbHelper!!.writableDatabase
-        var id: String? = uri.lastPathSegment
+        val id: String? = uri.lastPathSegment
         val table = switchToTableWrite(sURIMatcher.match(uri), uri)
         // return nb updated items
         return if (id != null) {

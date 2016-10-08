@@ -1,29 +1,19 @@
 package fr.geobert.efficio
 
-import android.app.Activity
-import android.app.Instrumentation
 import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.replaceText
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.core.deps.guava.base.Throwables
-import android.support.test.espresso.core.deps.guava.collect.Sets
 import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
-import android.support.test.runner.lifecycle.Stage
-import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.*
-import java.util.concurrent.Callable
-import java.util.concurrent.atomic.AtomicReference
 
 /**
  * [Testing Fundamentals](http://d.android.com/tools/testing/testing_android.html)
@@ -31,89 +21,14 @@ import java.util.concurrent.atomic.AtomicReference
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class EfficioTest {
+    @Rule @JvmField var activityRule: ActivityTestRule<MainActivity> =
+            ActivityTestRule(MainActivity::class.java)
+
     init {
         MainActivity.TEST_MODE = true
     }
 
-    @Rule @JvmField var activityRule: ActivityTestRule<MainActivity> =
-            ActivityTestRule(MainActivity::class.java)
-
-    private fun getActivity() = activityRule.activity
-
-    // consts
-    val ITEM_A = "Item A"
-    val ITEM_B = "Item B"
-    val ITEM_C = "Item C"
-    val DEP_A = "Dep 1"
-    val DEP_B = "Dep 2"
-
-    // tearDown helpers
-    private fun closeAllActivities(instrumentation: Instrumentation) {
-        val NUMBER_OF_RETRIES = 100
-        var i = 0
-        while (closeActivity(instrumentation)) {
-            if (i++ > NUMBER_OF_RETRIES) {
-                throw AssertionError("Limit of retries excesses")
-            }
-            Thread.sleep(200)
-        }
-    }
-
-    private fun <X> callOnMainSync(instrumentation: Instrumentation, callable: Callable<X>): X {
-        val retAtomic = AtomicReference<X>()
-        val exceptionAtomic = AtomicReference<Throwable>()
-        instrumentation.runOnMainSync({
-            try {
-                retAtomic.set(callable.call())
-            } catch (e: Throwable) {
-                exceptionAtomic.set(e)
-            }
-        })
-        val exception = exceptionAtomic.get()
-        if (exception != null) {
-            Throwables.propagate(exception)
-        }
-        return retAtomic.get()
-    }
-
-    private fun getActivitiesInStages(vararg stages: Stage): HashSet<Activity> {
-        val activities = Sets.newHashSet<Activity>()
-        val instance = ActivityLifecycleMonitorRegistry.getInstance()
-        for (stage in stages) {
-            val activitiesInStage = instance.getActivitiesInStage(stage)
-            if (activitiesInStage != null) {
-                activities.addAll(activitiesInStage)
-            }
-        }
-        return activities
-    }
-
-    private fun closeActivity(instrumentation: Instrumentation): Boolean {
-        val activityClosed = callOnMainSync(instrumentation, Callable<Boolean> {
-            val activities = getActivitiesInStages(Stage.RESUMED, Stage.STARTED, Stage.PAUSED,
-                    Stage.STOPPED, Stage.CREATED)
-            activities.removeAll(getActivitiesInStages(Stage.DESTROYED))
-            if (activities.size > 0) {
-                val activity = activities.iterator().next()
-                activity.finish()
-                true
-            } else {
-                false
-            }
-        })
-        if (activityClosed) {
-            instrumentation.waitForIdleSync()
-        }
-        return activityClosed
-    }
-    // end tearDown helpers
-
-    @After
-    fun tearDown() {
-//        closeAllActivities(InstrumentationRegistry.getInstrumentation())
-    }
-
-    fun testEnterSameItem() {
+    @Test fun testEnterSameItem() {
         addItem(ITEM_A, DEP_A)
         checkTaskListSize(1)
 
@@ -121,7 +36,7 @@ class EfficioTest {
         checkTaskListSize(1)
     }
 
-    fun testEnterTwoItems() {
+    @Test fun testEnterTwoItems() {
         addItem(ITEM_A, DEP_A)
         checkTaskListSize(1)
 
@@ -129,7 +44,7 @@ class EfficioTest {
         checkTaskListSize(2)
     }
 
-    fun testEditItemName() {
+    @Test fun testEditItemName() {
         addItem(ITEM_A, DEP_A)
         clickOnTask(0)
 
@@ -139,7 +54,7 @@ class EfficioTest {
     }
 
     // check the sort after drag an item
-    fun testSort2Items() {
+    @Test fun testSort2Items() {
         addItem(ITEM_A, DEP_B)
         checkTaskListSize(1)
 
@@ -167,7 +82,7 @@ class EfficioTest {
 
     }
 
-    fun testSort3Items() {
+    @Test fun testSort3Items() {
         addItem(ITEM_A, DEP_B)
         addItem(ITEM_B, DEP_A)
         dragTask(1, Direction.UP)
@@ -251,4 +166,5 @@ class EfficioTest {
         checkTaskListItemAt(1, ITEM_A)
         checkTaskListItemAt(2, ITEM_C)
     }
+
 }

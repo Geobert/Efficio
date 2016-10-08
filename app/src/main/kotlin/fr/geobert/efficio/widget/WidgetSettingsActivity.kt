@@ -17,7 +17,7 @@ import fr.geobert.efficio.misc.consume
 import kotlinx.android.synthetic.main.toolbar.*
 
 class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolbarTrait {
-
+    private val TAG = "WidgetSettingsActivity"
     private val storeManager = StoreManager(this, this)
 
     private val widgetId by lazy {
@@ -56,6 +56,7 @@ class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolba
     private fun saveValues() {
         if (WidgetTable.create(this, widgetId, store_spinner.selectedItemId, 0.8f) <= 0) {
             // todo err management
+            Log.e(TAG, "ERROR creating widget in DB")
         }
         val prefs = getSharedPreferences("widgetPrefs", Context.MODE_PRIVATE)
         prefs.edit().putBoolean("isConfigured_$widgetId", true).commit()
@@ -70,7 +71,6 @@ class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolba
         val remView = RemoteViews(applicationContext.packageName, R.id.tasks_list_widget)
         val mgr = AppWidgetManager.getInstance(applicationContext)
         mgr.updateAppWidget(widgetId, remView)
-
         TaskListWidget.instance!!.onUpdate(applicationContext, mgr, intArrayOf(widgetId))
     }
 

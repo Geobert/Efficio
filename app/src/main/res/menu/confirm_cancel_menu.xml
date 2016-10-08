@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:radis="http://schemas.android.com/apk/res-auto">
+      xmlns:radis="http://schemas.android.com/apk/res-auto">
     <!--<item-->
     <!--android:icon="@drawable/cancel_48"-->
     <!--android:title="@string/cancel"-->
@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/confirm"
-        android:icon="@android:drawable/ic_menu_save"
+        android:icon="@drawable/save"
         android:title="@android:string/ok"
-        radis:showAsAction="always" />
+        radis:showAsAction="always"/>
 </menu>

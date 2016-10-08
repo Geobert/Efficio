@@ -38,19 +38,23 @@ class TaskListWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "onReceive: ${intent.action}")
+        instance = this
+        val extras = intent.extras
+        val widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                AppWidgetManager.INVALID_APPWIDGET_ID)
         when (intent.action) {
             ACTION_CHECKBOX_CHANGED -> {
-                val extras = intent.extras
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 TaskTable.updateDoneState(context, extras.getLong("taskId"), true)
                 appWidgetManager.notifyAppWidgetViewDataChanged(
-                        extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                                AppWidgetManager.INVALID_APPWIDGET_ID), R.id.tasks_list_widget)
+                        widgetId, R.id.tasks_list_widget)
                 val i = Intent(OnRefreshReceiver.REFRESH_ACTION)
                 //i.putExtra("storeId", ) // TODO get storeId according to widgetId
                 context.sendBroadcast(i)
             }
-            AppWidgetManager.ACTION_APPWIDGET_ENABLED -> instance = this
+            "android.appwidget.action.APPWIDGET_DELETED" ->
+                if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID)
+                    WidgetTable.delete(context, widgetId)
         }
         super.onReceive(context, intent)
     }

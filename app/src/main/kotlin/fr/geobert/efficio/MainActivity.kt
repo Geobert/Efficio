@@ -1,15 +1,26 @@
 package fr.geobert.efficio
 
-import android.content.*
-import android.os.*
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Build
+import android.os.Bundle
 import android.support.v7.app.ActionBarDrawerToggle
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import com.crashlytics.android.Crashlytics
-import fr.geobert.efficio.data.*
-import fr.geobert.efficio.db.*
-import fr.geobert.efficio.dialog.*
-import fr.geobert.efficio.misc.*
+import fr.geobert.efficio.data.Store
+import fr.geobert.efficio.data.StoreLoaderListener
+import fr.geobert.efficio.data.StoreManager
+import fr.geobert.efficio.db.DbContentProvider
+import fr.geobert.efficio.db.StoreTable
+import fr.geobert.efficio.dialog.DeleteConfirmationDialog
+import fr.geobert.efficio.dialog.StoreNameDialog
+import fr.geobert.efficio.misc.CREATE_STORE
+import fr.geobert.efficio.misc.DELETE_STORE
+import fr.geobert.efficio.misc.DeleteDialogInterface
+import fr.geobert.efficio.misc.RENAME_STORE
 import io.fabric.sdk.android.Fabric
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -20,6 +31,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
     private var taskListFrag: TaskListFragment by Delegates.notNull()
     private var currentStore: Store by Delegates.notNull()
     private var storeManager: StoreManager = StoreManager(this, this)
+    private val TAG = "MainActivity"
 
     private val prefs: SharedPreferences by lazy { getPreferences(Context.MODE_PRIVATE) }
 
@@ -46,6 +58,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         // see https://stackoverflow.com/questions/33059307/google-espresso-delete-user-data-on-each-test
         if (TEST_MODE) {
             //DBPrefsManager.getInstance(this).resetAll()
+            Log.d(TAG, "ERASING DB")
             val client = contentResolver.acquireContentProviderClient("fr.geobert.efficio")
             val provider = client.localContentProvider as DbContentProvider
             provider.deleteDatabase(this)

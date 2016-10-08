@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fr.geobert.efficio">
+          package="fr.geobert.efficio">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -16,49 +16,48 @@
             android:name=".MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".ItemEditorActivity"
             android:label="@string/change_item_name_and_dep"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"/>
         <activity
             android:name=".EditDepartmentsActivity"
             android:label="@string/manage_departments"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"/>
 
         <provider
             android:name=".db.DbContentProvider"
             android:authorities="fr.geobert.efficio"
-            android:exported="true" />
+            android:exported="true"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="042692be669fee44b81f635e59db4a99012d097f" />
+            android:value="042692be669fee44b81f635e59db4a99012d097f"/>
 
         <receiver android:name=".widget.TaskListWidget">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/task_list_widget_info" />
+                android:resource="@xml/task_list_widget_info"/>
         </receiver>
 
         <service
             android:name=".widget.TaskListWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
         <activity
             android:name=".widget.WidgetSettingsActivity"
             android:label="@string/title_activity_widget_settings">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
         </activity>
     </application>

@@ -10,6 +10,13 @@ import android.support.test.espresso.matcher.ViewMatchers
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import fr.geobert.efficio.adapter.TaskViewHolder
 
+// consts
+val ITEM_A = "Item A"
+val ITEM_B = "Item B"
+val ITEM_C = "Item C"
+val DEP_A = "Dep 1"
+val DEP_B = "Dep 2"
+
 fun addItem(name: String, depName: String? = null) {
     onView(withId(R.id.quick_add_text)).perform(replaceText(name))
     onView(withId(R.id.quick_add_btn)).perform(click())

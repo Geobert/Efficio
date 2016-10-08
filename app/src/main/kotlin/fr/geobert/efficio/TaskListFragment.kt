@@ -1,21 +1,45 @@
 package fr.geobert.efficio
 
 
-import android.app.*
+import android.app.Activity
+import android.app.Fragment
+import android.app.LoaderManager
 import android.appwidget.AppWidgetManager
-import android.content.*
+import android.content.ComponentName
+import android.content.CursorLoader
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
-import android.support.v7.widget.*
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.text.*
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.view.*
-import fr.geobert.efficio.adapter.*
-import fr.geobert.efficio.data.*
-import fr.geobert.efficio.db.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import fr.geobert.efficio.adapter.TaskAdapter
+import fr.geobert.efficio.adapter.TaskViewHolder
+import fr.geobert.efficio.data.Department
+import fr.geobert.efficio.data.DepartmentManager
+import fr.geobert.efficio.data.Item
+import fr.geobert.efficio.data.Store
+import fr.geobert.efficio.data.Task
+import fr.geobert.efficio.db.ItemDepTable
+import fr.geobert.efficio.db.ItemTable
+import fr.geobert.efficio.db.ItemWeightTable
+import fr.geobert.efficio.db.StoreCompositionTable
+import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.dialog.DepartmentChoiceDialog
-import fr.geobert.efficio.misc.*
+import fr.geobert.efficio.misc.CREATE_TASK
+import fr.geobert.efficio.misc.GET_TASKS_OF_STORE
+import fr.geobert.efficio.misc.RefreshInterface
+import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
+import fr.geobert.efficio.misc.map
 import fr.geobert.efficio.widget.TaskListWidget
 import kotlinx.android.synthetic.main.item_list_fragment.*
 import java.util.*
@@ -196,6 +220,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         if (needUpdate) {
             quick_add_text.text.clear()
             fetchStore(this, lastStoreId)
+            updateWidgets()
         }
     }
 
@@ -219,6 +244,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                         tasksList.sort()
                         taskAdapter!!.animateTo(tasksList)
                         quick_add_text.text.clear()
+                        updateWidgets()
                     }
                 }
             } else {
