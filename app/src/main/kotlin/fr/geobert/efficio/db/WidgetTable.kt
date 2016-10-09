@@ -3,7 +3,6 @@ package fr.geobert.efficio.db
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
-import android.util.Log
 
 object WidgetTable : BaseTable() {
     override val TABLE_NAME: String = "widgets"
@@ -24,7 +23,6 @@ object WidgetTable : BaseTable() {
     override val COLS_TO_QUERY: Array<String> = arrayOf(COL_STORE_ID, COL_OPACITY, "${StoreTable.TABLE_NAME}.${StoreTable.COL_NAME}")
 
     fun create(ctx: Context, widgetId: Int, storeId: Long, opacity: Float): Long {
-        Log.d(TAG, "create: $widgetId")
         val v = ContentValues()
         v.put(COL_WIDGET_ID, widgetId)
         v.put(COL_STORE_ID, storeId)
@@ -33,7 +31,6 @@ object WidgetTable : BaseTable() {
     }
 
     fun delete(ctx: Context, widgetId: Int): Int {
-        Log.d(TAG, "delete: $widgetId", Throwable())
         return super.delete(ctx, widgetId.toLong())
     }
 
@@ -42,5 +39,10 @@ object WidgetTable : BaseTable() {
                 RESTRICT_TO_WIDGET, arrayOf(widgetId.toString()), null)
     }
 
-
+    fun update(ctx: Context, widgetId: Int, storeId: Long, opacity: Float): Int {
+        val v = ContentValues()
+        v.put(COL_STORE_ID, storeId)
+        v.put(COL_OPACITY, opacity)
+        return ctx.contentResolver.update(WidgetTable.CONTENT_URI, v, "widget_id = $widgetId", null)
+    }
 }

@@ -60,6 +60,8 @@ class DbContentProvider : ContentProvider() {
         private var mDbHelper: DbHelper? = null
     }
 
+    private val TAG = "DbContentProvider"
+
     fun deleteDatabase(ctx: Context): Boolean {
         Log.d("DbContentProvider", "deleteDatabase from ContentProvider")
         DbHelper.delete()
@@ -143,15 +145,21 @@ class DbContentProvider : ContentProvider() {
     }
 
     override fun onCreate(): Boolean {
-        Log.d("DbContentProvider", "onCreate")
+        Log.d(TAG, "onCreate")
         mDbHelper = DbHelper.getInstance(context)
         return true
     }
 
     override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
         val db = mDbHelper!!.writableDatabase
-        val id: String? = uri.lastPathSegment
+        val id: String? = try {
+            uri.lastPathSegment.toLong()
+            uri.lastPathSegment
+        } catch (ex: NumberFormatException) {
+            null
+        }
         val table = switchToTableWrite(sURIMatcher.match(uri), uri)
+        Log.d(TAG, "update id: $id, table: $table")
         // return nb updated items
         return if (id != null) {
             if (selection == null || selection.trim().length == 0) {

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.widget.RemoteViews
 import fr.geobert.efficio.BaseActivity
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.StoreLoaderListener
@@ -17,6 +16,10 @@ import fr.geobert.efficio.misc.consume
 import kotlinx.android.synthetic.main.toolbar.*
 
 class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolbarTrait {
+    companion object {
+        val FIRST_CONFIG = "FirstConfig"
+    }
+
     private val TAG = "WidgetSettingsActivity"
     private val storeManager = StoreManager(this, this)
 
@@ -24,6 +27,8 @@ class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolba
         intent.extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID)
     }
+
+    private val isFirstConfig by lazy { intent.extras.getBoolean(FIRST_CONFIG, true) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,24 +59,37 @@ class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolba
     }
 
     private fun saveValues() {
-        if (WidgetTable.create(this, widgetId, store_spinner.selectedItemId, 0.8f) <= 0) {
-            // todo err management
-            Log.e(TAG, "ERROR creating widget in DB")
-        }
         val prefs = getSharedPreferences("widgetPrefs", Context.MODE_PRIVATE)
-        prefs.edit().putBoolean("isConfigured_$widgetId", true).commit()
+        if (isFirstConfig) {
+            if (WidgetTable.create(this, widgetId, store_spinner.selectedItemId, 0.8f) <= 0) {
+                // todo err management
+                Log.e(TAG, "ERROR creating widget in DB")
+            }
+            prefs.edit().putBoolean("isConfigured_$widgetId", true).commit()
+        } else {
+            if (WidgetTable.update(this, widgetId, store_spinner.selectedItemId, 0.8f) <= 0) {
+                // todo err management
+                Log.e(TAG, "ERROR updating widget in DB")
+            }
+        }
     }
 
     private fun updateWidget() {
-        val result = Intent()
-        result.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-        Log.d("widgetSettings", "try to updateWidget: $widgetId")
-        setResult(RESULT_OK, result)
+        val intent = Intent(this, TaskListWidget::class.java)
+        intent.action = "android.appwidget.action.APPWIDGET_UPDATE"
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        sendBroadcast(intent)
 
-        val remView = RemoteViews(applicationContext.packageName, R.id.tasks_list_widget)
-        val mgr = AppWidgetManager.getInstance(applicationContext)
-        mgr.updateAppWidget(widgetId, remView)
-        TaskListWidget.instance!!.onUpdate(applicationContext, mgr, intArrayOf(widgetId))
+//        val result = Intent()
+//        result.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+//        Log.d("widgetSettings", "try to updateWidget: $widgetId")
+//        setResult(RESULT_OK, result)
+//
+//        val remView = RemoteViews(applicationContext.packageName, R.id.widget_layout)
+//        val mgr = AppWidgetManager.getInstance(applicationContext)
+//        mgr.updateAppWidget(widgetId, remView)
+        //mgr.notifyAppWidgetViewDataChanged(widgetId, R.id.tasks_list_widget)
+        //TaskListWidget.instance!!.onUpdate(applicationContext, mgr, intArrayOf(widgetId))
     }
 
 }
