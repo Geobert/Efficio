@@ -67,7 +67,7 @@ class EfficioWidgetTest {
 
         // long press on home to bring up widgets menu entry
         mDevice.swipe(arrayOf(screenCenter, screenCenter), 150)
-        pauseTest(2000)
+        pauseTest(1500)
 
         // look for widgets button, with different case
         val tab = mDevice.findObject(By.text("Widgets"))
@@ -133,6 +133,19 @@ class EfficioWidgetTest {
         mDevice.wait(Until.hasObject(By.pkg(EFFICIO_PACKAGE).depth(0)), 5000)
     }
 
+    fun assertItemsOrder(items: Array<String>) {
+        val max = items.size
+        if (max > 1) {
+            var i = 0
+            do {
+                val a = mDevice.findObject(By.text(items[i]))
+                val b = mDevice.findObject(By.text(items[i + 1]))
+                i++
+                Assert.assertTrue(a.visibleCenter.y < b.visibleCenter.y)
+            } while (i < items.size - 2)
+        }
+    }
+
     @Before fun setup() {
         mDevice = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         MainActivity.TEST_MODE = true
@@ -153,6 +166,7 @@ class EfficioWidgetTest {
         launchApp()
         addItem(ITEM_B, DEP_B)
         backToHome()
+        Assert.assertNotNull(mDevice.findObject(By.text(ITEM_A)))
         Assert.assertNotNull(mDevice.findObject(By.text(ITEM_B)))
 
         // test check item
@@ -160,12 +174,21 @@ class EfficioWidgetTest {
         clickTickOfTaskAt(0)
         backToHome()
         Assert.assertNull(mDevice.findObject(By.text(ITEM_A)))
+        Assert.assertNotNull(mDevice.findObject(By.text(ITEM_B)))
 
         // test uncheck item
         launchApp()
         clickTickOfTaskAt(2)
         backToHome()
         Assert.assertNotNull(mDevice.findObject(By.text(ITEM_A)))
+        Assert.assertNotNull(mDevice.findObject(By.text(ITEM_B)))
+
+        // test order
+        assertItemsOrder(arrayOf(ITEM_A, ITEM_B))
+        launchApp()
+        dragTask(1, Direction.UP)
+        backToHome()
+        assertItemsOrder(arrayOf(ITEM_B, ITEM_A))
 
         // test delete item
         launchApp()
@@ -173,8 +196,7 @@ class EfficioWidgetTest {
         Espresso.onView(ViewMatchers.withId(R.id.delete_task_btn)).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withText("OK")).perform(ViewActions.click())
         backToHome()
-        Assert.assertNotNull(mDevice.findObject(By.text(ITEM_A)))
-        Assert.assertNull(mDevice.findObject(By.text(ITEM_B)))
-
+        Assert.assertNull(mDevice.findObject(By.text(ITEM_A)))
+        Assert.assertNotNull(mDevice.findObject(By.text(ITEM_B)))
     }
 }

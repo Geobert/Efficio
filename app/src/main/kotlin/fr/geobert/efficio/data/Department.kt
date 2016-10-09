@@ -39,6 +39,6 @@ class Department : Comparable<Department> {
     }
 
     fun isEquals(other: Department): Boolean {
-        return weight == other.weight && name.equals(other.name)
+        return weight == other.weight && name == other.name
     }
 }

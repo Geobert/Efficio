@@ -85,12 +85,13 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                     if (vh == null) {
                         // end of drag n drop, adapter is correctly ordered but not our representation here
                         lastDragTask!!.cardView.cardElevation = orig
-                        Log.d(TAG, "end of drag n drop, sort the list")
+                        //Log.d(TAG, "end of drag n drop, sort the list")
                         StoreCompositionTable.updateDepWeight(activity, lastDragTask!!.task.item.department)
                         ItemWeightTable.updateWeight(activity, lastDragTask!!.task.item)
-                        Log.d(TAG, "before sort : ${tasksList[0]} / ${tasksList[1]}")
+                        //Log.d(TAG, "before sort : ${tasksList[0]} / ${tasksList[1]}")
                         tasksList.sort()
-                        Log.d(TAG, "after sort : ${tasksList[0]} / ${tasksList[1]}")
+                        //Log.d(TAG, "after sort : ${tasksList[0]} / ${tasksList[1]}")
+                        updateWidgets()
                         val f = quick_add_text.text.trim().toString()
                         if (needAdapterSort || !f.isEmpty()) {
                             val l = if (!f.isEmpty()) filter(tasksList, f) else tasksList
@@ -207,13 +208,16 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             0 -> onItemEditFinished(resultCode == Activity.RESULT_OK)
-            1 -> onDepEditFinished()
+            1 -> onDepEditFinished(resultCode == Activity.RESULT_OK)
         }
 
     }
 
-    private fun onDepEditFinished() {
-        fetchStore(this, lastStoreId)
+    private fun onDepEditFinished(needUpdate: Boolean) {
+        if (needUpdate) {
+            fetchStore(this, lastStoreId)
+            updateWidgets()
+        }
     }
 
     fun onItemEditFinished(needUpdate: Boolean) {

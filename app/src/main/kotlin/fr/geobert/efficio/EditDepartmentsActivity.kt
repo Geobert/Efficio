@@ -1,5 +1,6 @@
 package fr.geobert.efficio
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.DialogFragment
@@ -97,13 +98,19 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         setContentView(R.layout.edit_departments_activity)
         title = getString(R.string.edit_departments)
         storeId = intent.extras.getLong("storeId")
-        depManager = DepartmentManager(this, findViewById(R.id.department_layout)!!, storeId, this)
+        depManager = DepartmentManager(this, findViewById(R.id.department_layout)!!,
+                storeId, this, true)
         depManager.setEditMode(true)
         depManager.request()
         depTouchHelper.attachToRecyclerView(dep_list)
         setIcon(R.mipmap.ic_action_arrow_left)
         setIconOnClick(View.OnClickListener { onBackPressed() })
         titleColor = ContextCompat.getColor(this, android.R.color.primary_text_dark)
+    }
+
+    override fun onBackPressed() {
+        setResult(if (depManager.hasChanged()) Activity.RESULT_OK else Activity.RESULT_CANCELED)
+        super.onBackPressed()
     }
 
     override fun onDepartmentChosen(d: Department) {

@@ -22,6 +22,7 @@ import fr.geobert.efficio.db.DepartmentTable
 import fr.geobert.efficio.db.StoreCompositionTable
 import fr.geobert.efficio.misc.GET_DEP_FROM_STORE
 import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
+import fr.geobert.efficio.misc.compareLists
 import fr.geobert.efficio.misc.map
 import fr.geobert.efficio.misc.normalize
 import kotlinx.android.synthetic.main.department_chooser_dialog.view.*
@@ -32,7 +33,8 @@ import kotlin.properties.Delegates
 class DepartmentManager(val activity: Activity,
                         val layout: View,
                         val storeId: Long,
-                        val listener: DepartmentChoiceListener) :
+                        val listener: DepartmentChoiceListener,
+                        val trackDifference: Boolean = false) :
         LoaderManager.LoaderCallbacks<Cursor>, TextWatcher, DepartmentViewHolder.OnClickListener {
 
     val TAG = "DepartmentManager"
@@ -48,6 +50,7 @@ class DepartmentManager(val activity: Activity,
 
     var depAdapter: DepartmentAdapter by Delegates.notNull()
     var departmentsList: MutableList<Department> by Delegates.notNull()
+    var origDepList: MutableList<Department>? = null
 
     init {
         list = layout.dep_list
@@ -133,6 +136,8 @@ class DepartmentManager(val activity: Activity,
                     b.putInt("name", data.getColumnIndex("dep_name"))
                     b.putInt("weight", data.getColumnIndex("dep_weight"))
                     departmentsList = data.map { Department(it, b) }
+                    if (trackDifference && origDepList == null)
+                        origDepList = data.map { Department(it, b) }
                     depAdapter = DepartmentAdapter(departmentsList, this)
                     list.adapter = depAdapter
                 } else {
@@ -155,11 +160,17 @@ class DepartmentManager(val activity: Activity,
         onDepartmentChosen(d)
     }
 
-    fun request() {
+    fun request(reset: Boolean = false) {
+        if (reset) origDepList = null
         val b = Bundle()
         b.putLong("storeId", storeId)
         activity.loaderManager.destroyLoader(GET_DEP_FROM_STORE)
         activity.loaderManager.initLoader(GET_DEP_FROM_STORE, b, this)
+    }
+
+    fun hasChanged(): Boolean {
+        val o = origDepList
+        return if (o != null) compareLists(o, departmentsList) != 0 else false
     }
 
     //
