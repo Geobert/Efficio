@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -54,7 +54,8 @@
 
         <activity
             android:name=".widget.WidgetSettingsActivity"
-            android:label="@string/title_activity_widget_settings">
+            android:label="@string/title_activity_widget_settings"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>

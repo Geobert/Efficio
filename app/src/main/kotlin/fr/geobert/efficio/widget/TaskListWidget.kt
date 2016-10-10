@@ -39,12 +39,14 @@ class TaskListWidget : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         instance = this
         val extras = intent.extras
-        val widgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID)
-        Log.d(TAG, "onReceive: ${intent.action} / widgetId: $widgetId")
+        Log.d(TAG, "onReceive: ${intent.action}")
+
         val appWidgetManager = AppWidgetManager.getInstance(context)
         when (intent.action) {
             ACTION_CHECKBOX_CHANGED -> {
+                val widgetId = extras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                        AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
+                Log.d(TAG, "widgetId: $widgetId")
                 TaskTable.updateDoneState(context, extras.getLong("taskId"), true)
                 appWidgetManager.notifyAppWidgetViewDataChanged(
                         widgetId, R.id.tasks_list_widget)
@@ -52,12 +54,16 @@ class TaskListWidget : AppWidgetProvider() {
                 //i.putExtra("storeId", ) // TODO get storeId according to widgetId
                 context.sendBroadcast(i)
             }
-            "android.appwidget.action.APPWIDGET_DELETED" ->
-                if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID)
-                    WidgetTable.delete(context, widgetId)
+            "android.appwidget.action.APPWIDGET_DELETED" -> {
+                val widgetId = extras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                        AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
+                Log.d(TAG, "widgetId: $widgetId")
+                WidgetTable.delete(context, widgetId)
+            }
             "android.appwidget.action.APPWIDGET_UPDATE" -> {
-                onUpdate(context, appWidgetManager, intArrayOf(widgetId))
-                appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.tasks_list_widget)
+                val widgetIds = extras?.getIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS)
+                if (widgetIds != null) for (widgetId in widgetIds)
+                    appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.id.tasks_list_widget)
             }
         }
         super.onReceive(context, intent)

@@ -33,9 +33,9 @@ class StoreManager(val activity: FragmentActivity, val callback: StoreLoaderList
         when (loader.id) {
             GET_ALL_STORES -> {
                 if (cursor.count > 0) {
-                    storesList = cursor.map { Store(it) }
+                    storesList = cursor.map(::Store)
                 } else {
-                    storesList.clear();
+                    storesList.clear()
                 }
                 storeAdapter = StoreAdapter(activity, storesList)
                 callback.onStoreLoaded()

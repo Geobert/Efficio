@@ -76,8 +76,11 @@ class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolba
 
     private fun updateWidget() {
         val intent = Intent(this, TaskListWidget::class.java)
+
+        Log.d("widgetSettings", "try to updateWidget: $widgetId")
         intent.action = "android.appwidget.action.APPWIDGET_UPDATE"
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
+        setResult(RESULT_OK, intent)
         sendBroadcast(intent)
 
 //        val result = Intent()
