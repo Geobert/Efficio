@@ -35,6 +35,7 @@ class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolba
         setContentView(R.layout.widget_settings_activity)
         //setSupportActionBar(mToolbar)
         initToolbar(this)
+        setTitle(R.string.title_activity_widget_settings)
     }
 
     override fun onResume() {

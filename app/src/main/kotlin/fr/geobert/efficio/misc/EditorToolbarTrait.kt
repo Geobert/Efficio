@@ -8,7 +8,7 @@ import fr.geobert.efficio.R
 
 interface EditorToolbarTrait : Toolbar.OnMenuItemClickListener {
     fun initToolbar(activity: BaseActivity) {
-        activity.setIcon(android.R.drawable.ic_menu_close_clear_cancel)
+        activity.setIcon(R.drawable.cancel)
         activity.setIconOnClick(View.OnClickListener { activity.onBackPressed() })
         activity.setMenu(R.menu.confirm_cancel_menu)
         activity.titleColor = ContextCompat.getColor(activity, android.R.color.primary_text_dark)
