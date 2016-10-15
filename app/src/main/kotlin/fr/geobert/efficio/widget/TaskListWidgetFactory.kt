@@ -39,9 +39,7 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
 
         val intent = Intent()
         intent.putExtra("taskId", t.id)
-        //val pIntent = PendingIntent.getActivity(ctx, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         rv.setOnClickFillInIntent(R.id.task_btn, intent)
-        //rv.setOnClickPendingIntent(R.id.checkbox, pIntent)
         return rv
     }
 

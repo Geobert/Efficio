@@ -50,4 +50,13 @@ class StoreManager(val activity: FragmentActivity, val callback: StoreLoaderList
     override fun onCreateLoader(p0: Int, p1: Bundle?): Loader<Cursor>? {
         return StoreTable.getAllStoresLoader(activity)
     }
+
+    fun indexOf(storeId: Long): Int {
+        var i = -1
+        for (s in storesList) {
+            i++
+            if (s.id == storeId) break
+        }
+        return if (i == storesList.size) -1 else i
+    }
 }

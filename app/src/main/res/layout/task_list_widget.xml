@@ -3,24 +3,38 @@
                 android:id="@+id/widget_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/cardview_dark_background"
                 android:orientation="vertical"
                 android:padding="@dimen/widget_margin">
+
+    <ImageView
+        android:id="@+id/widget_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/widget_background"
+        />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/widget_store_chooser_btn"
+        android:layout_alignParentTop="true"
+        android:alpha="0.1"
+        android:src="@drawable/widget_title_background"/>
 
     <Button
         android:id="@+id/widget_store_chooser_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="0dp"
         android:layout_toStartOf="@+id/widget_settings_btn"
+        android:background="@android:color/transparent"
         android:contentDescription="widget_store_btn"
         android:ellipsize="end"
         android:gravity="start|center_vertical"
         android:minWidth="150dp"
         android:text="Store 1"
         android:textAllCaps="false"
-
         tools:ignore="HardcodedText"/>
 
     <ImageButton

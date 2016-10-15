@@ -13,6 +13,7 @@ import fr.geobert.efficio.OnRefreshReceiver
 import fr.geobert.efficio.R
 import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.db.WidgetTable
+import kotlin.properties.Delegates
 
 /**
  * Implementation of App Widget functionality.
@@ -20,9 +21,11 @@ import fr.geobert.efficio.db.WidgetTable
 class TaskListWidget : AppWidgetProvider() {
     val TAG = "TaskListWidget"
 
+    var opacity: Float by Delegates.notNull()
+    var storeName by Delegates.notNull<String>()
+
     companion object {
         val ACTION_CHECKBOX_CHANGED = "fr.geobert.efficio.action_checkbox_changed"
-        var instance: AppWidgetProvider? = null
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -37,7 +40,6 @@ class TaskListWidget : AppWidgetProvider() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        instance = this
         val extras = intent.extras
         Log.d(TAG, "onReceive: ${intent.action}")
 
@@ -77,16 +79,14 @@ class TaskListWidget : AppWidgetProvider() {
         // Enter relevant functionality for when the last widget is disabled
     }
 
-    private fun getStoreName(ctx: Context, widgetId: Int): String {
+    private fun fetchWidgetInfo(ctx: Context, widgetId: Int): Boolean {
         val cursor = WidgetTable.getWidgetInfo(ctx, widgetId)
-        var res: String = ""
-        if (cursor != null) {
-            if (cursor.count > 0 && cursor.moveToFirst()) {
-                res = cursor.getString(2)
-            }
-            cursor.close()
+        if (cursor != null && cursor.count > 0 && cursor.moveToFirst()) {
+            opacity = cursor.getFloat(1)
+            storeName = cursor.getString(2)
+            return true
         }
-        return res
+        return false
     }
 
     fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
@@ -96,11 +96,12 @@ class TaskListWidget : AppWidgetProvider() {
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
-        val name = getStoreName(context, appWidgetId)
+        fetchWidgetInfo(context, appWidgetId)
 
         // Construct the RemoteViews object
         val views = RemoteViews(context.packageName, R.layout.task_list_widget)
-        views.setTextViewText(R.id.widget_store_chooser_btn, name)
+        views.setInt(R.id.widget_background, "setAlpha", (opacity * 255).toInt())
+        views.setTextViewText(R.id.widget_store_chooser_btn, storeName)
         views.setRemoteAdapter(R.id.tasks_list_widget, intent)
         views.setEmptyView(R.id.tasks_list_widget, R.id.empty_text_widget)
 
