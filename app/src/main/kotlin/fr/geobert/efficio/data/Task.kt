@@ -10,6 +10,7 @@ class Task : Comparable<Task> {
     var isDone: Boolean by Delegates.notNull()
     var item: Item by Delegates.notNull()
     var type: TaskAdapter.VIEW_TYPES by Delegates.notNull()
+    var qty: Int = 1
 
     constructor() {
         type = TaskAdapter.VIEW_TYPES.Header
@@ -23,6 +24,7 @@ class Task : Comparable<Task> {
         isDone = cursor.getInt(cursor.getColumnIndex(TaskTable.COL_IS_DONE)) == 1
         item = Item(cursor)
         type = TaskAdapter.VIEW_TYPES.Normal
+        qty = cursor.getInt(cursor.getColumnIndex(TaskTable.COL_QTY))
     }
 
     constructor(item: Item) {

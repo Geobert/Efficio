@@ -9,13 +9,15 @@ import android.provider.BaseColumns
 
 abstract class BaseTable : BaseColumns {
     abstract val TABLE_NAME: String
-    val PATH = TABLE_NAME
+    val PATH by lazy { TABLE_NAME }
     val CONTENT_URI = DbContentProvider.BASE_CONTENT_URI.buildUpon().appendPath(PATH).build()
     val CONTENT_TYPE = "${ContentResolver.CURSOR_DIR_BASE_TYPE}/${DbContentProvider.CONTENT_AUTHORITY}/$PATH"
     val CONTENT_ITEM_TYPE = "${ContentResolver.CURSOR_ITEM_BASE_TYPE}/${DbContentProvider.CONTENT_AUTHORITY}/$PATH"
 
-    val CREATE_TABLE: String = "CREATE TABLE $TABLE_NAME (" +
-            "${BaseColumns._ID} INTEGER PRIMARY KEY AUTOINCREMENT, ${CREATE_COLUMNS()});"
+    val CREATE_TABLE: String by lazy {
+        "CREATE TABLE $TABLE_NAME (" +
+                "${BaseColumns._ID} INTEGER PRIMARY KEY AUTOINCREMENT, ${CREATE_COLUMNS()});"
+    }
 
     protected abstract fun CREATE_COLUMNS(): String
     abstract val COLS_TO_QUERY: Array<String>

@@ -1,7 +1,9 @@
 package fr.geobert.efficio.db
 
 import android.app.Activity
-import android.content.*
+import android.content.ContentValues
+import android.content.Context
+import android.content.CursorLoader
 import android.database.Cursor
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Task
@@ -12,12 +14,14 @@ object TaskTable : BaseTable() {
     val COL_STORE_ID = "store_id"
     val COL_ITEM_ID = "item_id"
     val COL_IS_DONE = "is_done"
+    val COL_QTY = "quantity"
 
     override fun CREATE_COLUMNS(): String = "$COL_STORE_ID INTEGER NOT NULL, " +
             "$COL_ITEM_ID INTEGER NOT NULL, " +
             "$COL_IS_DONE INTEGER NOT NULL, " +
+            "$COL_QTY INTEGER NOT NULL DEFAULT 1, " +
             "${foreignId(COL_STORE_ID, StoreTable.TABLE_NAME)}, " +
-            "${foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)}"
+            foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)
 
     val TABLE_JOINED = "$TABLE_NAME " +
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreTable.TABLE_NAME)} " +
@@ -34,7 +38,8 @@ object TaskTable : BaseTable() {
             "${DepartmentTable.TABLE_NAME}.${DepartmentTable.COL_NAME} as dep_name",
             "${StoreCompositionTable.TABLE_NAME}.${StoreCompositionTable.COL_WEIGHT} as dep_weight",
             "${ItemWeightTable.TABLE_NAME}.${ItemWeightTable.COL_WEIGHT} as item_weight",
-            COL_IS_DONE
+            COL_IS_DONE,
+            COL_QTY
     )
 
     val RESTRICT_TO_STORE = "(${TaskTable.TABLE_NAME}.$COL_STORE_ID = ?)"
@@ -48,6 +53,7 @@ object TaskTable : BaseTable() {
                 "END"
     }
 
+    // async
     fun getAllTasksForStoreLoader(ctx: Context, storeId: Long): CursorLoader {
         return CursorLoader(ctx, TaskTable.CONTENT_URI, TaskTable.COLS_TO_QUERY, RESTRICT_TO_STORE,
                 arrayOf(storeId.toString()), ORDERING)
@@ -57,6 +63,7 @@ object TaskTable : BaseTable() {
         return CursorLoader(ctx, buildWithId(taskId), COLS_TO_QUERY, null, null, null)
     }
 
+    // sync version
     fun getAllTasksForStore(ctx: Context, storeId: Long): Cursor? {
         return ctx.contentResolver.query(TaskTable.CONTENT_URI,
                 TaskTable.COLS_TO_QUERY, RESTRICT_TO_STORE, arrayOf(storeId.toString()), ORDERING)
