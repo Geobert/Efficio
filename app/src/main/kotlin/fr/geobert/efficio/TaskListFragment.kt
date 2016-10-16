@@ -66,6 +66,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     private val header = Task()
 
+    // this manage drag and swipe on tasks
     private val taskItemTouchCbk =
             object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
                     ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -82,7 +83,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                     Log.d(TAG, "onMove")
                     Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
                     val r = updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
-                    //taskAdapter!!.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
                     taskAdapter!!.moveItem(viewHolder.adapterPosition, target.adapterPosition)
                     if (!needAdapterSort) needAdapterSort = r
                     return true
@@ -113,16 +113,20 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
                 private fun manageLastSwipeTask() {
                     Log.d(TAG, "manageLastSwipeTask")
-                    when (directionReached) {
-                        ItemTouchHelper.RIGHT -> {
-                            // minus
+                    val t = lastSwipeTask?.task
+                    if (t != null)
+                        when (directionReached) {
+                            ItemTouchHelper.RIGHT -> {
+                                // minus
+                                if (t.qty > 1)
+                                    t.qty--
+                            }
+                            ItemTouchHelper.LEFT -> {
+                                // plus
+                                t.qty++
+                            }
                         }
-                        ItemTouchHelper.LEFT -> {
-                            // plus
-                        }
-                    }
-//                    onChildDraw(canvas, recyclerview, lastSwipeTask!!, 0f, 0f,
-//                            ItemTouchHelper.ACTION_STATE_IDLE, true)
+                    TaskTable.updateTaskQty(activity, lastSwipeTask!!.task)
                     lastSwipeTask = null
                     directionReached = null
                 }
@@ -157,9 +161,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                             if (lastDragTask == null) needAdapterSort = false
                             lastDragTask = vh
                         }
-//                        ItemTouchHelper.ACTION_STATE_SWIPE -> {
-//                            lastSwipeTask = vh
-//                        }
                     }
                 }
 
@@ -169,7 +170,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
                 var handler: Handler? = null
                 var postAction: Runnable? = Runnable {
-                    Log.d(TAG, "postAction")
                     taskAdapter?.notifyDataSetChanged()
                     handler = null
                 }
@@ -178,7 +178,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                                          viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float,
                                          actionState: Int, isCurrentlyActive: Boolean) {
                     val dXToUse = if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                        Log.d(TAG, "onChildDraw: dX: $dX / isCurrentlyActive: $isCurrentlyActive")
+                        //Log.d(TAG, "onChildDraw: dX: $dX / isCurrentlyActive: $isCurrentlyActive")
                         canvas = c
                         recyclerview = recyclerView
                         lastSwipeTask = viewHolder as TaskViewHolder

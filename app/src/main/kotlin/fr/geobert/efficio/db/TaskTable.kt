@@ -89,10 +89,19 @@ object TaskTable : BaseTable() {
         return update(activity, taskId, v)
     }
 
+    fun updateTaskQty(activity: Activity, task: Task): Int {
+        val v = ContentValues()
+        v.put(COL_QTY, task.qty)
+        return update(activity, task.id, v)
+    }
+
     fun updateTask(activity: Activity, task: Task): Int {
-        if (ItemDepTable.updateItemDep(activity, task.item.id, task.item.department.id) > 0) {
-            return ItemTable.updateItem(activity, task.item)
-        }
+        val v = ContentValues()
+        v.put(COL_QTY, task.qty)
+        if (update(activity, task.id, v) > 0)
+            if (ItemDepTable.updateItemDep(activity, task.item.id, task.item.department.id) > 0) {
+                return ItemTable.updateItem(activity, task.item)
+            }
         return 0
     }
 
