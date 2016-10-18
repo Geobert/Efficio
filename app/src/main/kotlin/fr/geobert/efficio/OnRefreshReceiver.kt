@@ -11,7 +11,7 @@ class OnRefreshReceiver(val toRefresh: RefreshInterface) : BroadcastReceiver() {
     }
 
     override fun onReceive(ctx: Context, intent: Intent?) {
-        if (intent != null && intent.action.equals(REFRESH_ACTION)) {
+        if (intent != null && intent.action == REFRESH_ACTION) {
             toRefresh.onRefresh(intent)
         }
     }

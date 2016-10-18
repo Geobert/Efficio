@@ -117,9 +117,16 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         }
     }
 
-    fun refreshTaskList(id: Long) {
+    fun refreshTaskList(storeId: Long) {
         val intent = Intent(OnRefreshReceiver.REFRESH_ACTION)
-        intent.putExtra("newStoreId", id)
+        intent.putExtra("newStoreId", storeId)
+        sendBroadcast(intent)
+    }
+
+    fun refreshTask(taskId: Long) {
+        val intent = Intent(OnRefreshReceiver.REFRESH_ACTION)
+        intent.putExtra("storeId", lastStoreId)
+        intent.putExtra("taskId", taskId)
         sendBroadcast(intent)
     }
 

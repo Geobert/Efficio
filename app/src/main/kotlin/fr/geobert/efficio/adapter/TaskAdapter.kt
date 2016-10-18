@@ -1,12 +1,16 @@
 package fr.geobert.efficio.adapter
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
+import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.misc.normalize
 import java.util.*
+
 
 class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskViewHolderListener) :
         RecyclerView.Adapter<TaskViewHolder>() {
@@ -39,6 +43,19 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
 
     override fun getItemViewType(position: Int): Int {
         return taskList[position].type.ordinal
+    }
+
+    private fun getTaskPosition(taskId: Long): Int {
+        return taskList.indexOfFirst { taskId == it.id }
+    }
+
+    fun refreshTaskFromDB(ctx: Context, taskId: Long) {
+        val c = TaskTable.getTaskById(ctx, taskId)
+        if (c != null && c.moveToFirst()) {
+            val pos = getTaskPosition(taskId)
+            taskList[pos] = Task(c)
+            notifyItemChanged(pos)
+        }
     }
 
     fun getTaskByName(name: String): Pair<Task?, Int> {

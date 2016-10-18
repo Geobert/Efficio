@@ -31,11 +31,11 @@ class StoreNameDialog : DialogFragment() {
         }
     }
 
-    protected var customView: View by Delegates.notNull()
-    protected var storeId: Long by Delegates.notNull()
-    protected var action: Int by Delegates.notNull()
+    private var customView: View by Delegates.notNull()
+    private var storeId: Long by Delegates.notNull()
+    private var action: Int by Delegates.notNull()
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog? {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val b = AlertDialog.Builder(activity)
         customView = activity.layoutInflater.inflate(R.layout.input_dialog, null)
         storeId = arguments.getLong("storeId")

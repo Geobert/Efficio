@@ -16,6 +16,7 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: TaskViewHo
     interface TaskViewHolderListener {
         fun onDoneStateChanged(task: Task)
         fun onItemClicked(task: Task)
+        fun onQtyClicked(task: Task)
     }
 
     var name: TextView by Delegates.notNull()
@@ -69,6 +70,9 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: TaskViewHo
                 depName.text = "(${task.item.department.name})"
                 cardView.isSelected = task.isDone
                 qty.text = task.qty.toString()
+                qty.setOnClickListener { v ->
+                    listener.onQtyClicked(task)
+                }
                 setBgColor(task.isDone)
                 isListenerActive = true
             }

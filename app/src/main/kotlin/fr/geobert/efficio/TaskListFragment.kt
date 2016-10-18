@@ -33,6 +33,7 @@ import fr.geobert.efficio.db.ItemTable
 import fr.geobert.efficio.db.ItemWeightTable
 import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.dialog.DepartmentChoiceDialog
+import fr.geobert.efficio.dialog.QuantityDialog
 import fr.geobert.efficio.misc.CREATE_TASK
 import fr.geobert.efficio.misc.GET_TASKS_OF_STORE
 import fr.geobert.efficio.misc.RefreshInterface
@@ -126,7 +127,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         tasks_list.itemAnimator = DefaultItemAnimator()
         tasks_list.setHasFixedSize(true)
         tasks_list.addItemDecoration(TopBottomSpaceItemDecoration(10))
-        taskItemTouchHlp.attachToRecyclerView(tasks_list)
 
         quick_add_btn.setOnClickListener {
             onAddTaskClicked()
@@ -222,14 +222,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     }
 
-    override fun onDoneStateChanged(task: Task) {
-        TaskTable.updateDoneState(activity, task.id, task.isDone)
-        tasksList.sort()
-        addHeaderIfNeeded(tasksList)
-        taskAdapter!!.animateTo(tasksList)
-        updateWidgets()
-    }
-
     fun updateWidgets() {
         Log.d(TAG, "updateWidgets")
         val appWidgetManager = AppWidgetManager.getInstance(activity)
@@ -244,8 +236,20 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         ids.forEach { appWidgetManager.notifyAppWidgetViewDataChanged(it, R.id.tasks_list_widget) }
     }
 
+    override fun onDoneStateChanged(task: Task) {
+        TaskTable.updateDoneState(activity, task.id, task.isDone)
+        tasksList.sort()
+        addHeaderIfNeeded(tasksList)
+        taskAdapter!!.animateTo(tasksList)
+        updateWidgets()
+    }
+
     override fun onItemClicked(task: Task) {
         ItemEditorActivity.callMe(this, lastStoreId, task)
+    }
+
+    override fun onQtyClicked(task: Task) {
+        QuantityDialog.newInstance(task).show(fragmentManager, "QtyEdit")
     }
 
     //
@@ -288,8 +292,11 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         val extras = intent.extras
         val storeId = extras.getLong("storeId", -1)
         val newStoreId = extras.getLong("newStoreId", -1)
+        val taskId = extras.getLong("taskId", -1)
         if (newStoreId > 0) lastStoreId = newStoreId
-        if (storeId == lastStoreId || storeId < 0L) {
+        if (taskId > -1) { // at the moment, this is when a quantity has been edited via dialog
+            taskAdapter!!.refreshTaskFromDB(activity, taskId)
+        } else if (storeId == lastStoreId || storeId < 0L) {
             fetchStore(this, lastStoreId)
         }
     }
@@ -342,7 +349,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         when (cursorLoader.id) {
             GET_TASKS_OF_STORE -> {
                 if (cursor.count > 0) {
-                    tasksList = cursor.map { Task(it) }
+                    tasksList = cursor.map(::Task)
                     tasks_list.visibility = View.VISIBLE
                     empty_text.visibility = View.GONE
                 } else {
@@ -356,6 +363,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                 else
                     taskAdapter!!.animateTo(tasksList)
                 tasks_list.adapter = taskAdapter
+                taskItemTouchHlp.attachToRecyclerView(tasks_list)
             }
             else -> throw IllegalArgumentException("Unknown cursorLoader id")
         }

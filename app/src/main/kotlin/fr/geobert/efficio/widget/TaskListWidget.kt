@@ -23,6 +23,7 @@ class TaskListWidget : AppWidgetProvider() {
 
     var opacity: Float by Delegates.notNull()
     var storeName by Delegates.notNull<String>()
+    var storeId by Delegates.notNull<Long>()
 
     companion object {
         val ACTION_CHECKBOX_CHANGED = "fr.geobert.efficio.action_checkbox_changed"
@@ -53,7 +54,7 @@ class TaskListWidget : AppWidgetProvider() {
                 appWidgetManager.notifyAppWidgetViewDataChanged(
                         widgetId, R.id.tasks_list_widget)
                 val i = Intent(OnRefreshReceiver.REFRESH_ACTION)
-                //i.putExtra("storeId", ) // TODO get storeId according to widgetId
+                i.putExtra("storeId", storeId)
                 context.sendBroadcast(i)
             }
             "android.appwidget.action.APPWIDGET_DELETED" -> {
@@ -82,6 +83,7 @@ class TaskListWidget : AppWidgetProvider() {
     private fun fetchWidgetInfo(ctx: Context, widgetId: Int): Boolean {
         val cursor = WidgetTable.getWidgetInfo(ctx, widgetId)
         if (cursor != null && cursor.count > 0 && cursor.moveToFirst()) {
+            storeId = cursor.getLong(0)
             opacity = cursor.getFloat(1)
             storeName = cursor.getString(2)
             return true

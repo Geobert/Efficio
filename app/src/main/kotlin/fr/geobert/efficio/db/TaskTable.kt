@@ -69,6 +69,10 @@ object TaskTable : BaseTable() {
                 TaskTable.COLS_TO_QUERY, RESTRICT_TO_STORE, arrayOf(storeId.toString()), ORDERING)
     }
 
+    fun getTaskById(ctx: Context, taskId: Long): Cursor? {
+        return ctx.contentResolver.query(buildWithId(taskId), COLS_TO_QUERY, null, null, null)
+    }
+
     fun getAllNotDoneTasksForStore(ctx: Context, storeId: Long): Cursor? {
         return ctx.contentResolver.query(TaskTable.CONTENT_URI,
                 TaskTable.COLS_TO_QUERY, "$RESTRICT_TO_STORE and $TABLE_NAME.$COL_IS_DONE = 0",
@@ -89,10 +93,10 @@ object TaskTable : BaseTable() {
         return update(activity, taskId, v)
     }
 
-    fun updateTaskQty(activity: Activity, task: Task): Int {
+    fun updateTaskQty(activity: Activity, taskId: Long, qty: Int): Int {
         val v = ContentValues()
-        v.put(COL_QTY, task.qty)
-        return update(activity, task.id, v)
+        v.put(COL_QTY, qty)
+        return update(activity, taskId, v)
     }
 
     fun updateTask(activity: Activity, task: Task): Int {

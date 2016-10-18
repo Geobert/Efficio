@@ -62,7 +62,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, val tasksList: Mutable
     private fun manageLastSwipeTask() {
         Log.d(TAG, "manageLastSwipeTask")
         val t = lastSwipeTask?.task
-        if (t != null)
+        if (t != null) {
             when (directionReached) {
                 ItemTouchHelper.RIGHT -> {
                     // minus
@@ -74,7 +74,8 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, val tasksList: Mutable
                     t.qty++
                 }
             }
-        TaskTable.updateTaskQty(activity, lastSwipeTask!!.task)
+            TaskTable.updateTaskQty(activity, t.id, t.qty)
+        }
         lastSwipeTask = null
         directionReached = null
     }
@@ -118,7 +119,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, val tasksList: Mutable
 
     var handler: Handler? = null
     var postAction: Runnable? = Runnable {
-        taskAdapter?.notifyDataSetChanged()
+        taskAdapter.notifyDataSetChanged()
         handler = null
     }
 
