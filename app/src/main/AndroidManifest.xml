@@ -34,10 +34,6 @@
             android:authorities="fr.geobert.efficio"
             android:exported="true"/>
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="042692be669fee44b81f635e59db4a99012d097f"/>
-
         <receiver android:name=".widget.TaskListWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>

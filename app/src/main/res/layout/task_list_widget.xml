@@ -35,6 +35,7 @@
         android:minWidth="150dp"
         android:text="Store 1"
         android:textAllCaps="false"
+        android:textColor="@android:color/white"
         tools:ignore="HardcodedText"/>
 
     <ImageButton

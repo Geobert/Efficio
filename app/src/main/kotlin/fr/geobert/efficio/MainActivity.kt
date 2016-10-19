@@ -69,7 +69,8 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         cleanDatabaseIfTestingMode()
-        if (!BuildConfig.DEBUG) Fabric.with(this, Crashlytics())
+        if (!BuildConfig.DEBUG)
+            Fabric.with(this, Crashlytics())
         setContentView(R.layout.main_activity)
         title = ""
         if (savedInstanceState == null) {

@@ -29,7 +29,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
                 android:gravity="center_vertical"
                 tools:ignore="UselessParent">
 
@@ -40,10 +39,9 @@
                     android:layout_alignBottom="@+id/task_checkbox"
                     android:layout_alignTop="@+id/task_checkbox"
                     android:layout_toEndOf="@+id/task_checkbox"
-                    android:layout_toRightOf="@+id/task_checkbox"
                     android:gravity="center_vertical"
                     android:text="Test"
-                    android:textSize="21sp"
+                    android:textSize="18sp"
                     tools:ignore="HardcodedText"/>
 
                 <TextView
@@ -52,25 +50,20 @@
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@+id/task_checkbox"
                     android:layout_alignTop="@+id/task_checkbox"
-                    android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_toEndOf="@+id/name"
-                    android:layout_toRightOf="@+id/name"
                     android:gravity="center_vertical"
                     android:text="Department"
                     android:textColor="@color/colorPrimaryLight"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     tools:ignore="HardcodedText"/>
 
                 <CheckBox
                     android:id="@+id/task_checkbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
                     android:layout_marginEnd="5dp"
-                    android:layout_marginLeft="2dp"
-                    android:layout_marginRight="5dp"
                     android:layout_marginStart="2dp"
                     />
 
@@ -84,7 +77,9 @@
                     android:layout_margin="0dp"
                     android:minWidth="35dp"
                     android:padding="0dp"
-                    android:text="1"/>
+                    android:text="1"
+                    android:textSize="14sp"
+                    tools:ignore="HardcodedText"/>
 
             </RelativeLayout>
 

@@ -35,7 +35,8 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
 
         val rv = RemoteViews(ctx.packageName, R.layout.widget_task_row)
         rv.setTextViewText(R.id.name, t.item.name)
-        rv.setTextViewText(R.id.dep_name, t.item.department.name)
+        rv.setTextViewText(R.id.qty_txt, t.qty.toString())
+        //rv.setTextViewText(R.id.dep_name, t.item.department.name)
 
         val intent = Intent()
         intent.putExtra("taskId", t.id)

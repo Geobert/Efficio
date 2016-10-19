@@ -11,7 +11,7 @@ object ItemTable : BaseTable() {
     val COL_NAME = "item_name"
     val COL_NORM_NAME = "item_norm"
 
-    override fun CREATE_COLUMNS() = "${COL_NORM_NAME} TEXT NOT NULL UNIQUE ON CONFLICT IGNORE, " +
+    override fun CREATE_COLUMNS() = "$COL_NORM_NAME TEXT NOT NULL UNIQUE ON CONFLICT IGNORE, " +
             "$COL_NAME TEXT NOT NULL"
 
     override val COLS_TO_QUERY: Array<String> = arrayOf(BaseColumns._ID, COL_NAME)

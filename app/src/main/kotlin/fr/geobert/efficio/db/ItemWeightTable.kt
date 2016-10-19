@@ -15,7 +15,7 @@ object ItemWeightTable : BaseTable() {
             "$COL_ITEM_ID INTEGER NOT NULL, " +
             "$COL_WEIGHT INTEGER NOT NULL, " +
             "${foreignId(COL_STORE_ID, StoreTable.TABLE_NAME)}," +
-            "${foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)}"
+            foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)
 
     override val COLS_TO_QUERY: Array<String>
         get() = throw UnsupportedOperationException()

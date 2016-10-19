@@ -21,7 +21,7 @@ import kotlin.properties.Delegates
 class TaskListWidget : AppWidgetProvider() {
     val TAG = "TaskListWidget"
 
-    var opacity: Float by Delegates.notNull()
+    var opacity: Float by Delegates.notNull<Float>()
     var storeName by Delegates.notNull<String>()
     var storeId by Delegates.notNull<Long>()
 
@@ -98,7 +98,7 @@ class TaskListWidget : AppWidgetProvider() {
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
-        fetchWidgetInfo(context, appWidgetId)
+        if (!fetchWidgetInfo(context, appWidgetId)) return
 
         // Construct the RemoteViews object
         val views = RemoteViews(context.packageName, R.layout.task_list_widget)
