@@ -19,7 +19,7 @@ import fr.geobert.efficio.db.TaskTable
 import java.util.*
 import kotlin.properties.Delegates
 
-class TaskDragSwipeHelper(val fragment: TaskListFragment, val tasksList: MutableList<Task>,
+class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: MutableList<Task>,
                           val taskAdapter: TaskAdapter) :
         ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -35,7 +35,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, val tasksList: Mutable
 
     override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
                         target: RecyclerView.ViewHolder): Boolean {
-        Log.d(TAG, "onMove")
+        Log.d(TAG, "onMove: viewHolder.adapterPosition: ${viewHolder.adapterPosition} / target.adapterPosition: ${target.adapterPosition}  / tasksList.count: ${tasksList.size}")
         Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
         val r = fragment.updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
         taskAdapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)

@@ -58,10 +58,8 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     private val header = Task()
 
     // this manage drag and swipe on tasks
-
-    private val taskItemTouchHlp by lazy {
-        ItemTouchHelper(TaskDragSwipeHelper(this, tasksList, taskAdapter!!))
-    }
+    private val dragSwipeHlp by lazy { TaskDragSwipeHelper(this, tasksList, taskAdapter!!) }
+    private val taskItemTouchHlp by lazy { ItemTouchHelper(dragSwipeHlp) }
 
     fun updateTasksList(needAdapterSort: Boolean) {
         val f = quick_add_text.text.trim().toString()
@@ -362,6 +360,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                     taskAdapter = TaskAdapter(tasksList, this)
                 else
                     taskAdapter!!.animateTo(tasksList)
+                dragSwipeHlp.tasksList = tasksList
                 tasks_list.adapter = taskAdapter
                 taskItemTouchHlp.attachToRecyclerView(tasks_list)
             }

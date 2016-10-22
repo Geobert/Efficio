@@ -53,6 +53,10 @@ class TaskListWidget : AppWidgetProvider() {
                 TaskTable.updateDoneState(context, extras.getLong("taskId"), true)
                 appWidgetManager.notifyAppWidgetViewDataChanged(
                         widgetId, R.id.tasks_list_widget)
+                if (!fetchWidgetInfo(context, widgetId)) {
+                    Log.e(TAG, "onReceive ACTION_CHECKBOX_CHANGED fetchWidgetInfo FAILED")
+                    return
+                }
                 val i = Intent(OnRefreshReceiver.REFRESH_ACTION)
                 i.putExtra("storeId", storeId)
                 context.sendBroadcast(i)
@@ -82,11 +86,14 @@ class TaskListWidget : AppWidgetProvider() {
 
     private fun fetchWidgetInfo(ctx: Context, widgetId: Int): Boolean {
         val cursor = WidgetTable.getWidgetInfo(ctx, widgetId)
-        if (cursor != null && cursor.count > 0 && cursor.moveToFirst()) {
-            storeId = cursor.getLong(0)
-            opacity = cursor.getFloat(1)
-            storeName = cursor.getString(2)
-            return true
+        if (cursor != null) {
+            if (cursor.count > 0 && cursor.moveToFirst()) {
+                storeId = cursor.getLong(0)
+                opacity = cursor.getFloat(1)
+                storeName = cursor.getString(2)
+                return true
+            }
+            cursor.close()
         }
         return false
     }
@@ -98,7 +105,10 @@ class TaskListWidget : AppWidgetProvider() {
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
 
-        if (!fetchWidgetInfo(context, appWidgetId)) return
+        if (!fetchWidgetInfo(context, appWidgetId)) {
+            Log.e(TAG, "updateAppWidget fetchWidgetInfo FAILED")
+            return
+        }
 
         // Construct the RemoteViews object
         val views = RemoteViews(context.packageName, R.layout.task_list_widget)

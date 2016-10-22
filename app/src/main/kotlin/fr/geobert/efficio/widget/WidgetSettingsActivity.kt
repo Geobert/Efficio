@@ -15,7 +15,6 @@ import fr.geobert.efficio.db.WidgetTable
 import fr.geobert.efficio.misc.EditorToolbarTrait
 import fr.geobert.efficio.misc.consume
 import kotlinx.android.synthetic.main.widget_settings_activity.*
-import kotlin.properties.Delegates
 
 
 class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolbarTrait {
@@ -33,7 +32,7 @@ class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolba
 
     private val isFirstConfig by lazy { intent.extras.getBoolean(FIRST_CONFIG, true) }
 
-    private var opacity: Int by Delegates.notNull()
+    private var opacity: Int = 80
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +41,7 @@ class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolba
         initToolbar(this)
         setTitle(R.string.title_activity_widget_settings)
         opacity_seekbar.max = 100
+        opacity_seekbar.progress = opacity
         opacity_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 opacity = p1
