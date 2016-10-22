@@ -18,9 +18,12 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import fr.geobert.efficio.adapter.TaskAdapter
 import fr.geobert.efficio.adapter.TaskViewHolder
 import fr.geobert.efficio.data.Department
@@ -131,6 +134,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         }
 
         quick_add_text.addTextChangedListener(this)
+        quick_add_text.setOnEditorActionListener { textView,  i, keyEvent -> onEditorAction(textView, i, keyEvent) }
 
         fetchStore(this, lastStoreId)
 
@@ -145,6 +149,14 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     override fun onDestroyView() {
         super.onDestroyView()
         activity.unregisterReceiver(refreshReceiver)
+    }
+
+    private fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        if (actionId == EditorInfo.IME_ACTION_DONE){
+            onAddTaskClicked()
+            return true
+        }
+        return false
     }
 
     private fun onAddTaskClicked() {

@@ -18,6 +18,8 @@
 
     <EditText
         android:id="@+id/quick_add_text"
+        android:inputType="text|textCapSentences"
+        android:imeOptions="actionDone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@id/quick_add_btn"
@@ -27,7 +29,8 @@
         android:layout_marginLeft="5dp"
         android:layout_marginStart="5dp"
         android:layout_toLeftOf="@id/quick_add_btn"
-        android:layout_toStartOf="@id/quick_add_btn"/>
+        android:layout_toStartOf="@id/quick_add_btn"
+        android:maxLines="1"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/tasks_list"
