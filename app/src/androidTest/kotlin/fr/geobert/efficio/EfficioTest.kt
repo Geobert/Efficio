@@ -101,65 +101,61 @@ class EfficioTest {
 
     @Test fun testSort3Items() {
         addItem(ITEM_A, DEP_B)
-        addItem(ITEM_B, DEP_A)
-        dragTask(1, Direction.UP)
-        // same state as end of testSort2Items
-
-        // add C item same dep as A
+        addItem(ITEM_B, DEP_B)
         addItem(ITEM_C, DEP_B)
-        checkTaskListItemAt(0, ITEM_A)
-        checkTaskListItemAt(1, ITEM_C)
-        checkTaskListItemAt(2, ITEM_B)
+        checkOrderOfTask(ITEM_A, ITEM_B, ITEM_C)
 
-        // drag C above A
-        dragTask(1, Direction.UP)
-        checkTaskListItemAt(0, ITEM_C)
-        checkTaskListItemAt(1, ITEM_A)
-        checkTaskListItemAt(2, ITEM_B)
+        // drag C above B
+        dragTask(2, Direction.UP)
+        checkOrderOfTask(ITEM_A, ITEM_C, ITEM_B)
+        clickInDrawer(R.id.edit_departments)
+        Espresso.pressBack()
+        pauseTest(300)
+        checkOrderOfTask(ITEM_A, ITEM_C, ITEM_B)
 
-        // tick C, should fall at the bottom
+        addItem(ITEM_D, DEP_A)
+        checkOrderOfTask(ITEM_A, ITEM_C, ITEM_B, ITEM_D)
+
+        // drag D above B
+        dragTask(3, Direction.UP)
+        // D has diff dep as others, so its dep going above their dep, hence D is first
+        checkOrderOfTask(ITEM_D, ITEM_A, ITEM_C, ITEM_B)
+        clickInDrawer(R.id.edit_departments)
+        Espresso.pressBack()
+        pauseTest(300)
+        checkOrderOfTask(ITEM_D, ITEM_A, ITEM_C, ITEM_B)
+
+        // tick D, should fall at the bottom
         clickTickOfTaskAt(0)
-        checkTaskListItemAt(0, ITEM_A)
-        checkTaskListItemAt(1, ITEM_B)
+        checkOrderOfTask(ITEM_A, ITEM_C, ITEM_B, COMPLETED, ITEM_D)
 
         // tick A
         clickTickOfTaskAt(0)
-        checkTaskListItemAt(0, ITEM_B)
-        // pos 1 = header
-        checkTaskListItemAt(2, ITEM_A)
-        checkTaskListItemAt(3, ITEM_C)
+        checkOrderOfTask(ITEM_C, ITEM_B, COMPLETED, ITEM_A, ITEM_D)
 
-        // untick C
-        clickTickOfTaskAt(3)
-        checkTaskListItemAt(0, ITEM_C)
-        checkTaskListItemAt(1, ITEM_B)
-        // pos 2 = header
-        checkTaskListItemAt(3, ITEM_A)
+        // untick D
+        clickTickOfTaskAt(4)
+        checkOrderOfTask(ITEM_D, ITEM_C, ITEM_B, COMPLETED, ITEM_A)
 
         // untick A
-        clickTickOfTaskAt(3)
-        checkTaskListItemAt(0, ITEM_C)
-        checkTaskListItemAt(1, ITEM_A)
-        checkTaskListItemAt(2, ITEM_B)
+        clickTickOfTaskAt(4)
+        checkOrderOfTask(ITEM_D, ITEM_A, ITEM_C, ITEM_B)
 
-        // drag C under A
+        // drag D under A
         dragTask(0, Direction.DOWN)
-        checkTaskListItemAt(0, ITEM_A)
-        checkTaskListItemAt(1, ITEM_C)
-        checkTaskListItemAt(2, ITEM_B)
+        checkOrderOfTask(ITEM_A, ITEM_C, ITEM_B, ITEM_D)
 
-        // tick C
+        // drag C above A
+        dragTask(1, Direction.UP)
+        checkOrderOfTask(ITEM_C, ITEM_A, ITEM_B, ITEM_D)
+
+        // tick A
         clickTickOfTaskAt(1)
-        checkTaskListItemAt(0, ITEM_A)
-        checkTaskListItemAt(1, ITEM_B)
-        // pos 2 = header
-        checkTaskListItemAt(3, ITEM_C)
+        checkOrderOfTask(ITEM_C, ITEM_B, ITEM_D, COMPLETED, ITEM_A)
 
         // untick C
-        clickTickOfTaskAt(3)
-        checkTaskListItemAt(0, ITEM_A)
-        checkTaskListItemAt(1, ITEM_C)
-        checkTaskListItemAt(2, ITEM_B)
+        clickTickOfTaskAt(4)
+        checkOrderOfTask(ITEM_C, ITEM_A, ITEM_B, ITEM_D)
     }
 
 
@@ -167,9 +163,7 @@ class EfficioTest {
         addItem(ITEM_A, DEP_B)
         addItem(ITEM_B, DEP_A)
         addItem(ITEM_C, DEP_A)
-        checkTaskListItemAt(0, ITEM_B)
-        checkTaskListItemAt(1, ITEM_C)
-        checkTaskListItemAt(2, ITEM_A)
+        checkOrderOfTask(ITEM_A, ITEM_B, ITEM_C)
 
         // put C above A, so it get some weight
         dragTask(1, Direction.UP)

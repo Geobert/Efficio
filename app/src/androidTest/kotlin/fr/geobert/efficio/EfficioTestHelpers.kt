@@ -17,6 +17,7 @@ import fr.geobert.efficio.adapter.TaskViewHolder
 val ITEM_A = "Item A"
 val ITEM_B = "Item B"
 val ITEM_C = "Item C"
+val ITEM_D = "Item D"
 val DEP_A = "Dep 1"
 val DEP_B = "Dep 2"
 val COMPLETED: String by lazy { InstrumentationRegistry.getTargetContext().getString(R.string.completed) }

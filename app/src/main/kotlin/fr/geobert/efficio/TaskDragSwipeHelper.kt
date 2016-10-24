@@ -1,23 +1,14 @@
 package fr.geobert.efficio
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.*
 import android.os.Handler
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import com.crashlytics.android.Crashlytics
-import fr.geobert.efficio.adapter.TaskAdapter
-import fr.geobert.efficio.adapter.TaskViewHolder
-import fr.geobert.efficio.data.Item
-import fr.geobert.efficio.data.Task
-import fr.geobert.efficio.db.ItemWeightTable
-import fr.geobert.efficio.db.StoreCompositionTable
-import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.adapter.*
+import fr.geobert.efficio.data.*
+import fr.geobert.efficio.db.*
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -25,6 +16,8 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                           val taskAdapter: TaskAdapter) :
         ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+    private enum class Direction { UP, DOWN }
+
     private val TAG = "TaskDragSwipeHelper"
     private var lastDragTask: TaskViewHolder? = null
     private var lastSwipeTask: TaskViewHolder? = null
@@ -34,14 +27,18 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
     private var recyclerview: RecyclerView by Delegates.notNull()
     private val p = Paint()
     private val activity = fragment.activity
+    private var direction: Direction by Delegates.notNull()
 
     override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
                         target: RecyclerView.ViewHolder): Boolean {
         Log.d(TAG, "onMove: viewHolder.adapterPosition: ${viewHolder.adapterPosition} / target.adapterPosition: ${target.adapterPosition}  / tasksList.count: ${tasksList.size}")
         Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
-        //val r = updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
+        if (viewHolder.adapterPosition > target.adapterPosition) {
+            direction = Direction.UP
+        } else {
+            direction = Direction.DOWN
+        }
         taskAdapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
-        //if (!needAdapterSort) needAdapterSort = r
         return true
     }
 
@@ -65,10 +62,10 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
         }
     }
 
-    private fun updateTaskWeight(dragged: TaskViewHolder): Boolean {
+    private fun updateTaskWeight(dragged: TaskViewHolder) {
         val pos = dragged.adapterPosition
         val item = dragged.task.item
-        var needAdapterUpdate = false
+        needAdapterSort = false
         if (tasksList.size > 1) {
             if (pos == 0) { // the first
                 val next = tasksList[pos + 1].item
@@ -78,7 +75,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                 } else {
                     if (item.department.weight >= next.department.weight) {
                         item.department.weight = next.department.weight - 1.0
-                        needAdapterUpdate = true
+                        needAdapterSort = true
                     }
                 }
             } else if (pos == (tasksList.size - 1)) { // the last
@@ -89,20 +86,33 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                 } else {
                     if (item.department.weight <= prev.department.weight) {
                         item.department.weight = prev.department.weight + 1.0
-                        needAdapterUpdate = true
+                        needAdapterSort = true
                     }
                 }
             } else { // somewhere between
                 val next = tasksList[pos + 1].item
                 val prev = tasksList[pos - 1].item
-                if (item.weight <= prev.weight || item.weight >= next.weight) {
-                    item.weight = (next.weight + prev.weight) / 2.0
-                    if (item.weight >= next.weight || item.weight <= prev.weight)
-                        handleDoubleCollision(pos, item, next, prev)
+                val itemDep = item.department
+                val nextDep = next.department
+                val prevDep = prev.department
+                if (itemDep.id != prevDep.id && itemDep.id != nextDep.id) { // all different dep
+                    if (prevDep.id == nextDep.id) {
+                        itemDep.weight = nextDep.weight + if (direction == Direction.UP) -1.0 else 1.0
+                        needAdapterSort = true
+                    } else {
+                        itemDep.weight = (prevDep.weight + nextDep.weight) / 2.0
+                        // TODO collision of double
+                        needAdapterSort = true
+                    }
+                } else {
+                    if (item.weight <= prev.weight || item.weight >= next.weight) {
+                        item.weight = (next.weight + prev.weight) / 2.0
+                        if (item.weight >= next.weight || item.weight <= prev.weight)
+                            handleDoubleCollision(pos, item, next, prev)
+                    }
                 }
             }
         }
-        return needAdapterUpdate
     }
 
     private fun handleDoubleCollision(pos: Int, item: Item, next: Item, prev: Item) {
