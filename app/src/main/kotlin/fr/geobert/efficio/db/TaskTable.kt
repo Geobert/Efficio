@@ -43,7 +43,7 @@ object TaskTable : BaseTable() {
     )
 
     val RESTRICT_TO_STORE = "(${TaskTable.TABLE_NAME}.$COL_STORE_ID = ?)"
-    val ORDERING = "is_done asc, dep_weight desc, dep_name asc, item_weight desc, item_name asc"
+    val ORDERING = "is_done asc, dep_weight asc, dep_name asc, item_weight asc, item_name asc"
 
     val CREATE_TRIGGER_ON_TASK_DEL by lazy {
         "CREATE TRIGGER on_task_deleted " +

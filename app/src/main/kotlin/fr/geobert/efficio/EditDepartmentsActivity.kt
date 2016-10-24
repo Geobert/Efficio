@@ -8,21 +8,18 @@ import android.app.Fragment
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
-import fr.geobert.efficio.adapter.DepartmentViewHolder
 import fr.geobert.efficio.data.Department
 import fr.geobert.efficio.data.DepartmentManager
 import fr.geobert.efficio.db.DepartmentTable
-import fr.geobert.efficio.db.StoreCompositionTable
 import fr.geobert.efficio.dialog.MessageDialog
 import kotlinx.android.synthetic.main.department_chooser_dialog.*
 import kotlinx.android.synthetic.main.edit_dep_text.view.*
-import java.util.*
 import kotlin.properties.Delegates
+
 
 class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoiceListener {
     private var depManager: DepartmentManager by Delegates.notNull()
@@ -34,42 +31,7 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         }
     }
 
-    private val dragNDropMgr =
-            object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
-                override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
-                                    target: RecyclerView.ViewHolder): Boolean {
-                    Collections.swap(depManager.departmentsList, viewHolder.adapterPosition,
-                            target.adapterPosition)
-                    depManager.depAdapter.notifyItemMoved(viewHolder.adapterPosition,
-                            target.adapterPosition)
-                    updateDepWeight(viewHolder as DepartmentViewHolder, target as DepartmentViewHolder)
-                    return true
-                }
-
-                private var orig: Float = 0f
-                private var lastDragTask: DepartmentViewHolder? = null
-
-                override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-                    super.onSelectedChanged(viewHolder, actionState)
-                    // end of drag n drop, adapter is correctly ordered but not our representation here
-                    val vh = viewHolder as DepartmentViewHolder?
-                    if (vh == null) {
-                        val activity = this@EditDepartmentsActivity
-                        lastDragTask!!.cardView.cardElevation = orig
-                        StoreCompositionTable.updateDepWeight(activity, lastDragTask!!.dep!!)
-                    } else {
-                        orig = vh.cardView.cardElevation
-                        vh.cardView.cardElevation = 20.0f
-                    }
-                    lastDragTask = vh
-                }
-
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
-                    // nothing
-                }
-            }
-
-    private val depTouchHelper = ItemTouchHelper(dragNDropMgr)
+    private val depTouchHelper by lazy { ItemTouchHelper(DepartmentDragHelper(this, depManager)) }
 
     companion object {
         fun callMe(frg: Fragment, storeId: Long) {
@@ -78,20 +40,6 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
             frg.startActivityForResult(i, 1)
         }
     }
-
-    private fun updateDepWeight(dragged: DepartmentViewHolder, target: DepartmentViewHolder) {
-        if (dragged.adapterPosition < target.adapterPosition) {
-            // going up
-            if (dragged.dep!!.weight <= target.dep!!.weight)
-                dragged.dep!!.weight = target.dep!!.weight + 1
-
-        } else {
-            // going down
-            if (dragged.dep!!.weight >= target.dep!!.weight)
-                dragged.dep!!.weight = target.dep!!.weight - 1
-        }
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -134,7 +134,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
     private fun setUpDrawerToggle() {
         // Defer code dependent on restoration of previous instance state.
         // NB: required for the drawer indicator to show up!
-        drawer_layout.setDrawerListener(mDrawerToggle)
+        drawer_layout.addDrawerListener(mDrawerToggle)
         drawer_layout.post({ mDrawerToggle.syncState() })
     }
 

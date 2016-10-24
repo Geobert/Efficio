@@ -10,13 +10,13 @@ class Item {
     var id: Long by Delegates.notNull()
     var name: String by Delegates.notNull()
     fun normName(): String = name.normalize()
-    var weight: Int by Delegates.notNull()
+    var weight: Double by Delegates.notNull()
     var department: Department by Delegates.notNull()
 
     constructor(cursor: Cursor) {
         // from TaskTable query
         id = cursor.getLong(cursor.getColumnIndex(TaskTable.COL_ITEM_ID))
-        weight = cursor.getInt(cursor.getColumnIndex("item_weight"))
+        weight = cursor.getDouble(cursor.getColumnIndex("item_weight"))
         val depIdColIdx = cursor.getColumnIndex("dep_id")
         val depId = cursor.getLong(depIdColIdx)
         val dep = departmentsList[depId]
@@ -34,17 +34,17 @@ class Item {
         name = cursor.getString(cursor.getColumnIndex("item_name"))
     }
 
-    constructor(name: String, dep: Department) {
+    constructor(name: String, dep: Department, w: Double) {
         id = 0
         this.name = name
-        weight = 0
+        weight = w
         department = dep
     }
 
     constructor() {
         id = 0
         this.name = ""
-        weight = 0
+        weight = 0.0
         department = Department()
     }
 
@@ -56,7 +56,7 @@ class Item {
     }
 
     fun isEquals(item: Item): Boolean {
-        return weight == item.weight && name.equals(item.name) &&
+        return weight == item.weight && name == item.name &&
                 department.isEquals(item.department)
     }
 

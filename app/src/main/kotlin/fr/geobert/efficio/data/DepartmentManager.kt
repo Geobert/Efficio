@@ -50,7 +50,7 @@ class DepartmentManager(val activity: Activity,
 
     var depAdapter: DepartmentAdapter by Delegates.notNull()
     var departmentsList: MutableList<Department> by Delegates.notNull()
-    var origDepList: MutableList<Department>? = null
+    private var origDepList: MutableList<Department>? = null
 
     init {
         list = layout.dep_list
@@ -67,6 +67,9 @@ class DepartmentManager(val activity: Activity,
         addDepEdt.addTextChangedListener(this)
     }
 
+    fun nbDepartment() = departmentsList.size
+    fun getDepartement(pos: Int) = departmentsList[pos]
+
     fun setEditMode(isEdit: Boolean) {
         if (isEdit) {
             addDepBtn.visibility = View.GONE
@@ -76,6 +79,10 @@ class DepartmentManager(val activity: Activity,
             addDepEdt.visibility = View.VISIBLE
             addDepBtn.visibility = View.VISIBLE
         }
+    }
+
+    private fun maxDepWeight(): Double {
+        return if (departmentsList.size > 0) departmentsList.last().weight else 0.0
     }
 
     private fun onAddDepClicked() {
@@ -93,7 +100,7 @@ class DepartmentManager(val activity: Activity,
             if (existingDep != null) {
                 onDepartmentChosen(existingDep)
             } else {
-                val d = Department(t)
+                val d = Department(t, maxDepWeight() + 1.0)
                 d.id = DepartmentTable.create(activity, d)
                 if (d.id > 0) {
                     if (StoreCompositionTable.create(activity, storeId, d) > 0) {

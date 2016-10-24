@@ -45,7 +45,7 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
         return taskList[position].type.ordinal
     }
 
-    private fun getTaskPosition(taskId: Long): Int {
+    fun getTaskPosition(taskId: Long): Int {
         return taskList.indexOfFirst { taskId == it.id }
     }
 

@@ -13,7 +13,7 @@ object ItemWeightTable : BaseTable() {
 
     override fun CREATE_COLUMNS(): String = "$COL_STORE_ID INTEGER NOT NULL, " +
             "$COL_ITEM_ID INTEGER NOT NULL, " +
-            "$COL_WEIGHT INTEGER NOT NULL, " +
+            "$COL_WEIGHT REAL NOT NULL, " +
             "${foreignId(COL_STORE_ID, StoreTable.TABLE_NAME)}," +
             foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)
 
@@ -24,7 +24,7 @@ object ItemWeightTable : BaseTable() {
         val v = ContentValues()
         v.put(COL_STORE_ID, storeId)
         v.put(COL_ITEM_ID, i.id)
-        v.put(COL_WEIGHT, 0)
+        v.put(COL_WEIGHT, i.weight)
         return insert(activity, v)
     }
 

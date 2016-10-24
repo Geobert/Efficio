@@ -75,46 +75,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         }
     }
 
-    fun updateTaskWeight(dragged: TaskViewHolder, target: TaskViewHolder): Boolean {
-        val dTask = dragged.task
-        val tTask = target.task
-        val dItem = dTask.item
-        val tItem = tTask.item
-        val dDep = dItem.department
-        val tDep = tItem.department
-        var res: Boolean = false
-        Log.d(TAG, "dragged task: $dTask")
-        if (dragged.adapterPosition > target.adapterPosition) {
-            // item goes up
-            Log.d(TAG, "item goes up")
-            if (dDep.id == tDep.id) {
-                if (dItem.weight <= tItem.weight) {
-                    dItem.weight = tItem.weight + 1
-                }
-            } else {
-                if (dDep.weight <= tDep.weight) {
-                    dDep.weight = tDep.weight + 1
-                    res = true
-                }
-            }
-        } else if (dragged.adapterPosition < target.adapterPosition) {
-            // item goes down
-            Log.d(TAG, "item goes down")
-            if (dDep.id == tDep.id) {
-                if (dItem.weight >= tItem.weight) {
-                    dItem.weight = tItem.weight - 1
-                }
-            } else {
-                if (dDep.weight >= tDep.weight) {
-                    dDep.weight = tDep.weight - 1
-                    res = true
-                }
-            }
-        }
-        Log.d(TAG, "dragged task after: $dTask")
-        return res
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup,
                               savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
@@ -134,7 +94,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         }
 
         quick_add_text.addTextChangedListener(this)
-        quick_add_text.setOnEditorActionListener { textView,  i, keyEvent -> onEditorAction(textView, i, keyEvent) }
+        quick_add_text.setOnEditorActionListener { textView, i, keyEvent -> onEditorAction(textView, i, keyEvent) }
 
         fetchStore(this, lastStoreId)
 
@@ -152,7 +112,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     private fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
-        if (actionId == EditorInfo.IME_ACTION_DONE){
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
             onAddTaskClicked()
             return true
         }
@@ -207,20 +167,23 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     override fun onDepartmentChosen(d: Department) {
         Log.d(TAG, "onDepartmentChosen : ${d.name}")
         // we choose a department, so the task does not exist
-
-        val i = Item(quick_add_text.text.trim().toString(), d)
+        val maxWeightForDep = findMaxWeightForDepartment(d)
+        val i = Item(quick_add_text.text.trim().toString(), d, maxWeightForDep + 1.0)
         i.id = ItemTable.create(activity, i)
         if (i.id > 0) {
+            // add to adapter, but need to find the right position
+            val t = Task(i)
+            tasksList.add(t)
+            tasksList.sort()
+            taskAdapter!!.animateTo(tasksList)
+            quick_add_text.text.clear()
+
             if (ItemWeightTable.create(activity, i, lastStoreId) > 0) {
                 if (ItemDepTable.create(activity, i, lastStoreId) > 0) {
-                    val t = Task(i)
                     if (TaskTable.create(activity, t, lastStoreId) > 0) {
-                        // add to adapter, but need to find the right position
-                        tasksList.add(t)
-                        tasksList.sort()
-                        taskAdapter!!.animateTo(tasksList)
-                        quick_add_text.text.clear()
                         updateWidgets()
+                    } else {
+                        Log.e(TAG, "error on creating task")
                     }
                 }
             } else {
@@ -230,6 +193,11 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
             Log.e(TAG, "error on item creation")
         }
 
+    }
+
+    private fun findMaxWeightForDepartment(d: Department): Double {
+        val filteredByDep = tasksList.filter { t -> t.item.department.id == d.id }
+        return if (filteredByDep.size > 0) filteredByDep.last().item.weight else 0.0
     }
 
     fun updateWidgets() {
@@ -250,7 +218,12 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         TaskTable.updateDoneState(activity, task.id, task.isDone)
         tasksList.sort()
         addHeaderIfNeeded(tasksList)
+        val layMan = (tasks_list.layoutManager as LinearLayoutManager)
+        var pos = layMan.findFirstVisibleItemPosition()
         taskAdapter!!.animateTo(tasksList)
+        if (!task.isDone) pos = taskAdapter!!.getTaskPosition(task.id)
+        tasks_list.scrollToPosition(pos)
+        tasks_list.post { tasks_list.invalidateItemDecorations() }
         updateWidgets()
     }
 
@@ -304,7 +277,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         val newStoreId = extras.getLong("newStoreId", -1)
         val taskId = extras.getLong("taskId", -1)
         if (newStoreId > 0) lastStoreId = newStoreId
-        if (taskId > -1) { // at the moment, this is when a quantity has been edited via dialog
+        if (taskId > -1) { // for the moment, this is only when a quantity has been edited via dialog
             taskAdapter!!.refreshTaskFromDB(activity, taskId)
         } else if (storeId == lastStoreId || storeId < 0L) {
             fetchStore(this, lastStoreId)

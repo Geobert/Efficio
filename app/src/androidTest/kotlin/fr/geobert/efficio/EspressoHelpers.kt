@@ -1,7 +1,7 @@
 package fr.geobert.efficio
 
 import android.support.test.espresso.*
-import android.support.test.espresso.action.ViewActions.actionWithAssertions
+import android.support.test.espresso.action.ViewActions
 import android.support.test.espresso.matcher.ViewMatchers
 import android.support.test.espresso.util.*
 import android.support.v7.widget.RecyclerView
@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.ListView
 import junit.framework.AssertionFailedError
 import org.hamcrest.*
+
 
 // sugar wrapper for the backquote
 fun <T> iz(matcher: Matcher<T>): Matcher<T> = Matchers.`is`(matcher)
@@ -65,7 +66,7 @@ fun withRecyclerViewSize(expectedCount: Int): Matcher<View> {
 }
 
 fun dragViewInRecycler(dir: Direction, step: Int = 1): ViewAction {
-    return actionWithAssertions(DragViewInRecyclerAction(dir, step))
+    return ViewActions.actionWithAssertions(DragViewInRecyclerAction(dir, step))
 }
 
 fun withRecyclerView(recyclerViewId: Int): RecyclerViewMatcher {

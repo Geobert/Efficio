@@ -30,7 +30,6 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
     }
 
     override fun getViewAt(position: Int): RemoteViews? {
-        Log.d(TAG, "getViewAt $position")
         val t = tasksList[position]
 
         val rv = RemoteViews(ctx.packageName, R.layout.widget_task_row)
@@ -48,7 +47,6 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
     }
 
     override fun onCreate() {
-        Log.d(TAG, "onCreate")
     }
 
     private fun fetchWidgetInfo(widgetId: Int): Boolean {
@@ -58,7 +56,7 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
             opacity = cursor.getFloat(1)
             storeName = cursor.getString(2)
 
-            Log.d(TAG, "fetchWidgetInfo: storeId:$storeId, opacity:$opacity")
+            //Log.d(TAG, "fetchWidgetInfo: storeId:$storeId, opacity:$opacity")
             return true
         }
         Log.e(TAG, "fetchWidgetInfo: failed")
@@ -66,11 +64,9 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
     }
 
     private fun fetchStoreTask(storeId: Long) {
-        Log.d(TAG, "fetchStoreTask, store:$storeId")
         val token = Binder.clearCallingIdentity()
         try {
             val cursor = TaskTable.getAllNotDoneTasksForStore(ctx, storeId)
-            Log.d(TAG, "cursor count : ${cursor?.count}")
             if (cursor != null && cursor.count > 0) {
                 tasksList = cursor.map(::Task)
             } else {
@@ -83,12 +79,10 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
     }
 
     override fun getItemId(position: Int): Long {
-        Log.d(TAG, "getItemId : $position = ${tasksList[position].id}")
         return tasksList[position].id
     }
 
     override fun onDataSetChanged() {
-        Log.d(TAG, "onDataSetChanged for widgetId: $widgetId")
         if (fetchWidgetInfo(widgetId))
             fetchStoreTask(storeId)
     }
@@ -98,12 +92,10 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
     }
 
     override fun getCount(): Int {
-        Log.d(TAG, "getCount: ${tasksList.count()}")
         return tasksList.count()
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "onDestroy")
     }
 
 }

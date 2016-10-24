@@ -7,25 +7,25 @@ import kotlin.properties.Delegates
 class Department : Comparable<Department> {
     var id: Long by Delegates.notNull()
     var name: String by Delegates.notNull()
-    var weight: Int by Delegates.notNull()
+    var weight: Double by Delegates.notNull()
 
     constructor(cursor: Cursor, b: Bundle) {
         id = cursor.getLong(b.getInt("id"))
         name = cursor.getString(b.getInt("name"))
         val idx = b.getInt("weight")
-        weight = if (idx > 0) cursor.getInt(idx) else 0
+        weight = if (idx > 0) cursor.getDouble(idx) else 0.0
     }
 
-    constructor(name: String) {
+    constructor(name: String, w: Double) {
         id = 0
         this.name = name
-        weight = 0
+        weight = w
     }
 
     constructor() {
         id = 0
         this.name = ""
-        weight = 0
+        weight = 0.0
     }
 
     constructor(department: Department) {

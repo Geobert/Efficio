@@ -17,7 +17,7 @@ object StoreCompositionTable : BaseTable() {
 
     override fun CREATE_COLUMNS(): String = "$COL_STORE_ID INTEGER NOT NULL, " +
             "$COL_DEP_ID INTEGER NOT NULL, " +
-            "$COL_WEIGHT INTEGER NOT NULL, " +
+            "$COL_WEIGHT REAL NOT NULL, " +
             "${foreignId(COL_STORE_ID, StoreTable.TABLE_NAME)}, " +
             "${foreignId(COL_DEP_ID, DepartmentTable.TABLE_NAME)}"
 
@@ -33,7 +33,7 @@ object StoreCompositionTable : BaseTable() {
             "$TABLE_NAME.$COL_WEIGHT")
 
     val RESTRICT_TO_STORE = "($TABLE_NAME.$COL_STORE_ID = ?)"
-    val ORDERING = "$COL_WEIGHT desc"
+    val ORDERING = "$COL_WEIGHT asc"
 
     fun getDepFromStoreLoader(activity: Context, storeId: Long): CursorLoader {
         return CursorLoader(activity, CONTENT_URI, COLS_TO_QUERY, RESTRICT_TO_STORE,
@@ -44,7 +44,7 @@ object StoreCompositionTable : BaseTable() {
         val v = ContentValues()
         v.put(COL_STORE_ID, storeId)
         v.put(COL_DEP_ID, department.id)
-        v.put(COL_WEIGHT, 0)
+        v.put(COL_WEIGHT, department.weight)
 
         val res = ctx.contentResolver.insert(CONTENT_URI, v)
         return res.lastPathSegment.toLong()

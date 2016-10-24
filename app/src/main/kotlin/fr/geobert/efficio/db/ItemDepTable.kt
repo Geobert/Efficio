@@ -16,7 +16,7 @@ object ItemDepTable : BaseTable() {
             "$COL_ITEM_ID INTEGER NOT NULL, " +
             "${foreignId(COL_STORE_ID, StoreTable.TABLE_NAME)}," +
             "${foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)}," +
-            "${foreignId(COL_DEP_ID, DepartmentTable.TABLE_NAME)}"
+            foreignId(COL_DEP_ID, DepartmentTable.TABLE_NAME)
 
     override val COLS_TO_QUERY: Array<String>
         get() = throw UnsupportedOperationException()

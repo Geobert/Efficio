@@ -2,17 +2,13 @@ package fr.geobert.efficio
 
 import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.action.ViewActions.replaceText
+import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
-import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.espresso.matcher.ViewMatchers.withText
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 
 /**
@@ -61,24 +57,45 @@ class EfficioTest {
         addItem(ITEM_B, DEP_A)
         checkTaskListSize(2)
 
-        // Item B is in Department 1, no weight yet, should be first
-        checkTaskListItemAt(0, ITEM_B)
+        // check dep order in dep editor
+        clickInDrawer(R.id.edit_departments)
+        checkOrderOfDeps(DEP_B, DEP_A)
+        Espresso.pressBack()
+        pauseTest(300)
 
-        // drag A above B
+        // creating an item, weight = max weight + 1, so B is last
+        checkOrderOfTask(ITEM_A, ITEM_B)
+
+        // drag B above A
         dragTask(1, Direction.UP)
-        checkTaskListItemAt(0, ITEM_A)
+        checkOrderOfTask(ITEM_B, ITEM_A)
 
-        // set A as done
+        // set B as done
         clickTickOfTaskAt(0)
 
-        // A going to bottom, B should be first
-        checkTaskListItemAt(0, ITEM_B)
+        // B going to bottom, A should be first
+        checkOrderOfTask(ITEM_A, COMPLETED, ITEM_B)
 
-        // uncheck A, position is 2 and not 1 because of header
+        // uncheck B, position is 2 and not 1 because of header
         clickTickOfTaskAt(2)
 
-        // A should go back to first pos because of dep weight
-        checkTaskListItemAt(0, ITEM_A)
+        // B should go back to first pos
+        checkOrderOfTask(ITEM_B, ITEM_A)
+
+        // go to dep editor and back to refresh list and check order again
+        clickInDrawer(R.id.edit_departments)
+        // check order, as Item B is in Dep A, Dep A should be 1st after Item B was dragged up
+        checkOrderOfDeps(DEP_A, DEP_B)
+        Espresso.pressBack()
+        pauseTest(300)
+        checkOrderOfTask(ITEM_B, ITEM_A)
+
+        // change dep order
+        clickInDrawer(R.id.edit_departments)
+        dragDep(1, Direction.UP)
+        checkOrderOfDeps(DEP_B, DEP_A)
+        Espresso.pressBack()
+        checkOrderOfTask(ITEM_A, ITEM_B)
 
     }
 

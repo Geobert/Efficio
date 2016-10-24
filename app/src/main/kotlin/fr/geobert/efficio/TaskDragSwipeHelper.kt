@@ -10,8 +10,10 @@ import android.os.Handler
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
+import com.crashlytics.android.Crashlytics
 import fr.geobert.efficio.adapter.TaskAdapter
 import fr.geobert.efficio.adapter.TaskViewHolder
+import fr.geobert.efficio.data.Item
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.ItemWeightTable
 import fr.geobert.efficio.db.StoreCompositionTable
@@ -37,9 +39,9 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                         target: RecyclerView.ViewHolder): Boolean {
         Log.d(TAG, "onMove: viewHolder.adapterPosition: ${viewHolder.adapterPosition} / target.adapterPosition: ${target.adapterPosition}  / tasksList.count: ${tasksList.size}")
         Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
-        val r = fragment.updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
+        //val r = updateTaskWeight(viewHolder as TaskViewHolder, target as TaskViewHolder)
         taskAdapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
-        if (!needAdapterSort) needAdapterSort = r
+        //if (!needAdapterSort) needAdapterSort = r
         return true
     }
 
@@ -47,16 +49,66 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
 
     private fun manageLastDragTask() {
         // end of drag n drop, adapter is correctly ordered but not our representation here
-        lastDragTask!!.cardView.cardElevation = orig
-        Log.d(TAG, "end of drag n drop, sort the list")
-        StoreCompositionTable.updateDepWeight(activity, lastDragTask!!.task.item.department)
-        ItemWeightTable.updateWeight(activity, lastDragTask!!.task.item)
-        //Log.d(TAG, "before sort : ${tasksList[0]} / ${tasksList[1]}")
-        tasksList.sort()
-        //Log.d(TAG, "after sort : ${tasksList[0]} / ${tasksList[1]}")
-        fragment.updateWidgets()
-        fragment.updateTasksList(needAdapterSort)
-        lastDragTask = null
+        val t = lastDragTask
+        if (t != null) {
+            t.cardView.cardElevation = orig
+            //Log.d(TAG, "end of drag n drop, sort the list")
+            updateTaskWeight(t)
+            StoreCompositionTable.updateDepWeight(activity, t.task.item.department)
+            ItemWeightTable.updateWeight(activity, t.task.item)
+            //Log.d(TAG, "before sort : ${tasksList[0]} / ${tasksList[1]}")
+            tasksList.sort()
+            //Log.d(TAG, "after sort : ${tasksList[0]} / ${tasksList[1]}")
+            fragment.updateWidgets()
+            fragment.updateTasksList(needAdapterSort)
+            lastDragTask = null
+        }
+    }
+
+    private fun updateTaskWeight(dragged: TaskViewHolder): Boolean {
+        val pos = dragged.adapterPosition
+        val item = dragged.task.item
+        var needAdapterUpdate = false
+        if (tasksList.size > 1) {
+            if (pos == 0) { // the first
+                val next = tasksList[pos + 1].item
+                if (item.department.id == next.department.id) {
+                    if (item.weight >= next.weight)
+                        item.weight = next.weight - 1.0
+                } else {
+                    if (item.department.weight >= next.department.weight) {
+                        item.department.weight = next.department.weight - 1.0
+                        needAdapterUpdate = true
+                    }
+                }
+            } else if (pos == (tasksList.size - 1)) { // the last
+                val prev = tasksList[pos - 1].item
+                if (item.department.id == prev.department.id) {
+                    if (item.weight <= prev.weight)
+                        item.weight = prev.weight + 1.0
+                } else {
+                    if (item.department.weight <= prev.department.weight) {
+                        item.department.weight = prev.department.weight + 1.0
+                        needAdapterUpdate = true
+                    }
+                }
+            } else { // somewhere between
+                val next = tasksList[pos + 1].item
+                val prev = tasksList[pos - 1].item
+                if (item.weight <= prev.weight || item.weight >= next.weight) {
+                    item.weight = (next.weight + prev.weight) / 2.0
+                    if (item.weight >= next.weight || item.weight <= prev.weight)
+                        handleDoubleCollision(pos, item, next, prev)
+                }
+            }
+        }
+        return needAdapterUpdate
+    }
+
+    private fun handleDoubleCollision(pos: Int, item: Item, next: Item, prev: Item) {
+        Log.e(TAG, "handleDoubleCollision")
+        if (!BuildConfig.DEBUG)
+            Crashlytics.log("double collision occurred for Items!!! handleDoubleCollision")
     }
 
     private fun manageLastSwipeTask() {
@@ -193,4 +245,38 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
         }
         super.onChildDraw(c, recyclerView, viewHolder, dXToUse, dY, actionState, isCurrentlyActive)
     }
+
+//    private fun updateTaskWeight(dragged: TaskViewHolder, target: TaskViewHolder): Boolean {
+//        val dItem = dragged.task.item
+//        val tItem = target.task.item
+//        val dDep = dItem.department
+//        val tDep = tItem.department
+//        var res: Boolean = false
+//        if (dragged.adapterPosition > target.adapterPosition) {
+//            // item goes up
+//            if (dDep.id == tDep.id) {
+//                if (dItem.weight <= tItem.weight) {
+//                    dItem.weight = tItem.weight + 1
+//                }
+//            } else {
+//                if (dDep.weight <= tDep.weight) {
+//                    dDep.weight = tDep.weight + 1
+//                    res = true
+//                }
+//            }
+//        } else if (dragged.adapterPosition < target.adapterPosition) {
+//            // item goes down
+//            if (dDep.id == tDep.id) {
+//                if (dItem.weight >= tItem.weight) {
+//                    dItem.weight = tItem.weight - 1
+//                }
+//            } else {
+//                if (dDep.weight >= tDep.weight) {
+//                    dDep.weight = tDep.weight - 1
+//                    res = true
+//                }
+//            }
+//        }
+//        return res
+//    }
 }

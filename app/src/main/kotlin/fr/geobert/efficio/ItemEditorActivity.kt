@@ -78,7 +78,7 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         if (needUpdate) {
             // change department, the item's weight is not relevant anymore
             if (task.item.department.id != origTask.item.department.id) {
-                task.item.weight = 0
+                task.item.weight = 0.0
                 ItemWeightTable.updateWeight(this, task.item)
             }
             TaskTable.updateTask(this, task)
