@@ -116,7 +116,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            0 -> onItemEditFinished(resultCode == Activity.RESULT_OK, data!!)
+            0 -> onItemEditFinished(resultCode == Activity.RESULT_OK, data)
             1 -> onDepEditFinished(resultCode == Activity.RESULT_OK)
         }
 
@@ -129,12 +129,12 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         }
     }
 
-    fun onItemEditFinished(needUpdate: Boolean, data: Intent) {
+    fun onItemEditFinished(needUpdate: Boolean, data: Intent?) {
         if (needUpdate) {
             quick_add_text.text.clear()
             val needWeightUpdate = data.getBooleanExtra(ItemEditorActivity.NEED_WEIGHT_UPDATE, false)
             if (needWeightUpdate) {
-                val task = taskAdapter!!.getTaskById(data.getLongExtra("taskId", 0))
+                val task = taskAdapter!!.getTaskById(data!!.getLongExtra("taskId", 0))
                 if (task != null) {
                     val max = findMaxWeightForDepartment(task.item.department)
                     task.item.weight = max + 1.0

@@ -1,17 +1,13 @@
 package fr.geobert.efficio.dialog
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.app.DialogFragment
+import android.app.*
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.View
-import fr.geobert.efficio.MainActivity
-import fr.geobert.efficio.R
+import fr.geobert.efficio.*
 import fr.geobert.efficio.data.Store
 import fr.geobert.efficio.db.StoreTable
-import fr.geobert.efficio.misc.CREATE_STORE
-import fr.geobert.efficio.misc.RENAME_STORE
+import fr.geobert.efficio.misc.*
 import kotlinx.android.synthetic.main.input_dialog.view.*
 import kotlin.properties.Delegates
 
@@ -47,6 +43,11 @@ class StoreNameDialog : DialogFragment() {
                 setNegativeButton(android.R.string.cancel,
                         { dialogInterface, i -> dialogInterface.cancel() })
         return b.create()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        customView.edit_text.selectAll()
     }
 
     private fun onOkClicked() {
