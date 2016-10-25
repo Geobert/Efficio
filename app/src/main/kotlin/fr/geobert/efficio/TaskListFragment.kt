@@ -132,9 +132,9 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     fun onItemEditFinished(needUpdate: Boolean, data: Intent?) {
         if (needUpdate) {
             quick_add_text.text.clear()
-            val needWeightUpdate = data.getBooleanExtra(ItemEditorActivity.NEED_WEIGHT_UPDATE, false)
+            val needWeightUpdate = data!!.getBooleanExtra(ItemEditorActivity.NEED_WEIGHT_UPDATE, false)
             if (needWeightUpdate) {
-                val task = taskAdapter!!.getTaskById(data!!.getLongExtra("taskId", 0))
+                val task = taskAdapter!!.getTaskById(data.getLongExtra("taskId", 0))
                 if (task != null) {
                     val max = findMaxWeightForDepartment(task.item.department)
                     task.item.weight = max + 1.0
