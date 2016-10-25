@@ -218,8 +218,8 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
             val itemView = viewHolder.itemView
             val height = itemView.bottom - itemView.top
             val width = height / 3
-            val verticalMargin = 8
-            val horizontalMargin = 35
+            val verticalMargin = 12
+            val horizontalMargin = 45
             val extHorizontalMargin = 15
             val maxDx = 150f
             val colorChange = maxDx - 5
