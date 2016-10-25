@@ -36,6 +36,7 @@ class StoreNameDialog : DialogFragment() {
         customView = activity.layoutInflater.inflate(R.layout.input_dialog, null)
         storeId = arguments.getLong("storeId")
         customView.edit_text.text = SpannableStringBuilder(arguments.getString("default"))
+        customView.edit_text.selectAll()
         customView.dialog_msg.text = SpannableStringBuilder(arguments.getString("msg"))
         action = arguments.getInt("action")
         b.setView(customView).setTitle(arguments.getString("title")).
@@ -43,11 +44,6 @@ class StoreNameDialog : DialogFragment() {
                 setNegativeButton(android.R.string.cancel,
                         { dialogInterface, i -> dialogInterface.cancel() })
         return b.create()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        customView.edit_text.selectAll()
     }
 
     private fun onOkClicked() {

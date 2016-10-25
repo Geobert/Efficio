@@ -1,19 +1,14 @@
 package fr.geobert.efficio
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.Dialog
-import android.app.DialogFragment
-import android.app.Fragment
+import android.app.*
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.LayoutInflater
-import android.view.View
+import android.text.SpannableStringBuilder
+import android.view.*
 import android.widget.LinearLayout
-import fr.geobert.efficio.data.Department
-import fr.geobert.efficio.data.DepartmentManager
+import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.DepartmentTable
 import fr.geobert.efficio.dialog.MessageDialog
 import kotlinx.android.synthetic.main.department_chooser_dialog.*
@@ -62,7 +57,7 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
     }
 
     override fun onDepartmentChosen(d: Department) {
-        EditDepartmentNameDialog.newInstance(d.id, onDepRenamedListener).show(fragmentManager,
+        EditDepartmentNameDialog.newInstance(d.id, d.name, onDepRenamedListener).show(fragmentManager,
                 "RenameDepDialog")
     }
 
@@ -75,11 +70,12 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         private var listener: OnDepRenameListener by Delegates.notNull()
 
         companion object {
-            fun newInstance(depId: Long, listener: OnDepRenameListener): EditDepartmentNameDialog {
+            fun newInstance(depId: Long, depName: String, listener: OnDepRenameListener): EditDepartmentNameDialog {
                 val d = EditDepartmentNameDialog()
                 d.listener = listener
                 val b = Bundle()
                 b.putLong("depId", depId)
+                b.putString("depName", depName)
                 d.arguments = b
                 return d
             }
@@ -90,7 +86,8 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog? {
             val b = AlertDialog.Builder(activity)
             customView = LayoutInflater.from(activity).inflate(R.layout.edit_dep_text, null) as LinearLayout
-
+            customView.edt.text = SpannableStringBuilder(arguments.getString("depName"))
+            customView.edt.selectAll()
             b.setTitle(R.string.edit_dep_name).setView(customView).setCancelable(true).
                     setPositiveButton(android.R.string.ok, { d, i -> onOkClicked() }).
                     setNegativeButton(android.R.string.cancel, { d, i -> d.cancel() })
