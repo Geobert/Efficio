@@ -28,6 +28,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
     private val p = Paint()
     private val activity = fragment.activity
     private var direction: Direction by Delegates.notNull()
+    private var lastTargetSameDep: Task? = null
 
     override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
                         target: RecyclerView.ViewHolder): Boolean {
@@ -38,6 +39,11 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
         } else {
             direction = Direction.DOWN
         }
+        val dragged = (viewHolder as TaskViewHolder).task
+        val targeted = (target as TaskViewHolder).task
+        if (dragged.item.department.id == targeted.item.department.id)
+            lastTargetSameDep = targeted
+
         taskAdapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
         return true
     }
@@ -75,6 +81,9 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                 } else {
                     if (item.department.weight >= next.department.weight) {
                         item.department.weight = next.department.weight - 1.0
+                        val lastItemSameDep = lastTargetSameDep?.item ?: null
+                        if (lastItemSameDep != null)
+                            item.weight = lastItemSameDep.weight - 1.0
                         needAdapterSort = true
                     }
                 }
@@ -86,6 +95,9 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                 } else {
                     if (item.department.weight <= prev.department.weight) {
                         item.department.weight = prev.department.weight + 1.0
+                        val lastItemSameDep = lastTargetSameDep?.item ?: null
+                        if (lastItemSameDep != null)
+                            item.weight = lastItemSameDep.weight + 1.0
                         needAdapterSort = true
                     }
                 }
@@ -98,12 +110,15 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                 if (itemDep.id != prevDep.id && itemDep.id != nextDep.id) { // all different dep
                     if (prevDep.id == nextDep.id) {
                         itemDep.weight = nextDep.weight + if (direction == Direction.UP) -1.0 else 1.0
-                        needAdapterSort = true
                     } else {
                         itemDep.weight = (prevDep.weight + nextDep.weight) / 2.0
-                        // TODO collision of double
-                        needAdapterSort = true
+                        if (itemDep.weight >= nextDep.weight || itemDep.weight <= prevDep.weight)
+                            handleDoubleCollisionForDep(pos, itemDep, nextDep, prevDep)
                     }
+                    val lastItemSameDep = lastTargetSameDep?.item ?: null
+                    if (lastItemSameDep != null)
+                        item.weight = lastItemSameDep.weight + if (direction == Direction.UP) -1.0 else 1.0
+                    needAdapterSort = true
                 } else {
                     if (item.weight <= prev.weight || item.weight >= next.weight) {
                         item.weight = (next.weight + prev.weight) / 2.0
@@ -119,6 +134,12 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
         Log.e(TAG, "handleDoubleCollision")
         if (!BuildConfig.DEBUG)
             Crashlytics.log("double collision occurred for Items!!! handleDoubleCollision")
+    }
+
+    private fun handleDoubleCollisionForDep(pos: Int, item: Department, next: Department, prev: Department) {
+        Log.e(TAG, "handleDoubleCollisionForDep")
+        if (!BuildConfig.DEBUG)
+            Crashlytics.log("double collision occurred for Deps!!! handleDoubleCollisionForDep")
     }
 
     private fun manageLastSwipeTask() {

@@ -1,26 +1,15 @@
 package fr.geobert.efficio
 
-import android.app.Activity
-import android.app.Fragment
-import android.app.LoaderManager
-import android.content.CursorLoader
-import android.content.Intent
-import android.content.Loader
+import android.app.*
+import android.content.*
 import android.database.Cursor
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.MenuItem
-import fr.geobert.efficio.data.Department
-import fr.geobert.efficio.data.DepartmentManager
-import fr.geobert.efficio.data.Task
-import fr.geobert.efficio.db.ItemWeightTable
-import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.data.*
+import fr.geobert.efficio.db.*
 import fr.geobert.efficio.dialog.DeleteConfirmationDialog
-import fr.geobert.efficio.misc.DELETE_TASK
-import fr.geobert.efficio.misc.DeleteDialogInterface
-import fr.geobert.efficio.misc.EditorToolbarTrait
-import fr.geobert.efficio.misc.GET_TASK
-import fr.geobert.efficio.misc.consume
+import fr.geobert.efficio.misc.*
 import kotlinx.android.synthetic.main.item_editor.*
 import kotlin.properties.Delegates
 
@@ -32,6 +21,7 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
     private var cursorLoader: CursorLoader? = null
 
     companion object {
+        val NEED_WEIGHT_UPDATE = "needUpdateWeight"
         fun callMe(ctx: Fragment, storeId: Long, task: Task) {
             val i = Intent(ctx.activity, ItemEditorActivity::class.java)
             i.putExtra("storeId", storeId)
@@ -77,12 +67,16 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         val needUpdate = !task.isEquals(origTask)
         if (needUpdate) {
             // change department, the item's weight is not relevant anymore
+            val data = Intent()
             if (task.item.department.id != origTask.item.department.id) {
-                task.item.weight = 0.0
-                ItemWeightTable.updateWeight(this, task.item)
+
+                data.putExtra(NEED_WEIGHT_UPDATE, true)
+                data.putExtra("taskId", task.id)
+            } else {
+                data.putExtra(NEED_WEIGHT_UPDATE, false)
             }
             TaskTable.updateTask(this, task)
-            setResult(Activity.RESULT_OK)
+            setResult(Activity.RESULT_OK, data)
         } else setResult(Activity.RESULT_CANCELED)
         finish()
     }

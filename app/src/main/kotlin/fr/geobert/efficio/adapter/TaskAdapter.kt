@@ -3,8 +3,7 @@ package fr.geobert.efficio.adapter
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import android.view.*
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
@@ -47,6 +46,10 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
 
     fun getTaskPosition(taskId: Long): Int {
         return taskList.indexOfFirst { taskId == it.id }
+    }
+
+    fun getTaskById(taskId: Long): Task? {
+        return taskList.find { taskId == it.id }
     }
 
     fun refreshTaskFromDB(ctx: Context, taskId: Long) {

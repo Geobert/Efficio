@@ -1,30 +1,19 @@
 package fr.geobert.efficio.data
 
-import android.app.Activity
-import android.app.LoaderManager
+import android.app.*
 import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.text.Editable
-import android.text.TextWatcher
+import android.support.v7.widget.*
+import android.text.*
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
+import android.view.inputmethod.EditorInfo
+import android.widget.*
 import fr.geobert.efficio.R
-import fr.geobert.efficio.adapter.DepartmentAdapter
-import fr.geobert.efficio.adapter.DepartmentViewHolder
-import fr.geobert.efficio.db.DepartmentTable
-import fr.geobert.efficio.db.StoreCompositionTable
-import fr.geobert.efficio.misc.GET_DEP_FROM_STORE
-import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
-import fr.geobert.efficio.misc.compareLists
-import fr.geobert.efficio.misc.map
-import fr.geobert.efficio.misc.normalize
+import fr.geobert.efficio.adapter.*
+import fr.geobert.efficio.db.*
+import fr.geobert.efficio.misc.*
 import kotlinx.android.synthetic.main.department_chooser_dialog.view.*
 import java.util.*
 import kotlin.properties.Delegates
@@ -65,10 +54,21 @@ class DepartmentManager(val activity: Activity,
         list.setHasFixedSize(true)
         addDepBtn.setOnClickListener { onAddDepClicked() }
         addDepEdt.addTextChangedListener(this)
+        addDepEdt.setOnEditorActionListener { textView, i, keyEvent ->
+            onEditorAction(i)
+        }
+    }
+
+    private fun onEditorAction(actionId: Int): Boolean {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            onAddDepClicked()
+            return true
+        }
+        return false
     }
 
     fun nbDepartment() = departmentsList.size
-    fun getDepartement(pos: Int) = departmentsList[pos]
+    fun getDepartment(pos: Int) = departmentsList[pos]
 
     fun setEditMode(isEdit: Boolean) {
         if (isEdit) {

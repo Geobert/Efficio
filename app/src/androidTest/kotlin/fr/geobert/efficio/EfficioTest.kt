@@ -32,14 +32,6 @@ class EfficioTest {
         checkTaskListSize(1)
     }
 
-    @Test fun testEnterTwoItems() {
-        addItem(ITEM_A, DEP_A)
-        checkTaskListSize(1)
-
-        addItem(ITEM_B, DEP_B)
-        checkTaskListSize(2)
-    }
-
     @Test fun testEditItemName() {
         addItem(ITEM_A, DEP_A)
         clickOnTask(0)
@@ -166,16 +158,15 @@ class EfficioTest {
         checkOrderOfTask(ITEM_A, ITEM_B, ITEM_C)
 
         // put C above A, so it get some weight
-        dragTask(1, Direction.UP)
+        dragTask(2, Direction.UP, 2)
+        checkOrderOfTask(ITEM_C, ITEM_B, ITEM_A)
 
-        // change C dep to the same as B, should reset item's weight, so under B
+        // change C dep to the same as A, should reset item's weight, so under B
         clickOnTask(0)
         Espresso.closeSoftKeyboard()
         onView(withText(DEP_B)).perform(click())
         onView(withId(R.id.confirm)).perform(click())
-        checkTaskListItemAt(0, ITEM_B)
-        checkTaskListItemAt(1, ITEM_A)
-        checkTaskListItemAt(2, ITEM_C)
+        checkOrderOfTask(ITEM_B, ITEM_A, ITEM_C)
     }
 
 }

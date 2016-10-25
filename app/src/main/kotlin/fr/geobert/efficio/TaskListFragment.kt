@@ -1,47 +1,22 @@
 package fr.geobert.efficio
 
 
-import android.app.Activity
-import android.app.Fragment
-import android.app.LoaderManager
+import android.app.*
 import android.appwidget.AppWidgetManager
-import android.content.ComponentName
-import android.content.CursorLoader
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.Loader
+import android.content.*
 import android.database.Cursor
 import android.os.Bundle
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.*
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.text.Editable
-import android.text.TextWatcher
+import android.text.*
 import android.util.Log
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
-import fr.geobert.efficio.adapter.TaskAdapter
-import fr.geobert.efficio.adapter.TaskViewHolder
-import fr.geobert.efficio.data.Department
-import fr.geobert.efficio.data.DepartmentManager
-import fr.geobert.efficio.data.Item
-import fr.geobert.efficio.data.Store
-import fr.geobert.efficio.data.Task
-import fr.geobert.efficio.db.ItemDepTable
-import fr.geobert.efficio.db.ItemTable
-import fr.geobert.efficio.db.ItemWeightTable
-import fr.geobert.efficio.db.TaskTable
-import fr.geobert.efficio.dialog.DepartmentChoiceDialog
-import fr.geobert.efficio.dialog.QuantityDialog
-import fr.geobert.efficio.misc.CREATE_TASK
-import fr.geobert.efficio.misc.GET_TASKS_OF_STORE
-import fr.geobert.efficio.misc.RefreshInterface
-import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
-import fr.geobert.efficio.misc.map
+import fr.geobert.efficio.adapter.*
+import fr.geobert.efficio.data.*
+import fr.geobert.efficio.db.*
+import fr.geobert.efficio.dialog.*
+import fr.geobert.efficio.misc.*
 import fr.geobert.efficio.widget.TaskListWidget
 import kotlinx.android.synthetic.main.item_list_fragment.*
 import java.util.*
@@ -94,7 +69,9 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         }
 
         quick_add_text.addTextChangedListener(this)
-        quick_add_text.setOnEditorActionListener { textView, i, keyEvent -> onEditorAction(textView, i, keyEvent) }
+        quick_add_text.setOnEditorActionListener { textView, i, keyEvent ->
+            onEditorAction(i)
+        }
 
         fetchStore(this, lastStoreId)
 
@@ -111,7 +88,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         activity.unregisterReceiver(refreshReceiver)
     }
 
-    private fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+    private fun onEditorAction(actionId: Int): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             onAddTaskClicked()
             return true
@@ -139,7 +116,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
-            0 -> onItemEditFinished(resultCode == Activity.RESULT_OK)
+            0 -> onItemEditFinished(resultCode == Activity.RESULT_OK, data!!)
             1 -> onDepEditFinished(resultCode == Activity.RESULT_OK)
         }
 
@@ -152,9 +129,18 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         }
     }
 
-    fun onItemEditFinished(needUpdate: Boolean) {
+    fun onItemEditFinished(needUpdate: Boolean, data: Intent) {
         if (needUpdate) {
             quick_add_text.text.clear()
+            val needWeightUpdate = data.getBooleanExtra(ItemEditorActivity.NEED_WEIGHT_UPDATE, false)
+            if (needWeightUpdate) {
+                val task = taskAdapter!!.getTaskById(data.getLongExtra("taskId", 0))
+                if (task != null) {
+                    val max = findMaxWeightForDepartment(task.item.department)
+                    task.item.weight = max + 1.0
+                    ItemWeightTable.updateWeight(activity, task.item)
+                }
+            }
             fetchStore(this, lastStoreId)
             updateWidgets()
         }
@@ -236,8 +222,8 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     //
-// TextWatcher
-//
+    // TextWatcher
+    //
     override fun afterTextChanged(s: Editable) {
         quick_add_btn.isEnabled = s.trim().length > 0
         if (tasksList.count() > 0) {
@@ -264,11 +250,11 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-
+        // nothing
     }
 
     override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-
+        // nothing
     }
 
     override fun onRefresh(intent: Intent) {
@@ -284,9 +270,9 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         }
     }
 
-//
-// Database operations
-//
+    //
+    // Database operations
+    //
 
     fun fetchStore(ctx: Fragment, storeId: Long) {
         val b = Bundle()

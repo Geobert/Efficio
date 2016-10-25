@@ -4,8 +4,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import com.crashlytics.android.Crashlytics
 import fr.geobert.efficio.adapter.DepartmentViewHolder
-import fr.geobert.efficio.data.Department
-import fr.geobert.efficio.data.DepartmentManager
+import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.StoreCompositionTable
 import java.util.*
 
@@ -51,16 +50,16 @@ class DepartmentDragHelper(val activity: EditDepartmentsActivity,
         val dep = dragged.dep!!
         if (depManager.nbDepartment() > 1)
             if (pos == 0) { // first
-                val next = depManager.getDepartement(pos + 1)
+                val next = depManager.getDepartment(pos + 1)
                 if (dep.weight >= next.weight)
                     dep.weight = next.weight - 1.0
             } else if (pos == (depManager.nbDepartment() - 1)) { // last
-                val prev = depManager.getDepartement(pos - 1)
+                val prev = depManager.getDepartment(pos - 1)
                 if (dep.weight <= prev.weight)
                     dep.weight = prev.weight + 1.0
             } else { // between
-                val next = depManager.getDepartement(pos + 1)
-                val prev = depManager.getDepartement(pos - 1)
+                val next = depManager.getDepartment(pos + 1)
+                val prev = depManager.getDepartment(pos - 1)
                 if (dep.weight <= prev.weight || dep.weight >= next.weight) {
                     dep.weight = (prev.weight + next.weight) / 2.0
                     if (dep.weight <= prev.weight || dep.weight >= next.weight)
