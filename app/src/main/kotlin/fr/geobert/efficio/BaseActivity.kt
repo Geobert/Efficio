@@ -3,6 +3,7 @@ package fr.geobert.efficio
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.View
+import kotlinx.android.synthetic.main.toolbar.view.*
 
 abstract class BaseActivity : AppCompatActivity() {
     val mToolbar: Toolbar by lazy { findViewById(R.id.my_toolbar) as Toolbar }
@@ -29,5 +30,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun setTitleColor(textColor: Int) {
         mToolbar.setTitleTextColor(textColor)
+    }
+
+    fun hideSpinner() {
+        mToolbar.store_spinner.visibility = View.GONE
     }
 }
