@@ -25,7 +25,7 @@
         android:layout_toStartOf="@id/add_dep_btn"
         android:hint="@string/filter_or_create_new_department"
         android:imeOptions="actionDone"
-        android:inputType="textAutoCorrect"
+        android:inputType="textCapSentences"
         android:textColorHint="@color/hint"/>
 
     <android.support.v7.widget.RecyclerView
