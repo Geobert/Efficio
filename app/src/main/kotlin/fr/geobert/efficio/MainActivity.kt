@@ -1,26 +1,18 @@
 package fr.geobert.efficio
 
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
-import android.os.Build
-import android.os.Bundle
+import android.appwidget.AppWidgetManager
+import android.content.*
+import android.os.*
 import android.support.v7.app.ActionBarDrawerToggle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import com.crashlytics.android.Crashlytics
-import fr.geobert.efficio.data.Store
-import fr.geobert.efficio.data.StoreLoaderListener
-import fr.geobert.efficio.data.StoreManager
-import fr.geobert.efficio.db.DbContentProvider
-import fr.geobert.efficio.db.StoreTable
-import fr.geobert.efficio.dialog.DeleteConfirmationDialog
-import fr.geobert.efficio.dialog.StoreNameDialog
-import fr.geobert.efficio.misc.CREATE_STORE
-import fr.geobert.efficio.misc.DELETE_STORE
-import fr.geobert.efficio.misc.DeleteDialogInterface
-import fr.geobert.efficio.misc.RENAME_STORE
+import fr.geobert.efficio.data.*
+import fr.geobert.efficio.db.*
+import fr.geobert.efficio.dialog.*
+import fr.geobert.efficio.misc.*
+import fr.geobert.efficio.widget.TaskListWidget
 import io.fabric.sdk.android.Fabric
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -166,7 +158,8 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
 
     fun storeRenamed(name: String) {
         currentStore.name = name
-        storeManager.storeAdapter.renameStore(name, lastStoreId)
+        storeManager.renameStore(name, lastStoreId)
+        updateWidgets()
     }
 
     private fun callCreateNewStore() {
@@ -191,6 +184,21 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         } else {
             currentStore = storeManager.storesList.find { it.id == lastStoreId } as Store
         }
+    }
+
+    fun updateWidgets() {
+        Log.d(TAG, "updateWidgets")
+        val appWidgetManager = AppWidgetManager.getInstance(this)
+
+        val intent = Intent(this, TaskListWidget::class.java)
+        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+
+        val thisWidget = ComponentName(this, TaskListWidget::class.java)
+        val ids = appWidgetManager.getAppWidgetIds(thisWidget)
+
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        sendBroadcast(intent)
+        //ids.forEach { appWidgetManager.notifyAppWidgetViewDataChanged(it, R.id.tasks_list_widget) }
     }
 
     companion object {

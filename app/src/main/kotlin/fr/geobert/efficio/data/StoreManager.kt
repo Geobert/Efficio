@@ -5,16 +5,15 @@ import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
-import android.support.v4.content.CursorLoader
 import fr.geobert.efficio.adapter.StoreAdapter
 import fr.geobert.efficio.db.StoreTable
-import fr.geobert.efficio.misc.GET_ALL_STORES
-import fr.geobert.efficio.misc.map
+import fr.geobert.efficio.misc.*
 import java.util.*
 import kotlin.properties.Delegates
 
-class StoreManager(val activity: FragmentActivity, val callback: StoreLoaderListener) : LoaderManager.LoaderCallbacks<Cursor> {
-    private var storeLoader: CursorLoader? = null
+class StoreManager(val activity: FragmentActivity, val callback: StoreLoaderListener) :
+        LoaderManager.LoaderCallbacks<Cursor> {
+    private var storeLoader: Loader<Cursor>? = null
     var storesList: MutableList<Store> = LinkedList()
         private set
     var storeAdapter: StoreAdapter by Delegates.notNull()
@@ -48,7 +47,8 @@ class StoreManager(val activity: FragmentActivity, val callback: StoreLoaderList
     }
 
     override fun onCreateLoader(p0: Int, p1: Bundle?): Loader<Cursor>? {
-        return StoreTable.getAllStoresLoader(activity)
+        storeLoader = StoreTable.getAllStoresLoader(activity)
+        return storeLoader
     }
 
     fun indexOf(storeId: Long): Int {
@@ -58,5 +58,11 @@ class StoreManager(val activity: FragmentActivity, val callback: StoreLoaderList
             if (s.id == storeId) break
         }
         return if (i == storesList.size) -1 else i
+    }
+
+    fun renameStore(name: String, storeId: Long) {
+        storeAdapter.renameStore(name, storeId)
+        val store = storesList.find { it.id == storeId }
+        store?.name = name
     }
 }

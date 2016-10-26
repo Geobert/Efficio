@@ -1,8 +1,7 @@
 package fr.geobert.efficio.adapter
 
 import android.support.v4.app.FragmentActivity
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.BaseAdapter
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Store
@@ -29,8 +28,7 @@ class StoreAdapter(val activity: FragmentActivity, list: MutableList<Store>) : B
             return null
         }
 
-        val s = storeList[p0]
-        h.name.text = s.name
+        h.name.text = storeList[p0].name
         return h.view
     }
 

@@ -2,7 +2,6 @@ package fr.geobert.efficio
 
 
 import android.app.*
-import android.appwidget.AppWidgetManager
 import android.content.*
 import android.database.Cursor
 import android.os.Bundle
@@ -17,7 +16,6 @@ import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.*
 import fr.geobert.efficio.dialog.*
 import fr.geobert.efficio.misc.*
-import fr.geobert.efficio.widget.TaskListWidget
 import kotlinx.android.synthetic.main.item_list_fragment.*
 import java.util.*
 
@@ -181,23 +179,13 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     }
 
+    internal fun updateWidgets() {
+        (activity as MainActivity).updateWidgets()
+    }
+
     private fun findMaxWeightForDepartment(d: Department): Double {
         val filteredByDep = tasksList.filter { t -> t.item.department.id == d.id }
         return if (filteredByDep.size > 0) filteredByDep.last().item.weight else 0.0
-    }
-
-    fun updateWidgets() {
-        Log.d(TAG, "updateWidgets")
-        val appWidgetManager = AppWidgetManager.getInstance(activity)
-
-        val intent = Intent(activity, TaskListWidget::class.java)
-        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-
-        val thisWidget = ComponentName(activity, TaskListWidget::class.java)
-        val ids = appWidgetManager.getAppWidgetIds(thisWidget)
-
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-        ids.forEach { appWidgetManager.notifyAppWidgetViewDataChanged(it, R.id.tasks_list_widget) }
     }
 
     override fun onDoneStateChanged(task: Task) {
