@@ -181,8 +181,12 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         if (storeManager.storesList.count() == 1) {
             currentStore = storeManager.storesList[0]
             lastStoreId = currentStore.id
+            title = currentStore.name
+            setSpinnerVisibility(View.GONE)
         } else {
             currentStore = storeManager.storesList.find { it.id == lastStoreId } as Store
+            setSpinnerVisibility(View.VISIBLE)
+            title = ""
         }
     }
 

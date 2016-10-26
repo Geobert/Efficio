@@ -32,7 +32,7 @@ abstract class BaseActivity : AppCompatActivity() {
         mToolbar.setTitleTextColor(textColor)
     }
 
-    fun hideSpinner() {
-        mToolbar.store_spinner.visibility = View.GONE
+    fun setSpinnerVisibility(visibility: Int) {
+        mToolbar.store_spinner.visibility = visibility
     }
 }

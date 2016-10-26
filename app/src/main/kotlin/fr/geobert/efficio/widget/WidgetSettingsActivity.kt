@@ -1,19 +1,15 @@
 package fr.geobert.efficio.widget
 
 import android.appwidget.AppWidgetManager
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.widget.SeekBar
-import fr.geobert.efficio.BaseActivity
-import fr.geobert.efficio.R
-import fr.geobert.efficio.data.StoreLoaderListener
-import fr.geobert.efficio.data.StoreManager
+import fr.geobert.efficio.*
+import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.WidgetTable
-import fr.geobert.efficio.misc.EditorToolbarTrait
-import fr.geobert.efficio.misc.consume
+import fr.geobert.efficio.misc.*
 import kotlinx.android.synthetic.main.widget_settings_activity.*
 
 
@@ -42,6 +38,7 @@ class WidgetSettingsActivity : BaseActivity(), StoreLoaderListener, EditorToolba
         setTitle(R.string.title_activity_widget_settings)
         opacity_seekbar.max = 100
         opacity_seekbar.progress = opacity
+        setOpacityText(opacity)
         opacity_seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                 opacity = p1
