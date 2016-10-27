@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Efficio</string>
+    <string name="add_department_button">Bouton d\'ajout de rayon</string>
+    <string name="add_widget">Ajouter widget</string>
+    <string name="appwidget_text">Widget Efficio</string>
+    <string name="change_item_name_and_dep">Editer article</string>
+    <string name="choose_new_store_name">Saisir un nom de magasin</string>
+</resources>

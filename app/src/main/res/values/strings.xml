@@ -24,7 +24,7 @@
     <string name="error_title">Oopsy…</string>
     <string name="error_empty_dep_name">Need a name to update</string>
     <string name="you_can_reorder_and_rename_the_departments">Drag to reorder,\nTap to rename the departments</string>
-    <string name="appwidget_text">EXAMPLE</string>
+    <string name="appwidget_text">Efficio widget</string>
     <string name="configure">Configure</string>
     <string name="add_widget">Add widget</string>
     <string name="empty_widget">No item</string>

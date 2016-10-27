@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/colorDivider"
                 android:orientation="vertical">
+
 
     <ImageButton
         android:id="@+id/quick_add_btn"
@@ -46,4 +48,21 @@
         android:textSize="22sp"
         android:visibility="visible"/>
 
+    <View
+        android:id="@+id/gradientShadow"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/toolbar_shadow"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_collapseMode="pin"/>
+
+    <View
+        android:id="@+id/quickadd_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_above="@id/quick_add_text"
+        android:background="@drawable/quickadd_shadow"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_collapseMode="pin"/>
 </RelativeLayout>
