@@ -8,7 +8,7 @@
     <string name="choose_new_store_name">Saisir un nom de magasin</string>
     <string name="choose_or_create_dep">Choisir ou Créer un rayon</string>
     <string name="choose_store">Choisir un magasin</string>
-    <string name="completed">Fait</string>
+    <string name="completed">Terminé</string>
     <string name="configure">Configuration</string>
     <string name="confirm_delete_store">Réellement supprimer le magasin nommé : %s</string>
     <string name="confirm_delete_task">Voulez vous supprimer cet article ?</string>
@@ -38,5 +38,5 @@
     <string name="rename_current_store">Renommer le magasin actuel</string>
     <string name="store">Magasin</string>
     <string name="title_activity_widget_settings">Paramètres du widget</string>
-    <string name="you_can_reorder_and_rename_the_departments">Glisser pour ordonner, tap pour renommer les rayons</string>
+    <string name="you_can_reorder_and_rename_the_departments">Glisser pour ordonner, toucher pour renommer les rayons</string>
 </resources>
