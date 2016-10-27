@@ -33,6 +33,7 @@
     <string name="manage_departments">Géstion des rayons</string>
     <string name="nb_items_format">%1$s (%2$d)</string>
     <string name="no_dep">Aucun rayon existant, veuillez en créer un ci-dessus</string>
+    <string name="no_dep_edit">Aucun rayon existant</string>
     <string name="no_item">Aucun article, veuillez utiliser l\'ajout rapide ci-dessous.</string>
     <string name="opacity">Opacité</string>
     <string name="rename_current_store">Renommer le magasin actuel</string>

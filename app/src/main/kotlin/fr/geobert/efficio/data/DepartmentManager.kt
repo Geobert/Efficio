@@ -74,10 +74,11 @@ class DepartmentManager(val activity: Activity,
         if (isEdit) {
             addDepBtn.visibility = View.GONE
             addDepEdt.visibility = View.GONE
-            // todo drag n drop management
+            layout.empty_text.text = SpannableStringBuilder(activity.getString(R.string.no_dep_edit))
         } else {
             addDepEdt.visibility = View.VISIBLE
             addDepBtn.visibility = View.VISIBLE
+            layout.empty_text.text = SpannableStringBuilder(activity.getString(R.string.no_dep))
         }
     }
 

@@ -4,6 +4,7 @@
     <string name="store">Store</string>
     <string name="choose_or_create_dep">Choose or Create Department</string>
     <string name="no_dep">No existing department,\nplease create one above</string>
+    <string name="no_dep_edit">No existing department</string>
     <string name="completed">Completed</string>
     <string name="current_department">Current department: %s</string>
     <string name="item_s_name">Item\'s name</string>

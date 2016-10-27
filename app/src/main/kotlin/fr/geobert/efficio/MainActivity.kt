@@ -1,5 +1,6 @@
 package fr.geobert.efficio
 
+import android.app.Fragment
 import android.appwidget.AppWidgetManager
 import android.content.*
 import android.os.*
@@ -20,7 +21,7 @@ import kotlin.properties.Delegates
 
 class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener {
     private var lastStoreId: Long by Delegates.notNull()
-    private var taskListFrag: TaskListFragment by Delegates.notNull()
+    private var taskListFrag: TaskListFragment? = null
     private var currentStore: Store by Delegates.notNull()
     private var storeManager: StoreManager = StoreManager(this, this)
     private val TAG = "MainActivity"
@@ -67,7 +68,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         title = ""
         if (savedInstanceState == null) {
             taskListFrag = TaskListFragment()
-            fragmentManager.beginTransaction().replace(R.id.flContent, taskListFrag).commit()
+            fragmentManager.beginTransaction().replace(R.id.flContent, taskListFrag, "tasksList").commit()
         }
         setSupportActionBar(mToolbar)
         setUpDrawerToggle()
@@ -76,6 +77,9 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
 
     override fun onResume() {
         super.onResume()
+        if (taskListFrag == null) {
+            taskListFrag = fragmentManager.findFragmentByTag("tasksList") as TaskListFragment
+        }
         store_spinner.onItemSelectedListener = null
         lastStoreId = prefs.getLong("lastStoreId", 1)
         storeManager.fetchAllStores()
@@ -86,7 +90,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 lastStoreId = id
-                prefs.edit().putLong("lastStoreId", id).commit()
+                prefs.edit().putLong("lastStoreId", id).apply()
                 currentStore = storeManager.storesList[position]
                 refreshTaskList(id)
             }
@@ -102,7 +106,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         if (storeManager.storesList.count() > 0) {
             currentStore = storeManager.storesList[0]
             lastStoreId = currentStore.id
-            prefs.edit().putLong("lastStoreId", lastStoreId).commit()
+            prefs.edit().putLong("lastStoreId", lastStoreId).apply()
             refreshTaskList(lastStoreId)
         } else {
             StoreTable.create(this, getString(R.string.store))
@@ -173,7 +177,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
     }
 
     private fun callEditDepartment() {
-        EditDepartmentsActivity.callMe(taskListFrag, lastStoreId)
+        EditDepartmentsActivity.callMe(taskListFrag as Fragment, lastStoreId)
     }
 
     override fun onStoreLoaded() {
@@ -185,6 +189,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
             setSpinnerVisibility(View.GONE)
         } else {
             currentStore = storeManager.storesList.find { it.id == lastStoreId } as Store
+            store_spinner.setSelection(storeManager.indexOf(lastStoreId))
             setSpinnerVisibility(View.VISIBLE)
             title = ""
         }
