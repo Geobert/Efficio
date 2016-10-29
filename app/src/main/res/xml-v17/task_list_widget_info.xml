@@ -5,7 +5,7 @@
                     android:initialLayout="@layout/task_list_widget"
                     android:minHeight="165dp"
                     android:minWidth="142dp"
-                    android:previewImage="@drawable/widget_example"
+                    android:previewImage="@drawable/widget_exemple"
                     android:resizeMode="horizontal|vertical"
                     android:updatePeriodMillis="10000"
                     android:widgetCategory="home_screen"/>
