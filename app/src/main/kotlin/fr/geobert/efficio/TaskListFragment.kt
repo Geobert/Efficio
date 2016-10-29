@@ -193,9 +193,8 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         tasksList.sort()
         addHeaderIfNeeded(tasksList)
         val layMan = (tasks_list.layoutManager as LinearLayoutManager)
-        var pos = layMan.findFirstVisibleItemPosition()
+        val pos = layMan.findLastVisibleItemPosition()
         taskAdapter!!.animateTo(tasksList)
-        if (!task.isDone) pos = taskAdapter!!.getTaskPosition(task.id)
         tasks_list.scrollToPosition(pos)
         tasks_list.post { tasks_list.invalidateItemDecorations() }
         updateWidgets()
