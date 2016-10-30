@@ -158,6 +158,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                 }
             }
             TaskTable.updateTaskQty(activity, t.id, t.qty)
+            fragment.updateWidgets()
         }
         lastSwipeTask = null
         directionReached = null

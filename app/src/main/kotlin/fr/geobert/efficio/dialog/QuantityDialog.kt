@@ -1,12 +1,9 @@
 package fr.geobert.efficio.dialog
 
-import android.app.AlertDialog
-import android.app.Dialog
-import android.app.DialogFragment
+import android.app.*
 import android.os.Bundle
 import android.view.View
-import fr.geobert.efficio.MainActivity
-import fr.geobert.efficio.R
+import fr.geobert.efficio.*
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
 import kotlinx.android.synthetic.main.quantity_dialog.view.*
@@ -49,6 +46,7 @@ class QuantityDialog : DialogFragment() {
         val a = activity
         if (a is MainActivity) {
             a.refreshTask(taskId)
+            a.updateWidgets()
         }
     }
 }
