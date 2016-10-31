@@ -14,7 +14,7 @@ class DbHelper : SQLiteOpenHelper {
 
     companion object {
         val DATABASE_NAME = "items.db"
-        val DB_VERSION = 1
+        val DB_VERSION = 2
         private var instance: DbHelper? = null
 
         fun getInstance(ctx: Context): DbHelper {
@@ -53,6 +53,11 @@ class DbHelper : SQLiteOpenHelper {
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // Here you can upgrade tables, as usual
+        if (oldVersion <= 1) upgradeFromV1(db, oldVersion, newVersion)
+    }
+
+    private fun upgradeFromV1(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        TaskTable.upgradeFromV1(db, oldVersion, newVersion)
+        DepartmentTable.upgradeFromV1(db, oldVersion, newVersion)
     }
 }

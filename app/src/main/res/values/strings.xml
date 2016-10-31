@@ -39,5 +39,7 @@
     <string name="title_activity_widget_settings">Widget Settings</string>
     <string name="opacity">Opacity</string>
     <string name="add_department_button">Add department button</string>
-
+    <string name="delete">Delete</string>
+    <string name="confirm_delete_dep">Deleting the department will delete all items related to it.\nAre you sure?</string>
+    <string name="confirm_delete_dep_title">Delete department: %s</string>
 </resources>

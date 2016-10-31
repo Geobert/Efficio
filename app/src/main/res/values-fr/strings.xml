@@ -40,4 +40,7 @@
     <string name="store">Magasin</string>
     <string name="title_activity_widget_settings">Paramètres du widget</string>
     <string name="you_can_reorder_and_rename_the_departments">Glisser pour ordonner, toucher pour renommer les rayons</string>
+    <string name="delete">Supprimer</string>
+    <string name="confirm_delete_dep">Supprimer le rayon va supprimer tous les articles associés.\nÊtes-vous sûr(e) ?</string>
+    <string name="confirm_delete_dep_title">Supprimer le rayon : %s</string>
 </resources>

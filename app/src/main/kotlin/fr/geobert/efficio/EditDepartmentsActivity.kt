@@ -10,15 +10,18 @@ import android.view.*
 import android.widget.LinearLayout
 import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.DepartmentTable
-import fr.geobert.efficio.dialog.MessageDialog
+import fr.geobert.efficio.dialog.*
+import fr.geobert.efficio.misc.*
 import kotlinx.android.synthetic.main.department_chooser_dialog.*
 import kotlinx.android.synthetic.main.edit_dep_text.view.*
 import kotlin.properties.Delegates
 
 
-class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoiceListener {
+class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoiceListener, DeleteDialogInterface {
+
     private var depManager: DepartmentManager by Delegates.notNull()
     private var storeId: Long by Delegates.notNull()
+    private var depUnderEdit: Department? = null
 
     private val onDepRenamedListener = object : EditDepartmentNameDialog.OnDepRenameListener {
         override fun onRenamingDone() {
@@ -41,6 +44,7 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         setContentView(R.layout.edit_departments_activity)
         title = getString(R.string.edit_departments)
         storeId = intent.extras.getLong("storeId")
+
         depManager = DepartmentManager(this, findViewById(R.id.department_layout)!!,
                 storeId, this, true)
         depManager.setEditMode(true)
@@ -58,8 +62,16 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
     }
 
     override fun onDepartmentChosen(d: Department) {
+        depUnderEdit = d
         EditDepartmentNameDialog.newInstance(d.id, d.name, onDepRenamedListener).show(fragmentManager,
                 "RenameDepDialog")
+    }
+
+    override fun onDeletedConfirmed() {
+        val d = depUnderEdit
+        if (d != null && (DepartmentTable.deleteDep(this, d.id) > 0)) {
+            depManager.remove(d)
+        }
     }
 
     class EditDepartmentNameDialog : DialogFragment() {
@@ -91,8 +103,15 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
             customView.edt.selectAll()
             b.setTitle(R.string.edit_dep_name).setView(customView).setCancelable(true).
                     setPositiveButton(android.R.string.ok, { d, i -> onOkClicked() }).
+                    setNeutralButton(R.string.delete, { d, i -> onDeleteClicked() }).
                     setNegativeButton(android.R.string.cancel, { d, i -> d.cancel() })
             return b.create()
+        }
+
+        private fun onDeleteClicked() {
+            DeleteConfirmationDialog.newInstance(getString(R.string.confirm_delete_dep),
+                    getString(R.string.confirm_delete_dep_title).format(arguments.getString("depName")),
+                    DELETE_DEP).show(fragmentManager, "DeleteDepConfirm")
         }
 
         private fun onOkClicked() {

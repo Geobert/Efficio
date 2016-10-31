@@ -211,4 +211,11 @@ class DepartmentManager(val activity: Activity,
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
         // nothing
     }
+
+    fun remove(department: Department) {
+        val pos = departmentsList.indexOf(department)
+        depAdapter.removeItem(pos)
+        departmentsList.remove(department)
+        depAdapter.notifyItemRemoved(pos)
+    }
 }

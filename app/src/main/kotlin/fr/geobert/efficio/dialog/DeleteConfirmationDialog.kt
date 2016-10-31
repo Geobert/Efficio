@@ -1,13 +1,9 @@
 package fr.geobert.efficio.dialog
 
 import android.R
-import android.app.AlertDialog
-import android.app.Dialog
-import android.app.DialogFragment
+import android.app.*
 import android.os.Bundle
-import fr.geobert.efficio.misc.DELETE_STORE
-import fr.geobert.efficio.misc.DELETE_TASK
-import fr.geobert.efficio.misc.DeleteDialogInterface
+import fr.geobert.efficio.misc.*
 
 class DeleteConfirmationDialog : DialogFragment() {
     companion object {
@@ -29,16 +25,11 @@ class DeleteConfirmationDialog : DialogFragment() {
                 .setCancelable(false)
                 .setPositiveButton(R.string.yes, { d, i ->
                     when (arguments.getInt("action")) {
-                        DELETE_STORE, DELETE_TASK -> {
+                        DELETE_STORE, DELETE_TASK, DELETE_DEP -> {
                             val a = activity
                             if (a is DeleteDialogInterface) a.onDeletedConfirmed()
                         }
-                    //                        DELETE_TASK ->
-                    //                            targetFragment.onActivityResult(targetRequestCode, Activity.RESULT_OK,
-                    //                                    activity.intent)
                     }
-
-
                 })
                 .setNegativeButton(R.string.cancel, { d, i -> d.cancel() })
         return builder.create()

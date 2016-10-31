@@ -2,9 +2,7 @@ package fr.geobert.efficio.db
 
 
 import android.app.Activity
-import android.content.ContentValues
-import android.content.Context
-import android.content.CursorLoader
+import android.content.*
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Department
 
@@ -19,7 +17,7 @@ object StoreCompositionTable : BaseTable() {
             "$COL_DEP_ID INTEGER NOT NULL, " +
             "$COL_WEIGHT REAL NOT NULL, " +
             "${foreignId(COL_STORE_ID, StoreTable.TABLE_NAME)}, " +
-            "${foreignId(COL_DEP_ID, DepartmentTable.TABLE_NAME)}"
+            foreignId(COL_DEP_ID, DepartmentTable.TABLE_NAME)
 
 
     val TABLE_JOINED = "$TABLE_NAME " +

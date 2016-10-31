@@ -1,10 +1,9 @@
 package fr.geobert.efficio.db
 
 import android.app.Activity
-import android.content.ContentValues
-import android.content.Context
-import android.content.CursorLoader
+import android.content.*
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Task
 
@@ -49,7 +48,7 @@ object TaskTable : BaseTable() {
         "CREATE TRIGGER on_task_deleted " +
                 "AFTER DELETE ON ${TaskTable.TABLE_NAME} BEGIN " +
                 "DELETE FROM ${ItemTable.TABLE_NAME} WHERE " +
-                "${ItemTable.TABLE_NAME}.${BaseColumns._ID} = old.${BaseColumns._ID};" +
+                "${ItemTable.TABLE_NAME}.${BaseColumns._ID} = old.$COL_ITEM_ID;" +
                 "END"
     }
 
@@ -111,5 +110,10 @@ object TaskTable : BaseTable() {
 
     fun deleteTask(activity: Activity, taskId: Long): Int {
         return delete(activity, taskId)
+    }
+
+    fun upgradeFromV1(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TRIGGER on_task_deleted")
+        db.execSQL(CREATE_TRIGGER_ON_TASK_DEL)
     }
 }
