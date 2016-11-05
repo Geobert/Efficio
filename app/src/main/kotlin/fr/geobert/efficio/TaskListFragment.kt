@@ -230,7 +230,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         val f = s.toLowerCase()
         val filtered = LinkedList<Task>()
         for (t in list) {
-            if ((t.type == TaskAdapter.VIEW_TYPES.Normal && t.item.name.toLowerCase().contains(f)) ||
+            if ((t.type == TaskAdapter.VIEW_TYPES.Normal && t.item.normName().toLowerCase().contains(f)) ||
                     t.type == TaskAdapter.VIEW_TYPES.Header) {
                 filtered.add(t)
             }

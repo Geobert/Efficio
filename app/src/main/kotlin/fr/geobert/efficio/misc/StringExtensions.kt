@@ -16,6 +16,8 @@ val UNICODE = "\u00C0\u00E0\u00C8\u00E8\u00CC\u00EC\u00D2\u00F2\u00D9\u00F9" +
         "\u00C5\u00E5" +
         "\u00C7\u00E7" +
         "\u0150\u0151\u0170\u0171"
+val DOUBLE_UNICODE = "\u0152\u0153\u04D4\u04D5"
+val DOUBLE_ASCII = arrayOf("OE", "oe", "AE", "ae")
 
 // remove accentuated from a string and replace with ascii equivalent
 fun String.convertNonAscii(): String {
@@ -27,7 +29,12 @@ fun String.convertNonAscii(): String {
         if (pos > -1) {
             sb.append(PLAIN_ASCII[pos])
         } else {
-            sb.append(c)
+            val dpos = DOUBLE_UNICODE.indexOf(c)
+            if (dpos > -1) {
+                sb.append(DOUBLE_ASCII[dpos])
+            } else {
+                sb.append(c)
+            }
         }
     }
     return sb.toString()
