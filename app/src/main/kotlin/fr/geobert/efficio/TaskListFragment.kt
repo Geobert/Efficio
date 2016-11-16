@@ -78,7 +78,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun onResume() {
         super.onResume()
-        quick_add_btn.isEnabled = quick_add_text.text.length > 0
+        quick_add_btn.isEnabled = quick_add_text.text.isNotEmpty()
     }
 
     override fun onDestroyView() {
@@ -187,15 +187,17 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     private fun findMaxWeightForDepartment(d: Department): Double {
         val filteredByDep = tasksList.filter { t -> t.item.department.id == d.id }
-        return if (filteredByDep.size > 0) filteredByDep.last().item.weight else 0.0
+        return if (filteredByDep.isNotEmpty()) filteredByDep.last().item.weight else 0.0
     }
 
     override fun onDoneStateChanged(task: Task) {
         TaskTable.updateDoneState(activity, task.id, task.isDone)
         tasksList.sort()
         addHeaderIfNeeded(tasksList)
+
         val layMan = (tasks_list.layoutManager as LinearLayoutManager)
-        val pos = layMan.findLastVisibleItemPosition()
+        val pos = if (task.isDone) layMan.findFirstVisibleItemPosition() else
+            layMan.findLastVisibleItemPosition()
         taskAdapter!!.animateTo(tasksList)
         tasks_list.scrollToPosition(pos)
         tasks_list.post { tasks_list.invalidateItemDecorations() }
@@ -214,7 +216,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     // TextWatcher
     //
     override fun afterTextChanged(s: Editable) {
-        quick_add_btn.isEnabled = s.trim().length > 0
+        quick_add_btn.isEnabled = s.trim().isNotEmpty()
         if (tasksList.count() > 0) {
             val filteredList = filter(tasksList, s.toString())
             addHeaderIfNeeded(filteredList)
@@ -228,12 +230,9 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     private fun filter(list: MutableList<Task>, s: String): MutableList<Task> {
         val f = s.toLowerCase()
-        val filtered = LinkedList<Task>()
-        for (t in list) {
-            if ((t.type == TaskAdapter.VIEW_TYPES.Normal && t.item.normName().toLowerCase().contains(f)) ||
-                    t.type == TaskAdapter.VIEW_TYPES.Header) {
-                filtered.add(t)
-            }
+        val filtered = list.filterTo(LinkedList<Task>()) {
+            (it.type == TaskAdapter.VIEW_TYPES.Normal && it.item.normName().toLowerCase().contains(f)) ||
+                    it.type == TaskAdapter.VIEW_TYPES.Header
         }
         return filtered
     }
