@@ -21,7 +21,7 @@ import java.util.*
 
 class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, TextWatcher,
         DepartmentManager.DepartmentChoiceListener, TaskViewHolder.TaskViewHolderListener,
-        RefreshInterface {
+        RefreshInterface, SharedPreferences.OnSharedPreferenceChangeListener {
     private val TAG = "TaskListFragment"
 
     var lastStoreId: Long = 1 // todo get it from prefs
@@ -30,6 +30,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     var taskAdapter: TaskAdapter? = null
     var tasksList: MutableList<Task> = LinkedList()
     val refreshReceiver = OnRefreshReceiver(this)
+    val mainActivity by lazy { activity as MainActivity }
 
     private val header = Task()
 
@@ -74,6 +75,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         fetchStore(this, lastStoreId)
 
         activity.registerReceiver(refreshReceiver, IntentFilter(OnRefreshReceiver.REFRESH_ACTION))
+        mainActivity.prefs.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onResume() {
@@ -160,7 +162,9 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
             // add to adapter, but need to find the right position
             val t = Task(i)
             tasksList.add(t)
-            tasksList.sort()
+
+            sort()
+
             taskAdapter!!.animateTo(tasksList)
             quick_add_text.text.clear()
 
@@ -181,6 +185,11 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     }
 
+    private fun sort() {
+        if (mainActivity.prefs.getBoolean("invert_list_pref", false)) tasksList.sortDescending()
+        else tasksList.sort()
+    }
+
     internal fun updateWidgets() {
         (activity as MainActivity).updateWidgets()
     }
@@ -192,12 +201,16 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun onDoneStateChanged(task: Task) {
         TaskTable.updateDoneState(activity, task.id, task.isDone)
-        tasksList.sort()
+        sort()
         addHeaderIfNeeded(tasksList)
-
+        val invertedList = mainActivity.prefs.getBoolean("invert_list_pref", false)
         val layMan = (tasks_list.layoutManager as LinearLayoutManager)
-        val pos = if (task.isDone) layMan.findFirstVisibleItemPosition() else
-            layMan.findLastVisibleItemPosition()
+        val pos = if (invertedList)
+            if (task.isDone) layMan.findLastVisibleItemPosition()
+            else layMan.findFirstVisibleItemPosition()
+        else
+            if (task.isDone) layMan.findFirstVisibleItemPosition()
+            else layMan.findLastVisibleItemPosition()
         taskAdapter!!.animateTo(tasksList)
         tasks_list.scrollToPosition(pos)
         tasks_list.post { tasks_list.invalidateItemDecorations() }
@@ -285,11 +298,12 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         var lastState: Boolean? = null
         var addPos: Int? = null
         list.remove(header)
+        val invertedList = mainActivity.prefs.getBoolean("invert_list_pref", false)
         for (t in list) {
             if (t.isDone && lastState == null) {
-                addPos = 0
+                addPos = if (invertedList) list.size else 0
             } else {
-                if (lastState == false && t.isDone == true) {
+                if (lastState != null && lastState != t.isDone) {
                     addPos = list.indexOf(t)
                     break
                 }
@@ -306,7 +320,8 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         when (cursorLoader.id) {
             GET_TASKS_OF_STORE -> {
                 if (cursor.count > 0) {
-                    tasksList = cursor.map(::Task)
+                    tasksList = if (mainActivity.prefs.getBoolean("invert_list_pref", false))
+                        cursor.mapInvert(::Task) else cursor.map(::Task)
                     tasks_list.visibility = View.VISIBLE
                     empty_text.visibility = View.GONE
                 } else {
@@ -316,7 +331,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                 }
                 addHeaderIfNeeded(tasksList)
                 if (taskAdapter == null)
-                    taskAdapter = TaskAdapter(tasksList, this)
+                    taskAdapter = TaskAdapter(tasksList, this, mainActivity.prefs)
                 else
                     taskAdapter!!.animateTo(tasksList)
                 dragSwipeHlp.tasksList = tasksList
@@ -330,5 +345,11 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     override fun onLoaderReset(cursorLoader: Loader<Cursor>?) {
         currentStore = null
         cursorLoader?.reset()
+    }
+
+    override fun onSharedPreferenceChanged(preferences: SharedPreferences, key: String) {
+        when (key) {
+            "invert_checkbox_pref", "invert_list_pref" -> fetchStore(this, lastStoreId)
+        }
     }
 }

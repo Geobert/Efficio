@@ -14,18 +14,23 @@ inline fun Cursor?.forEach(f: (it: Cursor) -> Unit): Unit {
 }
 
 inline fun <T> Cursor?.map(transform: (it: Cursor) -> T): MutableList<T> {
-    return mapTo(LinkedList<T>(), transform)
+    return mapTo(LinkedList<T>(), transform, false)
 }
 
-inline fun <T, C : MutableCollection<T>> Cursor?.mapTo(result: C, transform: (it: Cursor) -> T): C {
+inline fun <T> Cursor?.mapInvert(transform: (it: Cursor) -> T): MutableList<T> {
+    return mapTo(LinkedList<T>(), transform, true)
+}
+
+inline fun <T, C : MutableCollection<T>> Cursor?.mapTo(result: C, transform: (it: Cursor) -> T, invert: Boolean): C {
     return if (this == null) result else {
-        if (moveToFirst())
+        if (if (invert) moveToLast() else moveToFirst())
             do {
                 result.add(transform(this))
-            } while (moveToNext())
+            } while (if (invert) moveToPrevious() else moveToNext())
         result
     }
 }
+
 
 inline fun <T> Cursor?.mapAndClose(create: (it: Cursor) -> T): Collection<T> {
     try {

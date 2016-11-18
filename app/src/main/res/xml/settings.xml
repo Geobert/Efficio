@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="invert_checkbox_pref"
+        android:summary="@string/invert_checkbox_sum"
+        android:title="@string/invert_checkbox_pref"/>
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="invert_list_pref"
+        android:summary="@string/invert_list_sum"
+        android:title="@string/invert_list_pref"/>
+</PreferenceScreen>

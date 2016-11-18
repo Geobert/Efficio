@@ -42,4 +42,11 @@
     <string name="delete">Delete</string>
     <string name="confirm_delete_dep">Deleting the department will delete all items related to it.\nAre you sure?</string>
     <string name="confirm_delete_dep_title">Delete department: %s</string>
+    <string name="settings">Settings</string>
+    <string name="invert_checkbox_pref">Put checkbox on right side</string>
+    <string name="invert_checkbox_sum">Tick to put the checkbox on the right side</string>
+    <string name="invert_list_pref">Invert the list</string>
+    <string name="invert_list_sum">Tick to invert the whole list</string>
+    <string name="dep_name">(%s)</string>
+
 </resources>

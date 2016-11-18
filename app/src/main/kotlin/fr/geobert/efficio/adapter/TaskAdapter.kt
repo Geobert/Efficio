@@ -1,6 +1,6 @@
 package fr.geobert.efficio.adapter
 
-import android.content.Context
+import android.content.*
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.*
@@ -11,7 +11,8 @@ import fr.geobert.efficio.misc.normalize
 import java.util.*
 
 
-class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskViewHolderListener) :
+class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskViewHolderListener,
+                  val prefs: SharedPreferences) :
         RecyclerView.Adapter<TaskViewHolder>() {
     val taskList = LinkedList<Task>(list)
     val TAG = "TaskAdapter"
@@ -22,7 +23,9 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         val l = LayoutInflater.from(parent.context).inflate(when (viewType) {
-            VIEW_TYPES.Normal.ordinal -> R.layout.item_row
+            VIEW_TYPES.Normal.ordinal ->
+                if (prefs.getBoolean("invert_checkbox_pref", false)) R.layout.item_row_invert
+                else R.layout.item_row
             VIEW_TYPES.Header.ordinal -> R.layout.task_list_header
             else -> 0
         }, parent, false)
@@ -62,12 +65,10 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
     }
 
     fun getTaskByName(name: String): Pair<Task?, Int> {
-        for (t in taskList) {
-            if (t.type == VIEW_TYPES.Normal &&
-                    t.item.normName() == name.normalize())
-                return Pair(t, taskList.indexOf(t))
-        }
-        return Pair(null, 0)
+        return taskList
+                .firstOrNull { it.type == VIEW_TYPES.Normal && it.item.normName() == name.normalize() }
+                ?.let { Pair(it, taskList.indexOf(it)) }
+                ?: Pair(null, 0)
     }
 
     fun removeItem(pos: Int): Task {

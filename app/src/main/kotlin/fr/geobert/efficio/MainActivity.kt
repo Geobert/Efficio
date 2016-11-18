@@ -4,6 +4,7 @@ import android.app.Fragment
 import android.appwidget.AppWidgetManager
 import android.content.*
 import android.os.*
+import android.preference.PreferenceManager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.util.Log
 import android.view.View
@@ -26,7 +27,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
     private var storeManager: StoreManager = StoreManager(this, this)
     private val TAG = "MainActivity"
 
-    private val prefs: SharedPreferences by lazy { getPreferences(Context.MODE_PRIVATE) }
+    val prefs: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
 
     private val mDrawerToggle: ActionBarDrawerToggle by lazy {
         object : ActionBarDrawerToggle(this, /* host Activity */
@@ -65,6 +66,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         if (!BuildConfig.DEBUG)
             Fabric.with(this, Crashlytics())
         setContentView(R.layout.main_activity)
+        PreferenceManager.setDefaultValues(this, R.xml.settings, false)
         title = ""
         if (savedInstanceState == null) {
             taskListFrag = TaskListFragment()
@@ -73,6 +75,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         setSupportActionBar(mToolbar)
         setUpDrawerToggle()
         setupDrawerContent()
+
     }
 
     override fun onResume() {
@@ -141,10 +144,15 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
                 R.id.create_new_store -> callCreateNewStore()
                 R.id.rename_store -> callRenameStore()
                 R.id.delete_current_store -> callDeleteStore()
+                R.id.settings -> callSettings()
             }
             drawer_layout.closeDrawer(nvView)
             true
         })
+    }
+
+    private fun callSettings() {
+        SettingsActivity.callMe(this)
     }
 
     private fun callDeleteStore() {
@@ -207,7 +215,6 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
 
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
         sendBroadcast(intent)
-        //ids.forEach { appWidgetManager.notifyAppWidgetViewDataChanged(it, R.id.tasks_list_widget) }
     }
 
     companion object {

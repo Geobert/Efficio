@@ -43,4 +43,9 @@
     <string name="delete">Supprimer</string>
     <string name="confirm_delete_dep">Supprimer le rayon va supprimer tous les articles associés.\nÊtes-vous sûr(e) ?</string>
     <string name="confirm_delete_dep_title">Supprimer le rayon : %s</string>
+    <string name="settings">Options</string>
+    <string name="invert_checkbox_pref">Placer les cases à droite</string>
+    <string name="invert_checkbox_sum">Cocher pour mettre les cases à droite</string>
+    <string name="invert_list_pref">Inverser la liste</string>
+    <string name="invert_list_sum">Cocher pour inverser la liste</string>
 </resources>

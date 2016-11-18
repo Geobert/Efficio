@@ -5,21 +5,24 @@
             <menu>
                 <item
                     android:id="@+id/edit_departments"
-                    android:title="@string/edit_departments" />
+                    android:title="@string/edit_departments"/>
             </menu>
         </item>
         <item android:title="@string/store">
             <menu>
                 <item
                     android:id="@+id/create_new_store"
-                    android:title="@string/create_new_store" />
+                    android:title="@string/create_new_store"/>
                 <item
                     android:id="@+id/rename_store"
-                    android:title="@string/rename_current_store" />
+                    android:title="@string/rename_current_store"/>
                 <item
                     android:id="@+id/delete_current_store"
-                    android:title="@string/delete_current_store" />
+                    android:title="@string/delete_current_store"/>
             </menu>
         </item>
+        <item
+            android:id="@+id/settings"
+            android:title="@string/settings"/>
     </group>
 </menu>
