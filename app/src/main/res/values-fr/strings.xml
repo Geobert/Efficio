@@ -48,4 +48,5 @@
     <string name="invert_checkbox_sum">Cocher pour mettre les cases à droite</string>
     <string name="invert_list_pref">Inverser la liste</string>
     <string name="invert_list_sum">Cocher pour inverser la liste</string>
+    <string name="dep_name">(%s)</string>
 </resources>
