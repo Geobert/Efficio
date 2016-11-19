@@ -21,7 +21,7 @@ import java.util.*
 
 class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, TextWatcher,
         DepartmentManager.DepartmentChoiceListener, TaskViewHolder.TaskViewHolderListener,
-        RefreshInterface, SharedPreferences.OnSharedPreferenceChangeListener {
+        RefreshInterface {
     private val TAG = "TaskListFragment"
 
     var lastStoreId: Long = 1 // todo get it from prefs
@@ -75,7 +75,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         fetchStore(this, lastStoreId)
 
         activity.registerReceiver(refreshReceiver, IntentFilter(OnRefreshReceiver.REFRESH_ACTION))
-        mainActivity.prefs.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onResume() {
@@ -205,12 +204,15 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         addHeaderIfNeeded(tasksList)
         val invertedList = mainActivity.prefs.getBoolean("invert_list_pref", false)
         val layMan = (tasks_list.layoutManager as LinearLayoutManager)
+
         val pos = if (invertedList)
             if (task.isDone) layMan.findLastVisibleItemPosition()
             else layMan.findFirstVisibleItemPosition()
         else
             if (task.isDone) layMan.findFirstVisibleItemPosition()
             else layMan.findLastVisibleItemPosition()
+
+        if (!task.isDone) quick_add_text.text.clear()
         taskAdapter!!.animateTo(tasksList)
         tasks_list.scrollToPosition(pos)
         tasks_list.post { tasks_list.invalidateItemDecorations() }
@@ -345,11 +347,5 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     override fun onLoaderReset(cursorLoader: Loader<Cursor>?) {
         currentStore = null
         cursorLoader?.reset()
-    }
-
-    override fun onSharedPreferenceChanged(preferences: SharedPreferences, key: String) {
-        when (key) {
-            "invert_checkbox_pref", "invert_list_pref" -> fetchStore(this, lastStoreId)
-        }
     }
 }

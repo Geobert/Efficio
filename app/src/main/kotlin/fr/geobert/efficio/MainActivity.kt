@@ -20,7 +20,8 @@ import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlin.properties.Delegates
 
-class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener {
+class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
     private var lastStoreId: Long by Delegates.notNull()
     private var taskListFrag: TaskListFragment? = null
     private var currentStore: Store by Delegates.notNull()
@@ -75,7 +76,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         setSupportActionBar(mToolbar)
         setUpDrawerToggle()
         setupDrawerContent()
-
+        prefs.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onResume() {
@@ -86,6 +87,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
         store_spinner.onItemSelectedListener = null
         lastStoreId = prefs.getLong("lastStoreId", 1)
         storeManager.fetchAllStores()
+
         store_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // nothing
@@ -99,6 +101,11 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
             }
 
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        prefs.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     override fun onDeletedConfirmed() {
@@ -215,6 +222,12 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener 
 
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
         sendBroadcast(intent)
+    }
+
+    override fun onSharedPreferenceChanged(preferences: SharedPreferences, key: String) {
+        when (key) {
+            "invert_checkbox_pref", "invert_list_pref" -> refreshTaskList(lastStoreId)
+        }
     }
 
     companion object {
