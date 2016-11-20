@@ -1,4 +1,4 @@
-package fr.geobert.efficio.misc
+package fr.geobert.efficio.extensions
 
 val PLAIN_ASCII = "AaEeIiOoUu" /* grave */ +
         "AaEeIiOoUuYy"  /* acute */ +

@@ -5,12 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.LinearLayout
 import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.DepartmentTable
 import fr.geobert.efficio.dialog.*
+import fr.geobert.efficio.drag.DepartmentDragHelper
 import fr.geobert.efficio.misc.*
 import kotlinx.android.synthetic.main.department_chooser_dialog.*
 import kotlinx.android.synthetic.main.edit_dep_text.view.*
@@ -99,7 +99,7 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog? {
             val b = AlertDialog.Builder(activity)
             customView = LayoutInflater.from(activity).inflate(R.layout.edit_dep_text, null) as LinearLayout
-            customView.edt.text = SpannableStringBuilder(arguments.getString("depName"))
+            customView.edt.setText(arguments.getString("depName"))
             customView.edt.selectAll()
             b.setTitle(R.string.edit_dep_name).setView(customView).setCancelable(true).
                     setPositiveButton(android.R.string.ok, { d, i -> onOkClicked() }).
@@ -116,7 +116,7 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
 
         private fun onOkClicked() {
             val s = customView.edt.text.trim().toString()
-            if (s.length > 0) {
+            if (s.isNotEmpty()) {
                 if (DepartmentTable.updateDepartment(activity, arguments.getLong("depId"), s) > 0) {
                     listener.onRenamingDone()
                     dialog.cancel()

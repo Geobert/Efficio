@@ -11,7 +11,7 @@ import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.db.WidgetTable
-import fr.geobert.efficio.misc.map
+import fr.geobert.efficio.extensions.map
 import java.util.*
 import kotlin.properties.Delegates
 

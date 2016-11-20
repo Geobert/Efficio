@@ -1,18 +1,14 @@
 package fr.geobert.efficio.widget
 
 import android.app.PendingIntent
-import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
+import android.appwidget.*
+import android.content.*
 import android.net.Uri
 import android.util.Log
 import android.widget.RemoteViews
-import fr.geobert.efficio.OnRefreshReceiver
 import fr.geobert.efficio.R
-import fr.geobert.efficio.db.TaskTable
-import fr.geobert.efficio.db.WidgetTable
+import fr.geobert.efficio.db.*
+import fr.geobert.efficio.misc.OnRefreshReceiver
 import kotlin.properties.Delegates
 
 /**
@@ -32,9 +28,7 @@ class TaskListWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // There may be multiple widgets active, so update all of them
         Log.d(TAG, "onUpdate: ${appWidgetIds.size}")
-        val prefs = context.getSharedPreferences("widgetPrefs", Context.MODE_PRIVATE)
         for (appWidgetId in appWidgetIds) {
-//            if (prefs.getBoolean("isConfigured_$appWidgetId", false))
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds)

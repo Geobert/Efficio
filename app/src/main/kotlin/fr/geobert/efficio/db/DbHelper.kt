@@ -3,18 +3,17 @@ package fr.geobert.efficio.db
 import android.content.Context
 import android.database.sqlite.*
 import fr.geobert.efficio.R
-import fr.geobert.efficio.misc.normalize
+import fr.geobert.efficio.extensions.normalize
 import kotlin.properties.Delegates
 
-class DbHelper : SQLiteOpenHelper {
-    private constructor(ctx: Context) : super(ctx, DATABASE_NAME, null, DbHelper.DB_VERSION) {
-    }
+class DbHelper private constructor(ctx: Context) :
+        SQLiteOpenHelper(ctx, DATABASE_NAME, null, DbHelper.DB_VERSION) {
 
     private var ctx: Context by Delegates.notNull()
 
     companion object {
         val DATABASE_NAME = "items.db"
-        val DB_VERSION = 2
+        val DB_VERSION = 3
         private var instance: DbHelper? = null
 
         fun getInstance(ctx: Context): DbHelper {
@@ -53,11 +52,16 @@ class DbHelper : SQLiteOpenHelper {
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion <= 1) upgradeFromV1(db, oldVersion, newVersion)
+        if (oldVersion <= 1) upgradeFromV1(db)
+        if (oldVersion <= 2) upgradeFromV2(db)
     }
 
-    private fun upgradeFromV1(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        TaskTable.upgradeFromV1(db, oldVersion, newVersion)
-        DepartmentTable.upgradeFromV1(db, oldVersion, newVersion)
+    private fun upgradeFromV2(db: SQLiteDatabase) {
+        TaskTable.upgradeFromV2(db)
+    }
+
+    private fun upgradeFromV1(db: SQLiteDatabase) {
+        TaskTable.upgradeFromV1(db)
+        DepartmentTable.upgradeFromV1(db)
     }
 }

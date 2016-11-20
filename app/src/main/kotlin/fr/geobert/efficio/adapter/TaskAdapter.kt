@@ -7,7 +7,7 @@ import android.view.*
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
-import fr.geobert.efficio.misc.normalize
+import fr.geobert.efficio.extensions.normalize
 import java.util.*
 
 

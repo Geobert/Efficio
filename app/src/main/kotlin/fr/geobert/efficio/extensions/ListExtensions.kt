@@ -1,4 +1,4 @@
-package fr.geobert.efficio.misc
+package fr.geobert.efficio.extensions
 
 import kotlin.comparisons.compareValues
 

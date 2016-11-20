@@ -2,7 +2,6 @@ package fr.geobert.efficio.dialog
 
 import android.app.*
 import android.os.Bundle
-import android.text.SpannableStringBuilder
 import android.view.View
 import fr.geobert.efficio.*
 import fr.geobert.efficio.data.Store
@@ -35,9 +34,9 @@ class StoreNameDialog : DialogFragment() {
         val b = AlertDialog.Builder(activity)
         customView = activity.layoutInflater.inflate(R.layout.input_dialog, null)
         storeId = arguments.getLong("storeId")
-        customView.edit_text.text = SpannableStringBuilder(arguments.getString("default"))
+        customView.edit_text.setText(arguments.getString("default"))
         customView.edit_text.selectAll()
-        customView.dialog_msg.text = SpannableStringBuilder(arguments.getString("msg"))
+        customView.dialog_msg.text = arguments.getString("msg")
         action = arguments.getInt("action")
         b.setView(customView).setTitle(arguments.getString("title")).
                 setPositiveButton(android.R.string.ok, { dialogInterface, i -> onOkClicked() }).

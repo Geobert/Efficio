@@ -15,7 +15,10 @@ import fr.geobert.efficio.adapter.*
 import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.*
 import fr.geobert.efficio.dialog.*
+import fr.geobert.efficio.drag.TaskDragSwipeHelper
+import fr.geobert.efficio.extensions.*
 import fr.geobert.efficio.misc.*
+import hirondelle.date4j.DateTime
 import kotlinx.android.synthetic.main.item_list_fragment.*
 import java.util.*
 
@@ -200,6 +203,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun onDoneStateChanged(task: Task) {
         TaskTable.updateDoneState(activity, task.id, task.isDone)
+        task.lastChecked = DateTime.today(TIME_ZONE)
         sort()
         addHeaderIfNeeded(tasksList)
         val invertedList = mainActivity.prefs.getBoolean("invert_list_pref", false)

@@ -5,7 +5,7 @@ import android.content.*
 import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Department
-import fr.geobert.efficio.misc.normalize
+import fr.geobert.efficio.extensions.normalize
 
 object DepartmentTable : BaseTable() {
     override val TABLE_NAME = "departments"
@@ -54,7 +54,7 @@ object DepartmentTable : BaseTable() {
         return delete(activity, depId)
     }
 
-    fun upgradeFromV1(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+    fun upgradeFromV1(db: SQLiteDatabase) {
         db.execSQL("DROP TRIGGER on_dep_deleted")
         db.execSQL(CREATE_TRIGGER_ON_DEP_DELETE)
     }
