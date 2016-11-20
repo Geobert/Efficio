@@ -60,10 +60,10 @@
     </string-array>
 
     <string-array name="periodicity_units">
-        <item>Day(s)</item>
-        <item>Week(s)</item>
-        <item>Month(s)</item>
-        <item>Year(s)</item>
+        <item>Days</item>
+        <item>Weeks</item>
+        <item>Months</item>
+        <item>Years</item>
     </string-array>
     <string name="need_valid_period">Periodicity value must be a number</string>
 </resources>

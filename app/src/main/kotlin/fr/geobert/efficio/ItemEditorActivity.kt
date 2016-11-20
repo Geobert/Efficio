@@ -145,6 +145,10 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
                     Log.e("ItemEditorActivity", "error converting toInt: ${period_edt.text}")
                     return false
                 }
+                if (task.period == 1) {
+                    period_spinner.setSelection(task.periodUnit.ordinal)
+                    setCustomPeriodContVisibility(false)
+                }
             }
             else -> {
                 task.periodUnit = PeriodUnit.fromInt(period_unit_spinner.selectedItemPosition + 1)
@@ -193,7 +197,7 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
             period_edt.setText(task.period.toString())
             period_unit_spinner.setSelection(task.periodUnit.ordinal)
         } else {
-            period_edt.setText("1")
+            period_edt.setText("2")
         }
     }
 

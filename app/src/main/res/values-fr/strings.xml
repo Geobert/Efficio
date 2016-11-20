@@ -49,22 +49,22 @@
     <string name="invert_list_pref">Inverser la liste</string>
     <string name="invert_list_sum">Cocher pour inverser la liste</string>
     <string name="dep_name">(%s)</string>
-    <string name="cancel_custom_period">annuler la périodicité personalisée</string>
-    <string name="need_valid_period">La périodicité doit être un nombre</string>
-    <string name="periodicity">Périodicité :</string>
+    <string name="cancel_custom_period">annuler la fréquence personnalisée</string>
+    <string name="need_valid_period">La fréquence doit être un nombre</string>
+    <string name="periodicity">Fréquence :</string>
     <string-array name="periodicity_choices">
         <item>Aucune</item>
         <item>Journalière</item>
         <item>Hebdomadaire</item>
         <item>Mensuelle</item>
         <item>Annuelle</item>
-        <item>Perso.</item>
+        <item>Personnalisée</item>
     </string-array>
 
     <string-array name="periodicity_units">
-        <item>Jour(s)</item>
-        <item>Semaine(s)</item>
+        <item>Jours</item>
+        <item>Semaines</item>
         <item>Mois</item>
-        <item>Année(s)</item>
+        <item>Années</item>
     </string-array>
 </resources>
