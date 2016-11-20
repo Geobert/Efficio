@@ -31,8 +31,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:inputType="textAutoCorrect"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"/>
+            android:maxLines="1"/>
 
         <ImageButton
             android:id="@+id/delete_task_btn"
