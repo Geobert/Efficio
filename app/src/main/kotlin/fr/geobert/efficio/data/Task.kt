@@ -3,6 +3,8 @@ package fr.geobert.efficio.data
 import android.database.Cursor
 import fr.geobert.efficio.adapter.TaskAdapter
 import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.extensions.TIME_ZONE
+import hirondelle.date4j.DateTime
 import kotlin.properties.Delegates
 
 class Task : Comparable<Task> {
@@ -11,6 +13,30 @@ class Task : Comparable<Task> {
     var item: Item by Delegates.notNull()
     var type: TaskAdapter.VIEW_TYPES by Delegates.notNull()
     var qty: Int = 1
+    private var _lastChecked: DateTime = DateTime.today(TIME_ZONE)
+    var lastChecked: DateTime
+        get() = _lastChecked.truncate(DateTime.Unit.DAY)
+        set(value) {
+            _lastChecked = value
+        }
+    var period: Int = 0
+    var periodUnit: PeriodUnit = PeriodUnit.NONE
+
+    val periodicity: Period
+        get() =
+        when (periodUnit) {
+            PeriodUnit.NONE -> Period.NONE
+            else -> if (period == 1) {
+                when (periodUnit) {
+                    PeriodUnit.DAY -> Period.DAILY
+                    PeriodUnit.WEEK -> Period.WEEKLY
+                    PeriodUnit.MONTH -> Period.MONTHLY
+                    PeriodUnit.YEAR -> Period.YEARLY
+                    else -> Period.NONE
+                }
+            } else Period.CUSTOM
+        }
+
 
     constructor() {
         type = TaskAdapter.VIEW_TYPES.Header
@@ -25,6 +51,11 @@ class Task : Comparable<Task> {
         item = Item(cursor)
         type = TaskAdapter.VIEW_TYPES.Normal
         qty = cursor.getInt(cursor.getColumnIndex(TaskTable.COL_QTY))
+
+        val instant = cursor.getLong(cursor.getColumnIndex(TaskTable.COL_LAST_CHECKED))
+        lastChecked = if (instant > 0) DateTime.forInstant(instant, TIME_ZONE) else lastChecked
+        periodUnit = PeriodUnit.fromInt(cursor.getInt(cursor.getColumnIndex(TaskTable.COL_PERIOD_UNIT)))
+        period = cursor.getInt(cursor.getColumnIndex(TaskTable.COL_PERIOD))
     }
 
     constructor(item: Item) {
@@ -39,6 +70,9 @@ class Task : Comparable<Task> {
         isDone = task.isDone
         this.item = Item(task.item)
         type = task.type
+        period = task.period
+        periodUnit = task.periodUnit
+        lastChecked = task.lastChecked
     }
 
     // used for sort()
@@ -61,10 +95,14 @@ class Task : Comparable<Task> {
     fun isEquals(other: Task): Boolean {
         return isDone == other.isDone &&
                 type == other.type &&
-                item.isEquals(other.item)
+                item.isEquals(other.item) &&
+                period == other.period &&
+                periodUnit == other.periodUnit &&
+                periodicity == other.periodicity
+
     }
 
     override fun toString(): String {
-        return "[name: ${item.name} / depWeight: ${item.department.weight} / itemWeight: ${item.weight}]"
+        return "[name: ${item.name} / depWeight: ${item.department.weight} / itemWeight: ${item.weight} / lastChecked: $lastChecked]"
     }
 }

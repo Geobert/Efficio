@@ -1,9 +1,6 @@
-package fr.geobert.efficio
+package fr.geobert.efficio.misc
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import fr.geobert.efficio.misc.RefreshInterface
+import android.content.*
 
 class OnRefreshReceiver(val toRefresh: RefreshInterface) : BroadcastReceiver() {
     companion object {

@@ -48,5 +48,22 @@
     <string name="invert_list_pref">Invert the list</string>
     <string name="invert_list_sum">Tick to invert the whole list</string>
     <string name="dep_name">(%s)</string>
+    <string name="periodicity">Periodicity: </string>
+    <string name="cancel_custom_period">cancel custom period</string>
+    <string-array name="periodicity_choices">
+        <item>None</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+        <item>Yearly</item>
+        <item>Custom</item>
+    </string-array>
 
+    <string-array name="periodicity_units">
+        <item>Days</item>
+        <item>Weeks</item>
+        <item>Months</item>
+        <item>Years</item>
+    </string-array>
+    <string name="need_valid_period">Periodicity value must be a number</string>
 </resources>

@@ -13,6 +13,7 @@ import android.widget.*
 import fr.geobert.efficio.R
 import fr.geobert.efficio.adapter.*
 import fr.geobert.efficio.db.*
+import fr.geobert.efficio.extensions.*
 import fr.geobert.efficio.misc.*
 import kotlinx.android.synthetic.main.department_chooser_dialog.view.*
 import java.util.*

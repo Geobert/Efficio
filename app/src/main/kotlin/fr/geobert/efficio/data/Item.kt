@@ -3,7 +3,7 @@ package fr.geobert.efficio.data
 import android.database.Cursor
 import android.os.Bundle
 import fr.geobert.efficio.db.TaskTable
-import fr.geobert.efficio.misc.normalize
+import fr.geobert.efficio.extensions.normalize
 import kotlin.properties.Delegates
 
 class Item {

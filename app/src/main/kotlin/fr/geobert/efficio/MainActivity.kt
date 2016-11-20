@@ -1,7 +1,6 @@
 package fr.geobert.efficio
 
-import android.app.Fragment
-import android.appwidget.AppWidgetManager
+import android.app.*
 import android.content.*
 import android.os.*
 import android.preference.PreferenceManager
@@ -14,7 +13,7 @@ import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.*
 import fr.geobert.efficio.dialog.*
 import fr.geobert.efficio.misc.*
-import fr.geobert.efficio.widget.TaskListWidget
+import fr.geobert.efficio.service.*
 import io.fabric.sdk.android.Fabric
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -76,7 +75,20 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener,
         setSupportActionBar(mToolbar)
         setUpDrawerToggle()
         setupDrawerContent()
+        lastStoreId = prefs.getLong("lastStoreId", 1)
         prefs.registerOnSharedPreferenceChangeListener(this)
+        installServiceTimer()
+    }
+
+    private fun installServiceTimer() {
+        val pi = PendingIntent.getBroadcast(this, 0, Intent(this, OnAlarmReceiver::class.java),
+                PendingIntent.FLAG_NO_CREATE)
+        if (pi == null) { // no alarm set
+            val intent = Intent(this, InstallServiceReceiver::class.java)
+            intent.action = "fr.geobert.efficio.INSTALL_TIMER"
+            sendBroadcast(intent)
+        }
+        EfficioService.callMe(this, lastStoreId)
     }
 
     override fun onResume() {
@@ -97,7 +109,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener,
                 lastStoreId = id
                 prefs.edit().putLong("lastStoreId", id).apply()
                 currentStore = storeManager.storesList[position]
-                refreshTaskList(id)
+                refreshTaskList(this@MainActivity, id)
             }
 
         }
@@ -117,17 +129,11 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener,
             currentStore = storeManager.storesList[0]
             lastStoreId = currentStore.id
             prefs.edit().putLong("lastStoreId", lastStoreId).apply()
-            refreshTaskList(lastStoreId)
+            refreshTaskList(this, lastStoreId)
         } else {
             StoreTable.create(this, getString(R.string.store))
             storeManager.fetchAllStores()
         }
-    }
-
-    fun refreshTaskList(storeId: Long) {
-        val intent = Intent(OnRefreshReceiver.REFRESH_ACTION)
-        intent.putExtra("newStoreId", storeId)
-        sendBroadcast(intent)
     }
 
     fun refreshTask(taskId: Long) {
@@ -212,21 +218,12 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener,
 
     fun updateWidgets() {
         Log.d(TAG, "updateWidgets")
-        val appWidgetManager = AppWidgetManager.getInstance(this)
-
-        val intent = Intent(this, TaskListWidget::class.java)
-        intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-
-        val thisWidget = ComponentName(this, TaskListWidget::class.java)
-        val ids = appWidgetManager.getAppWidgetIds(thisWidget)
-
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
-        sendBroadcast(intent)
+        updateWidgets(this)
     }
 
     override fun onSharedPreferenceChanged(preferences: SharedPreferences, key: String) {
         when (key) {
-            "invert_checkbox_pref", "invert_list_pref" -> refreshTaskList(lastStoreId)
+            "invert_checkbox_pref", "invert_list_pref" -> refreshTaskList(this, lastStoreId)
         }
     }
 

@@ -1,4 +1,4 @@
-package fr.geobert.efficio
+package fr.geobert.efficio.drag
 
 import android.graphics.*
 import android.os.Handler
@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import com.crashlytics.android.Crashlytics
+import fr.geobert.efficio.*
 import fr.geobert.efficio.adapter.*
 import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.*

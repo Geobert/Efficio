@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import fr.geobert.efficio.adapter.StoreAdapter
 import fr.geobert.efficio.db.StoreTable
+import fr.geobert.efficio.extensions.map
 import fr.geobert.efficio.misc.*
 import java.util.*
 import kotlin.properties.Delegates

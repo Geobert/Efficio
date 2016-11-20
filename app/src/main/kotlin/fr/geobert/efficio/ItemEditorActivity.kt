@@ -4,10 +4,13 @@ import android.app.*
 import android.content.*
 import android.database.Cursor
 import android.os.Bundle
-import android.text.SpannableStringBuilder
-import android.view.MenuItem
+import android.support.design.widget.Snackbar
+import android.util.Log
+import android.view.*
+import android.view.animation.AnimationUtils
+import android.widget.*
 import fr.geobert.efficio.data.*
-import fr.geobert.efficio.db.*
+import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.dialog.DeleteConfirmationDialog
 import fr.geobert.efficio.misc.*
 import kotlinx.android.synthetic.main.item_editor.*
@@ -40,7 +43,52 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
                 extras.getLong("storeId"), this)
         depManager.request()
         delete_task_btn.setOnClickListener { onDeleteClicked() }
+        initPeriodWidgets()
         fetchTask()
+    }
+
+    private fun initPeriodWidgets() {
+        val adapter = ArrayAdapter.createFromResource(this, R.array.periodicity_choices,
+                android.R.layout.simple_spinner_item)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        period_spinner.adapter = adapter
+        val adapterUnit = ArrayAdapter.createFromResource(this, R.array.periodicity_units,
+                android.R.layout.simple_spinner_item)
+        adapterUnit.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        period_unit_spinner.adapter = adapterUnit
+
+        cancel_custom_period.setOnClickListener {
+            setCustomPeriodContVisibility(false)
+            period_spinner.setSelection(if (task.periodicity != Period.CUSTOM) // avoid being stuck in custom period mode
+                task.periodicity.ordinal else Period.NONE.ordinal)
+        }
+
+        period_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, pos: Int, id: Long) {
+                setCustomPeriodContVisibility(pos == (period_spinner.adapter.count - 1))
+            }
+
+            override fun onNothingSelected(arg0: AdapterView<*>) {
+                // nothing
+            }
+        }
+    }
+
+    private fun setCustomPeriodContVisibility(visible: Boolean) {
+        val fadeIn = AnimationUtils.makeInAnimation(this, false)
+        val fadeOut = AnimationUtils.makeOutAnimation(this, true)
+
+        if (visible && custom_periodicity_cont.visibility == View.GONE) {
+            period_spinner.startAnimation(fadeOut)
+            period_spinner.visibility = View.GONE
+            custom_periodicity_cont.visibility = View.VISIBLE
+            custom_periodicity_cont.startAnimation(fadeIn)
+        } else if (period_spinner.visibility == View.GONE) {
+            custom_periodicity_cont.startAnimation(fadeOut)
+            custom_periodicity_cont.visibility = View.GONE
+            period_spinner.visibility = View.VISIBLE
+            period_spinner.startAnimation(fadeIn)
+        }
     }
 
     override fun onDeletedConfirmed() {
@@ -63,13 +111,14 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
     }
 
     private fun onOkClicked() {
-        task.item.name = item_name_edt.text.trim().toString()
-        val needUpdate = !task.isEquals(origTask)
-        if (needUpdate) {
+        if (!fillTask()) {
+            Snackbar.make(my_toolbar, R.string.need_valid_period, Snackbar.LENGTH_SHORT).show()
+            return
+        }
+        if (!task.isEquals(origTask)) {
             // change department, the item's weight is not relevant anymore
             val data = Intent()
             if (task.item.department.id != origTask.item.department.id) {
-
                 data.putExtra(NEED_WEIGHT_UPDATE, true)
                 data.putExtra("taskId", task.id)
             } else {
@@ -79,6 +128,34 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
             setResult(Activity.RESULT_OK, data)
         } else setResult(Activity.RESULT_CANCELED)
         finish()
+    }
+
+    private fun fillTask(): Boolean {
+        task.item.name = item_name_edt.text.trim().toString()
+        when (Period.fromInt(period_spinner.selectedItemPosition)) {
+            Period.NONE -> {
+                task.periodUnit = PeriodUnit.NONE
+                task.period = 0
+            }
+            Period.CUSTOM -> {
+                task.periodUnit = PeriodUnit.fromInt(period_unit_spinner.selectedItemPosition + 1)
+                try {
+                    task.period = period_edt.text.trim().toString().toInt()
+                } catch (e: NumberFormatException) {
+                    Log.e("ItemEditorActivity", "error converting toInt: ${period_edt.text}")
+                    return false
+                }
+                if (task.period == 1) {
+                    period_spinner.setSelection(task.periodUnit.ordinal)
+                    setCustomPeriodContVisibility(false)
+                }
+            }
+            else -> {
+                task.periodUnit = PeriodUnit.fromInt(period_unit_spinner.selectedItemPosition + 1)
+                task.period = 1
+            }
+        }
+        return true
     }
 
     override fun onDepartmentChosen(d: Department) {
@@ -105,11 +182,22 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         if (data.count > 0) {
             data.moveToFirst()
             task = Task(data)
-            origTask = Task(task)
-            item_name_edt.text = SpannableStringBuilder(task.item.name)
-            setDepName()
+            origTask = Task(data)
+            updateUI()
         } else {
             // todo should not happen
+        }
+    }
+
+    private fun updateUI() {
+        item_name_edt.setText(task.item.name)
+        setDepName()
+        period_spinner.setSelection(task.periodicity.ordinal, true)
+        if (task.periodicity == Period.CUSTOM) {
+            period_edt.setText(task.period.toString())
+            period_unit_spinner.setSelection(task.periodUnit.ordinal)
+        } else {
+            period_edt.setText("2")
         }
     }
 

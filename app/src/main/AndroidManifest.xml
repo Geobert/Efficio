@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:allowBackup="true"
@@ -63,6 +65,16 @@
             android:name=".SettingsActivity"
             android:label="@string/settings">
         </activity>
+
+        <service android:name=".service.EfficioService"/>
+
+        <receiver android:name=".service.InstallServiceReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="fr.geobert.efficio.INSTALL_TIMER"/>
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".service.OnAlarmReceiver"/>
     </application>
 
 </manifest>

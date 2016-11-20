@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.CursorLoader
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Store
-import fr.geobert.efficio.misc.normalize
+import fr.geobert.efficio.extensions.normalize
 
 object StoreTable : BaseTable() {
     override val TABLE_NAME = "stores"
