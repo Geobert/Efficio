@@ -4,6 +4,8 @@ import android.app.*
 import android.content.*
 import android.database.Cursor
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
@@ -109,8 +111,10 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
     }
 
     private fun onOkClicked() {
-        fillTask()
-
+        if (!fillTask()) {
+            Snackbar.make(my_toolbar, R.string.need_valid_period, Snackbar.LENGTH_SHORT).show()
+            return
+        }
         if (!task.isEquals(origTask)) {
             // change department, the item's weight is not relevant anymore
             val data = Intent()
@@ -126,7 +130,7 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         finish()
     }
 
-    private fun fillTask() {
+    private fun fillTask(): Boolean {
         task.item.name = item_name_edt.text.trim().toString()
         when (Period.fromInt(period_spinner.selectedItemPosition)) {
             Period.NONE -> {
@@ -135,13 +139,19 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
             }
             Period.CUSTOM -> {
                 task.periodUnit = PeriodUnit.fromInt(period_unit_spinner.selectedItemPosition + 1)
-                task.period = period_edt.text.trim().toString().toInt()
+                try {
+                    task.period = period_edt.text.trim().toString().toInt()
+                } catch (e: NumberFormatException) {
+                    Log.e("ItemEditorActivity", "error converting toInt: ${period_edt.text}")
+                    return false
+                }
             }
             else -> {
                 task.periodUnit = PeriodUnit.fromInt(period_unit_spinner.selectedItemPosition + 1)
                 task.period = 1
             }
         }
+        return true
     }
 
     override fun onDepartmentChosen(d: Department) {
@@ -168,7 +178,7 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         if (data.count > 0) {
             data.moveToFirst()
             task = Task(data)
-            origTask = Task(task)
+            origTask = Task(data)
             updateUI()
         } else {
             // todo should not happen

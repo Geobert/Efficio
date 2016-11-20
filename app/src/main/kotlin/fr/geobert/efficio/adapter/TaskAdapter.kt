@@ -2,7 +2,6 @@ package fr.geobert.efficio.adapter
 
 import android.content.*
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.*
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
@@ -95,12 +94,10 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
     }
 
     private fun applyAndAnimateMoves(newList: MutableList<Task>) {
-        Log.d(TAG, "applyAndAnimateMoves, taskList: $taskList")
         for (to in (newList.size - 1) downTo 0) {
             val d = newList[to]
             val from = taskList.indexOf(d)
             if (from >= 0 && from != to) {
-                Log.d(TAG, "applyAndAnimateMoves $d")
                 moveItem(from, to)
             }
         }
@@ -110,7 +107,6 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
         for (i in 0..(newList.size - 1)) {
             val d = newList[i]
             if (!taskList.contains(d)) {
-                Log.d(TAG, "applyAndAnimateAdditions $d")
                 addItem(i, d)
             }
         }
@@ -120,7 +116,6 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
         for (i in (taskList.size - 1) downTo 0) {
             val d = taskList[i]
             if (!newList.contains(d)) {
-                Log.d(TAG, "applyAndAnimateRemovals $d")
                 removeItem(i)
             }
         }

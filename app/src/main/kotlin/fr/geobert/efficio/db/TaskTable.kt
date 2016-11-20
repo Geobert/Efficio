@@ -94,6 +94,17 @@ object TaskTable : BaseTable() {
                 arrayOf(storeId.toString()), ORDERING)
     }
 
+    fun getAllDoneAndSchedTasks(ctx: Context, storeId: Long): Cursor? {
+        return if (storeId > -1)
+            ctx.contentResolver.query(TaskTable.CONTENT_URI,
+                    TaskTable.COLS_TO_QUERY, "$RESTRICT_TO_STORE AND $TABLE_NAME.$COL_IS_DONE = ? AND $TABLE_NAME.$COL_PERIOD_UNIT != ?",
+                    arrayOf(storeId.toString(), "1", "0"), ORDERING)
+        else
+            ctx.contentResolver.query(TaskTable.CONTENT_URI,
+                    TaskTable.COLS_TO_QUERY, "$TABLE_NAME.$COL_IS_DONE = ? AND $TABLE_NAME.$COL_PERIOD_UNIT != ?",
+                    arrayOf("1", "0"), ORDERING)
+    }
+
     fun create(activity: Activity, t: Task, storeId: Long): Long {
         val v = ContentValues()
         v.put(COL_STORE_ID, storeId)
@@ -142,4 +153,6 @@ object TaskTable : BaseTable() {
         db.execSQL(ADD_PERIOD_COL)
         db.execSQL(ADD_PERIOD_UNIT_COL)
     }
+
+
 }

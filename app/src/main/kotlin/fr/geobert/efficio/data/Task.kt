@@ -13,7 +13,12 @@ class Task : Comparable<Task> {
     var item: Item by Delegates.notNull()
     var type: TaskAdapter.VIEW_TYPES by Delegates.notNull()
     var qty: Int = 1
-    var lastChecked: DateTime = DateTime.now(TIME_ZONE)
+    private var _lastChecked: DateTime = DateTime.today(TIME_ZONE)
+    var lastChecked: DateTime
+        get() = _lastChecked.truncate(DateTime.Unit.DAY)
+        set(value) {
+            _lastChecked = value
+        }
     var period: Int = 0
     var periodUnit: PeriodUnit = PeriodUnit.NONE
 
@@ -65,6 +70,9 @@ class Task : Comparable<Task> {
         isDone = task.isDone
         this.item = Item(task.item)
         type = task.type
+        period = task.period
+        periodUnit = task.periodUnit
+        lastChecked = task.lastChecked
     }
 
     // used for sort()
@@ -95,6 +103,6 @@ class Task : Comparable<Task> {
     }
 
     override fun toString(): String {
-        return "[name: ${item.name} / depWeight: ${item.department.weight} / itemWeight: ${item.weight}]"
+        return "[name: ${item.name} / depWeight: ${item.department.weight} / itemWeight: ${item.weight} / lastChecked: $lastChecked]"
     }
 }

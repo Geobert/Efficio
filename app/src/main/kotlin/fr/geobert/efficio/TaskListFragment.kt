@@ -193,7 +193,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     internal fun updateWidgets() {
-        (activity as MainActivity).updateWidgets()
+        updateWidgets(activity)
     }
 
     private fun findMaxWeightForDepartment(d: Department): Double {
