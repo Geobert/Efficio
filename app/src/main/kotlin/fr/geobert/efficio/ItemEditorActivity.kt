@@ -151,7 +151,7 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
                 }
             }
             else -> {
-                task.periodUnit = PeriodUnit.fromInt(period_unit_spinner.selectedItemPosition + 1)
+                task.periodUnit = PeriodUnit.fromInt(period_spinner.selectedItemPosition)
                 task.period = 1
             }
         }
