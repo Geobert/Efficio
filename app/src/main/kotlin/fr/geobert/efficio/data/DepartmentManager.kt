@@ -32,7 +32,7 @@ class DepartmentManager(val activity: Activity,
     private var addDepBtn: ImageButton by Delegates.notNull()
     private var addDepEdt: EditText by Delegates.notNull()
     private var emptyTxt: TextView by Delegates.notNull()
-    private var cursorLoader: Loader<Cursor>? = null
+    //private var cursorLoader: Loader<Cursor>? = null
 
     interface DepartmentChoiceListener {
         fun onDepartmentChosen(d: Department)
@@ -40,6 +40,7 @@ class DepartmentManager(val activity: Activity,
 
     var depAdapter: DepartmentAdapter by Delegates.notNull()
     var departmentsList: MutableList<Department> by Delegates.notNull()
+    var allDepartmentsList: List<Department> by Delegates.notNull()
     private var origDepList: MutableList<Department>? = null
 
     init {
@@ -58,6 +59,7 @@ class DepartmentManager(val activity: Activity,
         addDepEdt.setOnEditorActionListener { textView, i, keyEvent ->
             onEditorAction(i)
         }
+        activity.loaderManager.initLoader(GET_ALL_DEP, Bundle(), this)
     }
 
     private fun onEditorAction(actionId: Int): Boolean {
@@ -89,21 +91,21 @@ class DepartmentManager(val activity: Activity,
 
     private fun onAddDepClicked() {
         val t = addDepEdt.text.trim().toString()
-        if (t.length > 0) {
+        if (t.isNotEmpty()) {
             val n = t.normalize()
-            var existingDep: Department? = null
-            for (d in departmentsList) {
-                if (d.name.normalize() == n) {
-                    existingDep = d
-                    break
-                }
-            }
+            val existingStoreDep: Department? = departmentsList.firstOrNull { it.name.normalize() == n }
 
-            if (existingDep != null) {
-                onDepartmentChosen(existingDep)
+            if (existingStoreDep != null) {
+                onDepartmentChosen(existingStoreDep)
             } else {
-                val d = Department(t, maxDepWeight() + 1.0)
-                d.id = DepartmentTable.create(activity, d)
+                val existingDep: Department? = allDepartmentsList.firstOrNull { it.name.normalize() == n }
+                val d = if (existingDep == null) {
+                    val d = Department(t, maxDepWeight() + 1.0)
+                    d.id = DepartmentTable.create(activity, d)
+                    d
+                } else {
+                    existingDep
+                }
                 if (d.id > 0) {
                     if (StoreCompositionTable.create(activity, storeId, d) > 0) {
                         onDepartmentChosen(d)
@@ -116,6 +118,7 @@ class DepartmentManager(val activity: Activity,
             }
         }
     }
+
 
     private fun onDepartmentChosen(department: Department) {
         listener.onDepartmentChosen(department)
@@ -138,7 +141,6 @@ class DepartmentManager(val activity: Activity,
 
         when (loader.id) {
             GET_DEP_FROM_STORE -> {
-                cursorLoader = loader
                 if (data.count > 0) {
                     val b = Bundle()
                     b.putInt("id", data.getColumnIndex(StoreCompositionTable.COL_DEP_ID))
@@ -152,6 +154,19 @@ class DepartmentManager(val activity: Activity,
                 } else {
                     departmentsList = LinkedList<Department>()
                 }
+                activity.loaderManager.destroyLoader(GET_DEP_FROM_STORE)
+            }
+            GET_ALL_DEP -> {
+                if (data.count > 0) {
+                    val b = Bundle()
+                    b.putInt("id", data.getColumnIndex("_id"))
+                    b.putInt("name", data.getColumnIndex("dep_name"))
+                    b.putInt("weight", data.getColumnIndex("dep_weight"))
+                    allDepartmentsList = data.map { Department(it, b) }
+                } else {
+                    allDepartmentsList = LinkedList<Department>()
+                }
+                activity.loaderManager.destroyLoader(GET_ALL_DEP)
             }
             else -> throw IllegalArgumentException("Unknown cursorLoader id")
         }
@@ -161,6 +176,7 @@ class DepartmentManager(val activity: Activity,
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor>? {
         return when (id) {
             GET_DEP_FROM_STORE -> StoreCompositionTable.getDepFromStoreLoader(activity, storeId)
+            GET_ALL_DEP -> DepartmentTable.getAllDepLoader(activity)
             else -> null
         }
     }
@@ -173,7 +189,6 @@ class DepartmentManager(val activity: Activity,
         if (reset) origDepList = null
         val b = Bundle()
         b.putLong("storeId", storeId)
-        activity.loaderManager.destroyLoader(GET_DEP_FROM_STORE)
         activity.loaderManager.initLoader(GET_DEP_FROM_STORE, b, this)
     }
 
@@ -182,9 +197,9 @@ class DepartmentManager(val activity: Activity,
         return if (o != null) compareLists(o, departmentsList) != 0 else false
     }
 
-    //
-    // TextWatcher
-    //
+//
+// TextWatcher
+//
 
     override fun afterTextChanged(s: Editable) {
         if (departmentsList.count() > 0) {
@@ -196,12 +211,7 @@ class DepartmentManager(val activity: Activity,
 
     private fun filter(list: MutableList<Department>, s: Editable): MutableList<Department> {
         val f = s.toString().toLowerCase()
-        val filtered = LinkedList<Department>()
-        for (d in list) {
-            if (d.name.toLowerCase().contains(f)) {
-                filtered.add(d)
-            }
-        }
+        val filtered = list.filterTo(LinkedList<Department>()) { it.name.toLowerCase().contains(f) }
         return filtered
     }
 

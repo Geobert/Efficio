@@ -1,9 +1,10 @@
 package fr.geobert.efficio.db
 
-import android.content.ContentValues
-import android.content.Context
+import android.content.*
+import android.database.Cursor
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Item
+import fr.geobert.efficio.extensions.normalize
 
 object ItemTable : BaseTable() {
     override val TABLE_NAME = "items"
@@ -40,5 +41,10 @@ object ItemTable : BaseTable() {
         v.put(COL_NAME, item.name)
         v.put(COL_NORM_NAME, item.normName())
         return update(activity, item.id, v)
+    }
+
+    fun fetchItemByName(activity: Context, name: String): Cursor? {
+        return activity.contentResolver.query(ItemTable.CONTENT_URI, ItemTable.COLS_TO_QUERY,
+                "($COL_NORM_NAME = ?)", arrayOf(name.normalize()), null)
     }
 }

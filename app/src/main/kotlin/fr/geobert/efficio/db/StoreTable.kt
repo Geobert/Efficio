@@ -1,8 +1,6 @@
 package fr.geobert.efficio.db
 
-import android.content.ContentValues
-import android.content.Context
-import android.content.CursorLoader
+import android.content.*
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Store
 import fr.geobert.efficio.extensions.normalize
@@ -13,7 +11,7 @@ object StoreTable : BaseTable() {
     val COL_NAME = "store_name"
     val COL_NORM_NAME = "store_norm"
 
-    override fun CREATE_COLUMNS() = "${COL_NORM_NAME} TEXT NOT NULL UNIQUE ON CONFLICT IGNORE, " +
+    override fun CREATE_COLUMNS() = "$COL_NORM_NAME TEXT NOT NULL UNIQUE ON CONFLICT IGNORE, " +
             "$COL_NAME TEXT NOT NULL"
 
     override val COLS_TO_QUERY: Array<String> = arrayOf(BaseColumns._ID, COL_NAME)

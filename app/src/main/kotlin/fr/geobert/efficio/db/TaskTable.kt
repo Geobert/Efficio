@@ -24,11 +24,11 @@ object TaskTable : BaseTable() {
             "$COL_ITEM_ID INTEGER NOT NULL, " +
             "$COL_IS_DONE INTEGER NOT NULL, " +
             "$COL_QTY INTEGER NOT NULL DEFAULT 1, " +
-            "${foreignId(COL_STORE_ID, StoreTable.TABLE_NAME)}, " +
-            "${foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)}, " +
             "$COL_LAST_CHECKED INTEGER NOT NULL DEFAULT 0, " +
             "$COL_PERIOD INTEGER NOT NULL DEFAULT 0, " +
-            "$COL_PERIOD_UNIT INTEGER NOT NULL DEFAULT 0"
+            "$COL_PERIOD_UNIT INTEGER NOT NULL DEFAULT 0, " +
+            "${foreignId(COL_STORE_ID, StoreTable.TABLE_NAME)}, " +
+            foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)
 
 
     val ADD_LAST_CHECKED_COL = "ALTER TABLE $TABLE_NAME ADD COLUMN $COL_LAST_CHECKED INTEGER NOT NULL DEFAULT 0"
@@ -38,9 +38,9 @@ object TaskTable : BaseTable() {
     val TABLE_JOINED = "$TABLE_NAME " +
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreTable.TABLE_NAME)} " +
             "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemTable.TABLE_NAME)} " +
-            "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemDepTable.TABLE_NAME, ItemDepTable.COL_ITEM_ID)} " +
+            "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemDepTable.TABLE_NAME, ItemDepTable.COL_ITEM_ID)} AND tasks.store_id = items_dep.store_id " +
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreCompositionTable.TABLE_NAME, StoreCompositionTable.COL_STORE_ID)} AND items_dep.dep_id = department_weight.dep_id " +
-            "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemWeightTable.TABLE_NAME, ItemWeightTable.COL_ITEM_ID)} " +
+            "${leftOuterJoin(TABLE_NAME, COL_ITEM_ID, ItemWeightTable.TABLE_NAME, ItemWeightTable.COL_ITEM_ID)} AND tasks.store_id = items_weight.store_id " +
             "${leftOuterJoin(StoreCompositionTable.TABLE_NAME, StoreCompositionTable.COL_DEP_ID, DepartmentTable.TABLE_NAME)} "
 
     override val COLS_TO_QUERY: Array<String> = arrayOf("$TABLE_NAME.${BaseColumns._ID}",

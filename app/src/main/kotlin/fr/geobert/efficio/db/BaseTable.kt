@@ -1,9 +1,6 @@
 package fr.geobert.efficio.db
 
-import android.content.ContentResolver
-import android.content.ContentUris
-import android.content.ContentValues
-import android.content.Context
+import android.content.*
 import android.net.Uri
 import android.provider.BaseColumns
 

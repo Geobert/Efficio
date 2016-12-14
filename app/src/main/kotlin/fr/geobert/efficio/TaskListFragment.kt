@@ -29,7 +29,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     var lastStoreId: Long = 1 // todo get it from prefs
     var currentStore: Store? = null
-    var cursorLoader: CursorLoader? = null
+    var cursorLoader: Loader<Cursor>? = null
     var taskAdapter: TaskAdapter? = null
     var tasksList: MutableList<Task> = LinkedList()
     val refreshReceiver = OnRefreshReceiver(this)
@@ -158,15 +158,26 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         Log.d(TAG, "onDepartmentChosen : ${d.name}")
         // we choose a department, so the task does not exist
         val maxWeightForDep = findMaxWeightForDepartment(d)
-        val i = Item(quick_add_text.text.trim().toString(), d, maxWeightForDep + 1.0)
+        val itemName = quick_add_text.text.trim().toString()
+        val i = Item(itemName, d, maxWeightForDep + 1.0)
         i.id = ItemTable.create(activity, i)
+        if (i.id == 0L) {
+            // seems item with same name already in db, fetch it and use its id
+            val existingItem = ItemTable.fetchItemByName(activity, itemName)
+            if (existingItem != null) {
+                if (existingItem.moveToFirst()) {
+                    i.id = existingItem.getLong(0)
+                }
+                existingItem.close()
+            } else {
+                Log.e(TAG, "error on item creation")
+            }
+        }
         if (i.id > 0) {
             // add to adapter, but need to find the right position
             val t = Task(i)
             tasksList.add(t)
-
             sort()
-
             taskAdapter!!.animateTo(tasksList)
             quick_add_text.text.clear()
 
@@ -174,6 +185,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                 if (ItemDepTable.create(activity, i, lastStoreId) > 0) {
                     if (TaskTable.create(activity, t, lastStoreId) > 0) {
                         updateWidgets()
+                        //fetchStore(this, lastStoreId)
                     } else {
                         Log.e(TAG, "error on creating task")
                     }
@@ -181,10 +193,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
             } else {
                 Log.e(TAG, "error on item weight creation")
             }
-        } else {
-            Log.e(TAG, "error on item creation")
         }
-
     }
 
     private fun sort() {
@@ -343,6 +352,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                 dragSwipeHlp.tasksList = tasksList
                 tasks_list.adapter = taskAdapter
                 taskItemTouchHlp.attachToRecyclerView(tasks_list)
+                this.cursorLoader = cursorLoader
             }
             else -> throw IllegalArgumentException("Unknown cursorLoader id")
         }
