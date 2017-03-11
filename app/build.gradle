@@ -1,6 +1,6 @@
 buildscript {
-    ext.kotlin_version = '1.0.5-2'
-    ext.android_support = '25.0.1'
+    ext.kotlin_version = '1.1.0'
+    ext.android_support = '25.2.0'
     repositories {
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
@@ -25,14 +25,14 @@ repositories {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "24.0.3"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "fr.geobert.efficio"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0b7"
+        versionName "1.0b11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

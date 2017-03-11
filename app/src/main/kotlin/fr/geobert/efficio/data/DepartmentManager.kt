@@ -1,20 +1,33 @@
 package fr.geobert.efficio.data
 
-import android.app.*
+import android.app.Activity
+import android.app.LoaderManager
 import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
-import android.support.v7.widget.*
-import android.text.*
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.SpannableStringBuilder
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.TextView
 import fr.geobert.efficio.R
-import fr.geobert.efficio.adapter.*
-import fr.geobert.efficio.db.*
-import fr.geobert.efficio.extensions.*
-import fr.geobert.efficio.misc.*
+import fr.geobert.efficio.adapter.DepartmentAdapter
+import fr.geobert.efficio.adapter.DepartmentViewHolder
+import fr.geobert.efficio.db.DepartmentTable
+import fr.geobert.efficio.db.StoreCompositionTable
+import fr.geobert.efficio.extensions.compareLists
+import fr.geobert.efficio.extensions.map
+import fr.geobert.efficio.extensions.normalize
+import fr.geobert.efficio.misc.GET_ALL_DEP
+import fr.geobert.efficio.misc.GET_DEP_FROM_STORE
+import fr.geobert.efficio.misc.TopBottomSpaceItemDecoration
 import kotlinx.android.synthetic.main.department_chooser_dialog.view.*
 import java.util.*
 import kotlin.properties.Delegates
@@ -59,7 +72,7 @@ class DepartmentManager(val activity: Activity,
         addDepEdt.setOnEditorActionListener { textView, i, keyEvent ->
             onEditorAction(i)
         }
-        activity.loaderManager.initLoader(GET_ALL_DEP, Bundle(), this)
+        //activity.loaderManager.initLoader(GET_ALL_DEP, Bundle(), this)
     }
 
     private fun onEditorAction(actionId: Int): Boolean {
@@ -146,6 +159,7 @@ class DepartmentManager(val activity: Activity,
                     b.putInt("id", data.getColumnIndex(StoreCompositionTable.COL_DEP_ID))
                     b.putInt("name", data.getColumnIndex("dep_name"))
                     b.putInt("weight", data.getColumnIndex("dep_weight"))
+                    b.putInt("storeCompoId", data.getColumnIndex("store_compo_id"))
                     departmentsList = data.map { Department(it, b) }
                     if (trackDifference && origDepList == null)
                         origDepList = data.map { Department(it, b) }

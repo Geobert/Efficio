@@ -162,7 +162,7 @@ class DbContentProvider : ContentProvider() {
         Log.d(TAG, "update id: $id, table: $table")
         // return nb updated items
         return if (id != null) {
-            if (selection == null || selection.trim().length == 0) {
+            if (selection == null || selection.trim().isEmpty()) {
                 db.update(table, values, "${BaseColumns._ID}=?", arrayOf(id))
             } else {
                 val selArgs = if (selectionArgs != null) {

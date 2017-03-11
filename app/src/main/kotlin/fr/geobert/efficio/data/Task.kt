@@ -79,16 +79,16 @@ class Task : Comparable<Task> {
     override fun compareTo(other: Task): Int {
         return if (isDone != other.isDone) {
             if (isDone) 1 else -1 // done task always appears later on list
-        } else { // same task done state
-            if (isDone) item.name.compareTo(other.item.name) else // if task is done, we don't care about weights
-                if (item.department.weight > other.item.department.weight) 1 else // task is not done, compare department
-                    if (item.department.weight < other.item.department.weight) -1 else {
-                        val r = item.department.name.compareTo(other.item.department.name) // same dep weight compare their names
-                        if (r != 0) r else
-                            if (item.weight > other.item.weight) 1 else // same dep, compare item
-                                if (item.weight < other.item.weight) -1 else
-                                    item.name.compareTo(other.item.name)
-                    }
+        } else { // same done state for both
+            //if (isDone) item.name.compareTo(other.item.name) else // if task is done, we don't care about weights
+            if (item.department.weight > other.item.department.weight) 1 else // compare department
+                if (item.department.weight < other.item.department.weight) -1 else {
+                    val r = item.department.name.compareTo(other.item.department.name) // same dep weight compare dep names
+                    if (r != 0) r else
+                        if (item.weight > other.item.weight) 1 else // same dep, compare item
+                            if (item.weight < other.item.weight) -1 else
+                                item.name.compareTo(other.item.name)
+                }
         }
     }
 

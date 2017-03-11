@@ -1,7 +1,9 @@
 package fr.geobert.efficio.db
 
 import android.app.Activity
-import android.content.*
+import android.content.ContentValues
+import android.content.Context
+import android.content.CursorLoader
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.provider.BaseColumns
@@ -49,6 +51,7 @@ object TaskTable : BaseTable() {
             "${DepartmentTable.TABLE_NAME}.${BaseColumns._ID} as dep_id",
             "${DepartmentTable.TABLE_NAME}.${DepartmentTable.COL_NAME} as dep_name",
             "${StoreCompositionTable.TABLE_NAME}.${StoreCompositionTable.COL_WEIGHT} as dep_weight",
+            "${StoreCompositionTable.TABLE_NAME}.${BaseColumns._ID} as dep_store_compo_id",
             "${ItemWeightTable.TABLE_NAME}.${ItemWeightTable.COL_WEIGHT} as item_weight",
             COL_IS_DONE,
             COL_QTY,

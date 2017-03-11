@@ -2,7 +2,9 @@ package fr.geobert.efficio.db
 
 
 import android.app.Activity
-import android.content.*
+import android.content.ContentValues
+import android.content.Context
+import android.content.CursorLoader
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Department
 
@@ -28,6 +30,7 @@ object StoreCompositionTable : BaseTable() {
             "${StoreTable.TABLE_NAME}.${StoreTable.COL_NAME} as store_name",
             "${DepartmentTable.TABLE_NAME}.${BaseColumns._ID} as $COL_DEP_ID",
             "${DepartmentTable.TABLE_NAME}.${DepartmentTable.COL_NAME} as dep_name",
+            "${StoreCompositionTable.TABLE_NAME}.${BaseColumns._ID} as store_compo_id",
             "$TABLE_NAME.$COL_WEIGHT")
 
     val RESTRICT_TO_STORE = "($TABLE_NAME.$COL_STORE_ID = ?)"
@@ -51,6 +54,7 @@ object StoreCompositionTable : BaseTable() {
     fun updateDepWeight(activity: Activity, department: Department): Int {
         val v = ContentValues()
         v.put(COL_WEIGHT, department.weight)
-        return update(activity, department.id, v)
+        val id = department.storeCompoId
+        return if (id != null) update(activity, id, v) else 0
     }
 }

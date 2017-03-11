@@ -8,12 +8,15 @@ class Department : Comparable<Department> {
     var id: Long by Delegates.notNull()
     var name: String by Delegates.notNull()
     var weight: Double by Delegates.notNull()
+    var storeCompoId: Long? = null
 
     constructor(cursor: Cursor, b: Bundle) {
         id = cursor.getLong(b.getInt("id"))
         name = cursor.getString(b.getInt("name"))
-        val idx = b.getInt("weight")
-        weight = if (idx > 0) cursor.getDouble(idx) else 0.0
+        val idx = b.getInt("weight", -1)
+        weight = if (idx >= 0) cursor.getDouble(idx) else 0.0
+        val i = b.getInt("storeCompoId", -1)
+        storeCompoId = if (i >= 0) cursor.getLong(i) else null
     }
 
     constructor(name: String, w: Double) {

@@ -7,7 +7,7 @@ import android.widget.TextView
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Department
 
-class DepartmentViewHolder(val l: View, val listener: OnClickListener) :
+class DepartmentViewHolder(l: View, val listener: OnClickListener) :
         RecyclerView.ViewHolder(l), View.OnClickListener {
     interface OnClickListener {
         fun onClick(d: Department)

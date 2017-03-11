@@ -6,10 +6,17 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.Log
 import com.crashlytics.android.Crashlytics
-import fr.geobert.efficio.*
-import fr.geobert.efficio.adapter.*
-import fr.geobert.efficio.data.*
-import fr.geobert.efficio.db.*
+import fr.geobert.efficio.BuildConfig
+import fr.geobert.efficio.R
+import fr.geobert.efficio.TaskListFragment
+import fr.geobert.efficio.adapter.TaskAdapter
+import fr.geobert.efficio.adapter.TaskViewHolder
+import fr.geobert.efficio.data.Department
+import fr.geobert.efficio.data.Item
+import fr.geobert.efficio.data.Task
+import fr.geobert.efficio.db.ItemWeightTable
+import fr.geobert.efficio.db.StoreCompositionTable
+import fr.geobert.efficio.db.TaskTable
 import java.util.*
 import kotlin.properties.Delegates
 
@@ -82,7 +89,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                 } else {
                     if (item.department.weight >= next.department.weight) {
                         item.department.weight = next.department.weight - 1.0
-                        val lastItemSameDep = lastTargetSameDep?.item ?: null
+                        val lastItemSameDep = lastTargetSameDep?.item
                         if (lastItemSameDep != null)
                             item.weight = lastItemSameDep.weight - 1.0
                         needAdapterSort = true
@@ -96,7 +103,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                 } else {
                     if (item.department.weight <= prev.department.weight) {
                         item.department.weight = prev.department.weight + 1.0
-                        val lastItemSameDep = lastTargetSameDep?.item ?: null
+                        val lastItemSameDep = lastTargetSameDep?.item
                         if (lastItemSameDep != null)
                             item.weight = lastItemSameDep.weight + 1.0
                         needAdapterSort = true
@@ -116,7 +123,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                         if (itemDep.weight >= nextDep.weight || itemDep.weight <= prevDep.weight)
                             handleDoubleCollisionForDep(pos, itemDep, nextDep, prevDep)
                     }
-                    val lastItemSameDep = lastTargetSameDep?.item ?: null
+                    val lastItemSameDep = lastTargetSameDep?.item
                     if (lastItemSameDep != null)
                         item.weight = lastItemSameDep.weight + if (direction == Direction.UP) -1.0 else 1.0
                     needAdapterSort = true

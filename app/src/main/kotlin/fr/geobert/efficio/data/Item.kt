@@ -25,6 +25,7 @@ class Item {
             b.putInt("id", depIdColIdx)
             b.putInt("name", cursor.getColumnIndex("dep_name"))
             b.putInt("weight", cursor.getColumnIndex("dep_weight"))
+            b.putInt("storeCompoId", cursor.getColumnIndex("dep_store_compo_id"))
             department = Department(cursor, b)
             departmentsList[depId] = department
         } else {

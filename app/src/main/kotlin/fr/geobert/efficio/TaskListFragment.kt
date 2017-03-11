@@ -1,22 +1,37 @@
 package fr.geobert.efficio
 
 
-import android.app.*
-import android.content.*
+import android.app.Activity
+import android.app.Fragment
+import android.app.LoaderManager
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
-import android.support.v7.widget.*
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.text.*
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import fr.geobert.efficio.adapter.*
+import fr.geobert.efficio.adapter.TaskAdapter
+import fr.geobert.efficio.adapter.TaskViewHolder
 import fr.geobert.efficio.data.*
-import fr.geobert.efficio.db.*
-import fr.geobert.efficio.dialog.*
+import fr.geobert.efficio.db.ItemDepTable
+import fr.geobert.efficio.db.ItemTable
+import fr.geobert.efficio.db.ItemWeightTable
+import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.dialog.DepartmentChoiceDialog
+import fr.geobert.efficio.dialog.QuantityDialog
 import fr.geobert.efficio.drag.TaskDragSwipeHelper
-import fr.geobert.efficio.extensions.*
+import fr.geobert.efficio.extensions.TIME_ZONE
+import fr.geobert.efficio.extensions.map
+import fr.geobert.efficio.extensions.mapInvert
 import fr.geobert.efficio.misc.*
 import hirondelle.date4j.DateTime
 import kotlinx.android.synthetic.main.item_list_fragment.*
@@ -71,7 +86,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         }
 
         quick_add_text.addTextChangedListener(this)
-        quick_add_text.setOnEditorActionListener { textView, i, keyEvent ->
+        quick_add_text.setOnEditorActionListener { _, i, _ ->
             onEditorAction(i)
         }
 
