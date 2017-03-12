@@ -1,9 +1,12 @@
 package fr.geobert.efficio.dialog
 
-import android.app.*
+import android.app.AlertDialog
+import android.app.Dialog
+import android.app.DialogFragment
 import android.os.Bundle
 import android.view.View
-import fr.geobert.efficio.*
+import fr.geobert.efficio.MainActivity
+import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
 import kotlinx.android.synthetic.main.quantity_dialog.view.*
@@ -35,8 +38,8 @@ class QuantityDialog : DialogFragment() {
         customView.qty_picker.wrapSelectorWheel = false
         customView.qty_picker.value = taskQty
         b.setView(customView).setTitle("Quantity").
-                setPositiveButton(android.R.string.ok, { d, i -> onOkClicked() }).
-                setNegativeButton(android.R.string.cancel, { d, i -> d.cancel() })
+                setPositiveButton(android.R.string.ok, { _, _ -> onOkClicked() }).
+                setNegativeButton(android.R.string.cancel, { d, _ -> d.cancel() })
         return b.create()
     }
 

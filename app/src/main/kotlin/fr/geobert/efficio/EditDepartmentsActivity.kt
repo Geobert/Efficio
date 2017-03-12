@@ -5,13 +5,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
-import fr.geobert.efficio.data.*
+import fr.geobert.efficio.data.Department
+import fr.geobert.efficio.data.DepartmentManager
 import fr.geobert.efficio.db.DepartmentTable
-import fr.geobert.efficio.dialog.*
+import fr.geobert.efficio.dialog.DeleteConfirmationDialog
+import fr.geobert.efficio.dialog.MessageDialog
 import fr.geobert.efficio.drag.DepartmentDragHelper
-import fr.geobert.efficio.misc.*
+import fr.geobert.efficio.misc.DELETE_DEP
+import fr.geobert.efficio.misc.DeleteDialogInterface
 import kotlinx.android.synthetic.main.department_chooser_dialog.*
 import kotlinx.android.synthetic.main.edit_dep_text.view.*
 import kotlin.properties.Delegates
@@ -102,9 +106,9 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
             customView.edt.setText(arguments.getString("depName"))
             customView.edt.selectAll()
             b.setTitle(R.string.edit_dep_name).setView(customView).setCancelable(true).
-                    setPositiveButton(android.R.string.ok, { d, i -> onOkClicked() }).
-                    setNeutralButton(R.string.delete, { d, i -> onDeleteClicked() }).
-                    setNegativeButton(android.R.string.cancel, { d, i -> d.cancel() })
+                    setPositiveButton(android.R.string.ok, { _, _ -> onOkClicked() }).
+                    setNeutralButton(R.string.delete, { _, _ -> onDeleteClicked() }).
+                    setNegativeButton(android.R.string.cancel, { d, _ -> d.cancel() })
             return b.create()
         }
 

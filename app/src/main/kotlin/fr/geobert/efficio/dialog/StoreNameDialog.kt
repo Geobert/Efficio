@@ -1,12 +1,16 @@
 package fr.geobert.efficio.dialog
 
-import android.app.*
+import android.app.AlertDialog
+import android.app.Dialog
+import android.app.DialogFragment
 import android.os.Bundle
 import android.view.View
-import fr.geobert.efficio.*
+import fr.geobert.efficio.MainActivity
+import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Store
 import fr.geobert.efficio.db.StoreTable
-import fr.geobert.efficio.misc.*
+import fr.geobert.efficio.misc.CREATE_STORE
+import fr.geobert.efficio.misc.RENAME_STORE
 import kotlinx.android.synthetic.main.input_dialog.view.*
 import kotlin.properties.Delegates
 
@@ -39,9 +43,9 @@ class StoreNameDialog : DialogFragment() {
         customView.dialog_msg.text = arguments.getString("msg")
         action = arguments.getInt("action")
         b.setView(customView).setTitle(arguments.getString("title")).
-                setPositiveButton(android.R.string.ok, { dialogInterface, i -> onOkClicked() }).
+                setPositiveButton(android.R.string.ok, { _, _ -> onOkClicked() }).
                 setNegativeButton(android.R.string.cancel,
-                        { dialogInterface, i -> dialogInterface.cancel() })
+                        { dialogInterface, _ -> dialogInterface.cancel() })
         return b.create()
     }
 
@@ -64,7 +68,7 @@ class StoreNameDialog : DialogFragment() {
                 val s = Store(t)
                 if (StoreTable.create(activity, s) > 0) {
                     if (a is MainActivity) {
-                        a.storeCreated(s)
+                        a.storeCreated()
                     }
                 } else {
                     MessageDialog.newInstance(R.string.error_create_store, R.string.error).

@@ -1,19 +1,28 @@
 package fr.geobert.efficio
 
-import android.app.*
-import android.content.*
-import android.os.*
+import android.app.Fragment
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Build
+import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import com.crashlytics.android.Crashlytics
-import fr.geobert.efficio.data.*
-import fr.geobert.efficio.db.*
-import fr.geobert.efficio.dialog.*
+import fr.geobert.efficio.data.Store
+import fr.geobert.efficio.data.StoreLoaderListener
+import fr.geobert.efficio.data.StoreManager
+import fr.geobert.efficio.db.DbContentProvider
+import fr.geobert.efficio.db.StoreTable
+import fr.geobert.efficio.dialog.DeleteConfirmationDialog
+import fr.geobert.efficio.dialog.StoreNameDialog
 import fr.geobert.efficio.misc.*
-import fr.geobert.efficio.service.*
+import fr.geobert.efficio.service.EfficioService
+import fr.geobert.efficio.service.InstallServiceReceiver
+import fr.geobert.efficio.service.OnAlarmReceiver
 import io.fabric.sdk.android.Fabric
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -56,6 +65,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener,
             val client = contentResolver.acquireContentProviderClient("fr.geobert.efficio")
             val provider = client.localContentProvider as DbContentProvider
             provider.deleteDatabase(this)
+            @Suppress("DEPRECATION")
             if (Build.VERSION.SDK_INT < 24) client.release() else client.close()
         }
     }
@@ -193,7 +203,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener,
         d.show(fragmentManager, "createStore")
     }
 
-    fun storeCreated(store: Store) {
+    fun storeCreated() {
         storeManager.fetchAllStores()
     }
 

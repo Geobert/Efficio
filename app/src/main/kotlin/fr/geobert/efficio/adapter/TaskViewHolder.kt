@@ -1,8 +1,12 @@
 package fr.geobert.efficio.adapter
 
-import android.support.v7.widget.*
+import android.support.v7.widget.CardView
+import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.CompoundButton
+import android.widget.TextView
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
 import kotlin.properties.Delegates
@@ -34,12 +38,12 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: TaskViewHo
             depName = view.findViewById(R.id.dep_name) as TextView
             qty = view.findViewById(R.id.qty_btn) as Button
             checkbox.setOnCheckedChangeListener(this)
-            content.setOnClickListener { v -> onClicked(v) }
+            content.setOnClickListener { onClicked() }
 
         }
     }
 
-    private fun onClicked(v: View) {
+    private fun onClicked() {
         listener.onItemClicked(task)
     }
 
@@ -67,9 +71,7 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: TaskViewHo
                         format(task.item.department.name)
                 cardView.isSelected = task.isDone
                 qty.text = task.qty.toString()
-                qty.setOnClickListener { v ->
-                    listener.onQtyClicked(task)
-                }
+                qty.setOnClickListener { listener.onQtyClicked(task) }
                 setBgColor(task.isDone)
                 isListenerActive = true
             }
