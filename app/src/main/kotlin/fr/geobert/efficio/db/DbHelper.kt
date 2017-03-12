@@ -1,9 +1,17 @@
 package fr.geobert.efficio.db
 
 import android.content.Context
-import android.database.sqlite.*
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import android.os.Environment
+import android.util.Log
 import fr.geobert.efficio.R
+import fr.geobert.efficio.extensions.TIME_ZONE
 import fr.geobert.efficio.extensions.normalize
+import hirondelle.date4j.DateTime
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import kotlin.properties.Delegates
 
 class DbHelper private constructor(ctx: Context) :
@@ -12,6 +20,7 @@ class DbHelper private constructor(ctx: Context) :
     private var ctx: Context by Delegates.notNull()
 
     companion object {
+        val TAG = "DbHelper"
         val DATABASE_NAME = "items.db"
         val DB_VERSION = 3
         private var instance: DbHelper? = null
@@ -28,6 +37,78 @@ class DbHelper private constructor(ctx: Context) :
 
         fun delete() {
             instance = null
+        }
+
+        fun backupDb(): String? {
+            try {
+                val sd = Environment.getExternalStorageDirectory()
+                val data = Environment.getDataDirectory()
+                if (sd.canWrite()) {
+                    val now = DateTime.now(TIME_ZONE)
+                    val dbName = "efficio_${now.format("YYMMDD")}_${now.format("hhmmss")}.db"
+                    val currentDBPath = "/data/fr.geobert.efficio/databases/$DATABASE_NAME"
+                    val backupDBDir = "/Efficio/"
+                    val backupDBPath = "$backupDBDir/$dbName"
+                    val currentDB = File(data, currentDBPath)
+                    val backupDir = File(sd, backupDBDir)
+                    if (!backupDir.exists() && !backupDir.mkdirs()) {
+                        Log.e(TAG, "failed to create dir")
+                        return null
+                    }
+                    val backupDB = File(sd, backupDBPath)
+                    if (currentDB.exists()) {
+                        val srcFIS = FileInputStream(currentDB)
+                        val dstFOS = FileOutputStream(backupDB)
+                        val src = srcFIS.channel
+                        val dst = dstFOS.channel
+                        dst.transferFrom(src, 0, src.size())
+                        src.close()
+                        dst.close()
+                        srcFIS.close()
+                        dstFOS.close()
+                        return dbName
+                    } else {
+                        Log.e(TAG, "DB PATH: ${currentDB.absolutePath} does not exists")
+                    }
+                } else {
+                    Log.e(TAG, "External storage can't be write")
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "exception while backupDb", e)
+            }
+            return null
+        }
+
+        fun restoreDatabase(ctx: Context, name: String): Boolean {
+            try {
+                val sd = Environment.getExternalStorageDirectory()
+
+                val backupDBPath = "/Efficio/$name"
+                val currentDB = ctx.getDatabasePath(DATABASE_NAME)
+                val backupDB = File(sd, backupDBPath)
+
+                if (backupDB.exists()) {
+                    DbContentProvider.close()
+                    val srcFIS = FileInputStream(backupDB)
+                    val dstFOS = FileOutputStream(currentDB)
+                    val dst = dstFOS.channel
+                    val src = srcFIS.channel
+
+                    dst.transferFrom(src, 0, src.size())
+                    src.close()
+                    dst.close()
+                    srcFIS.close()
+                    dstFOS.close()
+                    DbContentProvider.reinit(ctx)
+                    //DBPrefsManager.getInstance(ctx).put(RadisService.CONSOLIDATE_DB, true)
+                    return true
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+            return false
         }
     }
 

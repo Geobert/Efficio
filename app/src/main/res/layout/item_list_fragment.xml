@@ -21,6 +21,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="5dp"
+        android:contentDescription="@string/quick_add_item"
         android:src="@drawable/plus_math"/>
 
     <EditText
@@ -32,6 +33,7 @@
         android:layout_alignTop="@id/quick_add_btn"
         android:layout_marginStart="5dp"
         android:layout_toStartOf="@id/quick_add_btn"
+        android:hint="@string/quick_add_item"
         android:imeOptions="actionDone"
         android:inputType="text|textCapSentences"
         android:maxLines="1"/>

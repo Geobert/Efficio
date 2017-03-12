@@ -69,10 +69,10 @@ class DepartmentManager(val activity: Activity,
         list.setHasFixedSize(true)
         addDepBtn.setOnClickListener { onAddDepClicked() }
         addDepEdt.addTextChangedListener(this)
-        addDepEdt.setOnEditorActionListener { textView, i, keyEvent ->
+        addDepEdt.setOnEditorActionListener { _, i, _ ->
             onEditorAction(i)
         }
-        //activity.loaderManager.initLoader(GET_ALL_DEP, Bundle(), this)
+        activity.loaderManager.initLoader(GET_ALL_DEP, Bundle(), this)
     }
 
     private fun onEditorAction(actionId: Int): Boolean {

@@ -52,6 +52,8 @@
     <string name="cancel_custom_period">annuler la fréquence personnalisée</string>
     <string name="need_valid_period">La fréquence doit être un nombre</string>
     <string name="periodicity">Fréquence :</string>
+    <string name="backup_database">Sauvegarder la base de données</string>
+    <string name="restore_database">Restaurer la base de données</string>
     <string-array name="periodicity_choices">
         <item>Aucune</item>
         <item>Journalière</item>
@@ -67,4 +69,13 @@
         <item>Mois</item>
         <item>Années</item>
     </string-array>
+    <string name="backup_database_done">Sauvegarde effectuée dans %s</string>
+    <string name="backup_database_fail">Sauvegarde échouée</string>
+    <string name="quick_add_item">Ajouter un article</string>
+    <string name="permission_required_title">Permission requise</string>
+    <string name="permission_write_required">Afin de sauvegarder la base de données, on a besoin que vous autorisiez l\'écriture sur la carte SD.</string>
+    <string name="choose_file_title">Choisir un fichier</string>
+    <string name="no_backup">Aucune sauvegarde disponible</string>
+    <string name="restore_database_done">Restauration terminée</string>
+    <string name="restore_database_fail">Restauration échouée</string>
 </resources>

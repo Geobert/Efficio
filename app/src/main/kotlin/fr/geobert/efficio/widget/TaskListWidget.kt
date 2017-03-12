@@ -1,13 +1,17 @@
 package fr.geobert.efficio.widget
 
 import android.app.PendingIntent
-import android.appwidget.*
-import android.content.*
+import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.RemoteViews
 import fr.geobert.efficio.R
-import fr.geobert.efficio.db.*
+import fr.geobert.efficio.db.TaskTable
+import fr.geobert.efficio.db.WidgetTable
 import fr.geobert.efficio.misc.OnRefreshReceiver
 import kotlin.properties.Delegates
 
@@ -43,7 +47,6 @@ class TaskListWidget : AppWidgetProvider() {
             ACTION_CHECKBOX_CHANGED -> {
                 val widgetId = extras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
                         AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
-                Log.d(TAG, "widgetId: $widgetId")
                 TaskTable.updateDoneState(context, extras.getLong("taskId"), true)
                 appWidgetManager.notifyAppWidgetViewDataChanged(
                         widgetId, R.id.tasks_list_widget)

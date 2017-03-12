@@ -1,10 +1,13 @@
 package fr.geobert.efficio.dialog
 
-import android.app.*
+import android.app.AlertDialog
+import android.app.Dialog
+import android.app.DialogFragment
 import android.os.Bundle
 import android.view.View
 import fr.geobert.efficio.R
-import fr.geobert.efficio.data.*
+import fr.geobert.efficio.data.Department
+import fr.geobert.efficio.data.DepartmentManager
 import kotlin.properties.Delegates
 
 
@@ -24,16 +27,16 @@ open class DepartmentChoiceDialog : DialogFragment(), DepartmentManager.Departme
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val b = createDialogBuilder(R.layout.department_chooser_dialog, savedInstanceState)
+        val b = createDialogBuilder(R.layout.department_chooser_dialog)
         b.setTitle(R.string.choose_or_create_dep)
         return b.create()
     }
 
-    protected fun createDialogBuilder(layoutId: Int, savedInstanceState: Bundle?): AlertDialog.Builder {
+    protected fun createDialogBuilder(layoutId: Int): AlertDialog.Builder {
         val builder = AlertDialog.Builder(activity)
         customView = activity.layoutInflater.inflate(layoutId, null)
         builder.setView(customView)
-                .setNegativeButton(android.R.string.cancel, { d, i ->
+                .setNegativeButton(android.R.string.cancel, { d, _ ->
                     d.cancel()
                 })
         return builder

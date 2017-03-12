@@ -66,4 +66,15 @@
         <item>Years</item>
     </string-array>
     <string name="need_valid_period">Periodicity value must be a number</string>
+    <string name="backup_database">Backup Database</string>
+    <string name="restore_database">Restore Database</string>
+    <string name="backup_database_done">Database backup done to file %s</string>
+    <string name="backup_database_fail">Database backup failed</string>
+    <string name="quick_add_item">Add an item</string>
+    <string name="permission_required_title">Permission required</string>
+    <string name="permission_write_required">In order to backup the database to the SD card, we need permission to write on it.</string>
+    <string name="choose_file_title">Choose a file</string>
+    <string name="no_backup">No backup available</string>
+    <string name="restore_database_done">Database restoration done</string>
+    <string name="restore_database_fail">Database restoration failed</string>
 </resources>

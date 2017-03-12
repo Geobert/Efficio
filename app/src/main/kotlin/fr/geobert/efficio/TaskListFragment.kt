@@ -290,9 +290,9 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
 
     override fun onRefresh(intent: Intent) {
         val extras = intent.extras
-        val storeId = extras.getLong("storeId", -1)
-        val newStoreId = extras.getLong("newStoreId", -1)
-        val taskId = extras.getLong("taskId", -1)
+        val storeId = extras?.getLong("storeId", -1) ?: -1
+        val newStoreId = extras?.getLong("newStoreId", -1) ?: -1
+        val taskId = extras?.getLong("taskId", -1) ?: -1
         if (newStoreId > 0) lastStoreId = newStoreId
         if (taskId > -1) { // for the moment, this is only when a quantity has been edited via dialog
             taskAdapter!!.refreshTaskFromDB(activity, taskId)

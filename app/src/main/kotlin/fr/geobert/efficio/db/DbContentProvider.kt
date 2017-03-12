@@ -56,6 +56,15 @@ class DbContentProvider : ContentProvider() {
             return matcher
         }
 
+        fun reinit(ctx: Context) {
+            mDbHelper?.close()
+            mDbHelper = DbHelper.getInstance(ctx)
+        }
+
+        fun close() {
+            DbHelper.delete()
+        }
+
         private val sURIMatcher = createUriMatcher()
         private var mDbHelper: DbHelper? = null
     }
