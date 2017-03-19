@@ -28,7 +28,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="3dp"
                 android:gravity="center_vertical"
                 tools:ignore="UselessParent">
 
@@ -61,22 +61,40 @@
                 <CheckBox
                     android:id="@+id/task_checkbox"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_alignParentStart="true"
                     android:layout_marginEnd="5dp"
                     android:layout_marginStart="2dp"
+                    />
+
+
+                <!--
+                this button is only to put a background on the next button
+                 so it can be as tall as possible to avoid miss clicks, hence clickable to false
+                -->
+                <Button
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="4dp"
+                    android:clickable="false"
+                    android:padding="0dp"
                     />
 
                 <Button
                     android:id="@+id/qty_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/name"
                     android:layout_alignParentEnd="true"
-                    android:layout_alignTop="@+id/name"
                     android:layout_margin="0dp"
-                    android:minWidth="35dp"
-                    android:padding="0dp"
+                    android:background="@android:color/transparent"
+                    android:minWidth="40dp"
+                    android:paddingBottom="0dp"
+                    android:paddingEnd="10dp"
+                    android:paddingStart="0dp"
+                    android:paddingTop="0dp"
                     android:text="1"
                     android:textSize="14sp"
                     tools:ignore="HardcodedText"/>
