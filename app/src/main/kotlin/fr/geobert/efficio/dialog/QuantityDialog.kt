@@ -37,7 +37,7 @@ class QuantityDialog : DialogFragment() {
         customView.qty_picker.maxValue = 999
         customView.qty_picker.wrapSelectorWheel = false
         customView.qty_picker.value = taskQty
-        b.setView(customView).setTitle("Quantity").
+        b.setView(customView).setTitle(getString(R.string.quantity)).
                 setPositiveButton(android.R.string.ok, { _, _ -> onOkClicked() }).
                 setNegativeButton(android.R.string.cancel, { d, _ -> d.cancel() })
         return b.create()

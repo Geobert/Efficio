@@ -10,4 +10,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:text="@string/tip_you_can_slide_an_item_right_or_left_to_change_quantity"
+        android:textSize="12sp"/>
+
 </LinearLayout>

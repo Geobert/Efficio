@@ -78,4 +78,6 @@
     <string name="no_backup">Aucune sauvegarde disponible</string>
     <string name="restore_database_done">Restauration terminée</string>
     <string name="restore_database_fail">Restauration échouée</string>
+    <string name="tip_you_can_slide_an_item_right_or_left_to_change_quantity">Astuce: Glissez un article vers la gauche ou la droite pour changer la quantité</string>
+    <string name="quantity">Quantité</string>
 </resources>

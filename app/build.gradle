@@ -32,7 +32,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0b14"
+        versionName "1.0b15"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -80,7 +80,7 @@ dependencies {
     }
 
     testCompile 'junit:junit:4.12'
-    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.+'
+    androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
 }

@@ -77,4 +77,6 @@
     <string name="no_backup">No backup available</string>
     <string name="restore_database_done">Database restoration done</string>
     <string name="restore_database_fail">Database restoration failed</string>
+    <string name="tip_you_can_slide_an_item_right_or_left_to_change_quantity">Tip: You can slide an item right or left to change quantity</string>
+    <string name="quantity">Quantity</string>
 </resources>
