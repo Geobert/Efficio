@@ -118,6 +118,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         if (t != null) {
             t.isDone = false
             taskAdapter!!.notifyItemChanged(pos)
+            quick_add_text.text.clear()
         } else {
             // case item does not exists yet
             createNewTask()
@@ -261,7 +262,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     override fun afterTextChanged(s: Editable) {
         quick_add_btn.isEnabled = s.trim().isNotEmpty()
         if (tasksList.count() > 0) {
-            val filteredList = filter(tasksList, s.toString())
+            val filteredList = filter(tasksList, s.trim().toString())
             addHeaderIfNeeded(filteredList)
             taskAdapter!!.animateTo(filteredList)
             tasks_list.post {
