@@ -2,13 +2,15 @@ package fr.geobert.efficio
 
 import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.*
+import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.action.ViewActions.replaceText
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import org.junit.*
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
@@ -123,10 +125,10 @@ class EfficioTest {
 
         // tick A
         clickTickOfTaskAt(0)
-        checkOrderOfTask(ITEM_C, ITEM_B, COMPLETED, ITEM_A, ITEM_D)
+        checkOrderOfTask(ITEM_C, ITEM_B, COMPLETED, ITEM_D, ITEM_A)
 
         // untick D
-        clickTickOfTaskAt(4)
+        clickTickOfTaskAt(3)
         checkOrderOfTask(ITEM_D, ITEM_C, ITEM_B, COMPLETED, ITEM_A)
 
         // untick A
@@ -145,7 +147,7 @@ class EfficioTest {
         clickTickOfTaskAt(1)
         checkOrderOfTask(ITEM_C, ITEM_B, ITEM_D, COMPLETED, ITEM_A)
 
-        // untick C
+        // untick A
         clickTickOfTaskAt(4)
         checkOrderOfTask(ITEM_C, ITEM_A, ITEM_B, ITEM_D)
     }
@@ -167,6 +169,29 @@ class EfficioTest {
         onView(withText(DEP_B)).perform(click())
         onView(withId(R.id.confirm)).perform(click())
         checkOrderOfTask(ITEM_B, ITEM_A, ITEM_C)
+
+        // add 3rd dep
+        addItem(ITEM_D, DEP_C)
+        checkOrderOfTask(ITEM_B, ITEM_A, ITEM_C, ITEM_D)
+
+        // drag D between A and C, should end between B and A
+        dragTask(3, Direction.UP)
+        checkOrderOfTask(ITEM_B, ITEM_D, ITEM_A, ITEM_C)
+
+        dragTask(2, Direction.UP)
+        checkOrderOfTask(ITEM_B, ITEM_A, ITEM_C, ITEM_D)
+
+        dragTask(1, Direction.DOWN)
+        checkOrderOfTask(ITEM_B, ITEM_C, ITEM_A, ITEM_D)
+
+        dragTask(3, Direction.UP)
+        checkOrderOfTask(ITEM_B, ITEM_D, ITEM_C, ITEM_A)
+
+        addItem(ITEM_E, DEP_D)
+        checkOrderOfTask(ITEM_B, ITEM_D, ITEM_C, ITEM_A, ITEM_E)
+
+        dragTask(4, Direction.UP)
+        checkOrderOfTask(ITEM_B, ITEM_D, ITEM_E, ITEM_C, ITEM_A)
     }
 
 }

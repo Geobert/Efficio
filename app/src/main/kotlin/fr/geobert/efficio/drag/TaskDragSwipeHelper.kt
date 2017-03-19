@@ -116,8 +116,13 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                 val nextDep = next.department
                 val prevDep = prev.department
                 if (itemDep.id != prevDep.id && itemDep.id != nextDep.id) { // all different dep
+                    val inc = if (direction == Direction.UP) -1.0 else 1.0
                     if (prevDep.id == nextDep.id) {
-                        itemDep.weight = nextDep.weight + if (direction == Direction.UP) -1.0 else 1.0
+                        val otherDep = findAdjacentDiffDep(nextDep, pos + inc.toInt())
+                        if (otherDep == null)
+                            itemDep.weight = nextDep.weight + inc
+                        else
+                            itemDep.weight = (otherDep.weight + nextDep.weight) / 2.0
                     } else {
                         itemDep.weight = (prevDep.weight + nextDep.weight) / 2.0
                         if (itemDep.weight >= nextDep.weight || itemDep.weight <= prevDep.weight)
@@ -125,17 +130,35 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                     }
                     val lastItemSameDep = lastTargetSameDep?.item
                     if (lastItemSameDep != null)
-                        item.weight = lastItemSameDep.weight + if (direction == Direction.UP) -1.0 else 1.0
+                        item.weight = lastItemSameDep.weight + inc
                     needAdapterSort = true
                 } else {
-                    if (item.weight <= prev.weight || item.weight >= next.weight) {
-                        item.weight = (next.weight + prev.weight) / 2.0
-                        if (item.weight >= next.weight || item.weight <= prev.weight)
-                            handleDoubleCollision(pos, item, next, prev)
+                    if (itemDep.id == prevDep.id && itemDep.id != nextDep.id) {
+                        if (item.weight <= prev.weight)
+                            item.weight = prev.weight + 1.0
+                    } else if (itemDep.id == nextDep.id && itemDep.id == prevDep.id) {
+                        if (item.weight >= next.weight)
+                            item.weight = next.weight - 1.0
+                    } else {
+                        if (item.weight <= prev.weight || item.weight >= next.weight) {
+                            item.weight = (next.weight + prev.weight) / 2.0
+                            if (item.weight >= next.weight || item.weight <= prev.weight)
+                                handleDoubleCollision(pos, item, next, prev)
+                        }
                     }
                 }
             }
         }
+    }
+
+    private fun findAdjacentDiffDep(dep: Department, pos: Int): Department? {
+        var idx = pos
+        while (if (direction == Direction.UP) idx > 0 else idx < tasksList.count() - 1) {
+            idx += if (direction == Direction.UP) -1 else +1
+            val t = tasksList[idx]
+            if (t.item.department.id != dep.id) return t.item.department
+        }
+        return null
     }
 
     private fun handleDoubleCollision(pos: Int, item: Item, next: Item, prev: Item) {

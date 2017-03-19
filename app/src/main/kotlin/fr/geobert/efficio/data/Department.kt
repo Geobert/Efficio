@@ -8,7 +8,7 @@ class Department : Comparable<Department> {
     var id: Long by Delegates.notNull()
     var name: String by Delegates.notNull()
     var weight: Double by Delegates.notNull()
-    var storeCompoId: Long? = null
+    var storeCompoId: Long? = null // to update StoreCompositionTable, where dep's weight are stored
 
     constructor(cursor: Cursor, b: Bundle) {
         id = cursor.getLong(b.getInt("id"))

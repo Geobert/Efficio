@@ -3,10 +3,14 @@ package fr.geobert.efficio
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.*
+import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.action.ViewActions.replaceText
 import android.support.test.espresso.assertion.ViewAssertions
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.contrib.*
+import android.support.test.espresso.contrib.DrawerActions
+import android.support.test.espresso.contrib.DrawerMatchers
+import android.support.test.espresso.contrib.NavigationViewActions
+import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.matcher.ViewMatchers
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.util.Log
@@ -18,8 +22,11 @@ val ITEM_A = "Item A"
 val ITEM_B = "Item B"
 val ITEM_C = "Item C"
 val ITEM_D = "Item D"
+val ITEM_E = "Item E"
 val DEP_A = "Dep 1"
 val DEP_B = "Dep 2"
+val DEP_C = "Dep 3"
+val DEP_D = "Dep 4"
 val COMPLETED: String by lazy { InstrumentationRegistry.getTargetContext().getString(R.string.completed) }
 
 fun addItem(name: String, depName: String? = null) {
