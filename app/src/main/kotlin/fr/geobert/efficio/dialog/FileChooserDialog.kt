@@ -24,7 +24,7 @@ interface FileChooserDialogListener {
 
 class FileViewHolder(val view: View, val adapter: FileAdapter) : RecyclerView.ViewHolder(view) {
     var file: File by Delegates.notNull()
-    val text = view.findViewById(android.R.id.text1) as TextView
+    val text: TextView = view.findViewById(android.R.id.text1)
 
     init {
         view.isClickable = true
@@ -68,7 +68,7 @@ class FileAdapter(val fileList: List<File>) : RecyclerView.Adapter<FileViewHolde
 
 class FileChooserDialog : DialogFragment() {
     private var customView: View by Delegates.notNull()
-    private val fileListView: RecyclerView by lazy { customView.findViewById(R.id.file_list) as RecyclerView }
+    private val fileListView: RecyclerView by lazy { customView.findViewById<RecyclerView>(R.id.file_list) }
 
     companion object {
         fun newInstance(path: String): FileChooserDialog {

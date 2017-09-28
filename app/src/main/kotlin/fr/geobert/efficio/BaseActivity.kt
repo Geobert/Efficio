@@ -6,7 +6,7 @@ import android.view.View
 import kotlinx.android.synthetic.main.toolbar.view.*
 
 abstract class BaseActivity : AppCompatActivity() {
-    val mToolbar: Toolbar by lazy { findViewById(R.id.my_toolbar) as Toolbar }
+    val mToolbar: Toolbar by lazy { findViewById<Toolbar>(R.id.my_toolbar) }
 
     fun setIcon(id: Int) {
         mToolbar.setNavigationIcon(id)
