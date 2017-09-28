@@ -31,12 +31,12 @@ class TaskViewHolder(val view: View, isHeader: Boolean, val listener: TaskViewHo
 
     init {
         if (!isHeader) {
-            name = view.findViewById(R.id.name) as TextView
-            checkbox = view.findViewById(R.id.task_checkbox) as CheckBox
-            cardView = view.findViewById(R.id.item_row_layout) as CardView
+            name = view.findViewById(R.id.name)
+            checkbox = view.findViewById(R.id.task_checkbox)
+            cardView = view.findViewById(R.id.item_row_layout)
             content = view.findViewById(R.id.card_content)
-            depName = view.findViewById(R.id.dep_name) as TextView
-            qty = view.findViewById(R.id.qty_btn) as Button
+            depName = view.findViewById(R.id.dep_name)
+            qty = view.findViewById(R.id.qty_btn)
             checkbox.setOnCheckedChangeListener(this)
             content.setOnClickListener { onClicked() }
 

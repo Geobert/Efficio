@@ -13,9 +13,9 @@ class DepartmentViewHolder(l: View, val listener: OnClickListener) :
         fun onClick(d: Department)
     }
 
-    val name = l.findViewById(R.id.dep_name) as TextView
+    val name = l.findViewById<TextView>(R.id.dep_name)
     var dep: Department? = null
-    val cardView: CardView = l.findViewById(R.id.card_view) as CardView
+    val cardView: CardView = l.findViewById(R.id.card_view)
 
     init {
         l.setOnClickListener(this)

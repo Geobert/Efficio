@@ -59,9 +59,9 @@ class DepartmentManager(val activity: Activity,
     init {
         list = layout.dep_list
         //        list = layout.findViewById(R.id.dep_list) as RecyclerView
-        addDepBtn = layout.findViewById(R.id.add_dep_btn) as ImageButton
-        addDepEdt = layout.findViewById(R.id.add_dep_text) as EditText
-        emptyTxt = layout.findViewById(R.id.empty_text) as TextView
+        addDepBtn = layout.findViewById(R.id.add_dep_btn)
+        addDepEdt = layout.findViewById(R.id.add_dep_text)
+        emptyTxt = layout.findViewById(R.id.empty_text)
 
         list.layoutManager = LinearLayoutManager(activity)
         list.itemAnimator = DefaultItemAnimator()
