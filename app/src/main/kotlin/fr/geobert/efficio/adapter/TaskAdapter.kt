@@ -1,8 +1,10 @@
 package fr.geobert.efficio.adapter
 
-import android.content.*
+import android.content.Context
+import android.content.SharedPreferences
 import android.support.v7.widget.RecyclerView
-import android.view.*
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import fr.geobert.efficio.R
 import fr.geobert.efficio.data.Task
 import fr.geobert.efficio.db.TaskTable
@@ -11,9 +13,9 @@ import java.util.*
 
 
 class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskViewHolderListener,
-                  val prefs: SharedPreferences) :
+                  private val prefs: SharedPreferences) :
         RecyclerView.Adapter<TaskViewHolder>() {
-    val taskList = LinkedList<Task>(list)
+    private val taskList = LinkedList<Task>(list)
     val TAG = "TaskAdapter"
 
     enum class VIEW_TYPES {
@@ -46,7 +48,7 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
         return taskList[position].type.ordinal
     }
 
-    fun getTaskPosition(taskId: Long): Int {
+    private fun getTaskPosition(taskId: Long): Int {
         return taskList.indexOfFirst { taskId == it.id }
     }
 
@@ -70,13 +72,13 @@ class TaskAdapter(list: MutableList<Task>, val listener: TaskViewHolder.TaskView
                 ?: Pair(null, 0)
     }
 
-    fun removeItem(pos: Int): Task {
+    private fun removeItem(pos: Int): Task {
         val d = taskList.removeAt(pos)
         notifyItemRemoved(pos)
         return d
     }
 
-    fun addItem(pos: Int, d: Task) {
+    private fun addItem(pos: Int, d: Task) {
         taskList.add(pos, d)
         notifyItemInserted(pos)
     }

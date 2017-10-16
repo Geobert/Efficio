@@ -41,5 +41,5 @@ fun String.convertNonAscii(): String {
 }
 
 fun String.normalize(): String {
-    return this.convertNonAscii().toLowerCase()
+    return this.trim().convertNonAscii().toLowerCase()
 }

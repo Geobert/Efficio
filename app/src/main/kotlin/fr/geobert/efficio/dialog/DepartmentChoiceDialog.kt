@@ -32,7 +32,7 @@ open class DepartmentChoiceDialog : DialogFragment(), DepartmentManager.Departme
         return b.create()
     }
 
-    protected fun createDialogBuilder(layoutId: Int): AlertDialog.Builder {
+    private fun createDialogBuilder(layoutId: Int): AlertDialog.Builder {
         val builder = AlertDialog.Builder(activity)
         customView = activity.layoutInflater.inflate(layoutId, null)
         builder.setView(customView)

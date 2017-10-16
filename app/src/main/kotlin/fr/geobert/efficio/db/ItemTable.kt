@@ -1,6 +1,7 @@
 package fr.geobert.efficio.db
 
-import android.content.*
+import android.content.ContentValues
+import android.content.Context
 import android.database.Cursor
 import android.provider.BaseColumns
 import fr.geobert.efficio.data.Item

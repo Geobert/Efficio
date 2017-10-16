@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.Loader
 import android.database.Cursor
+import android.database.DatabaseUtils
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -32,6 +33,7 @@ import fr.geobert.efficio.drag.TaskDragSwipeHelper
 import fr.geobert.efficio.extensions.TIME_ZONE
 import fr.geobert.efficio.extensions.map
 import fr.geobert.efficio.extensions.mapInvert
+import fr.geobert.efficio.extensions.normalize
 import fr.geobert.efficio.misc.*
 import hirondelle.date4j.DateTime
 import kotlinx.android.synthetic.main.item_list_fragment.*
@@ -147,7 +149,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         }
     }
 
-    fun onItemEditFinished(needUpdate: Boolean, data: Intent?) {
+    private fun onItemEditFinished(needUpdate: Boolean, data: Intent?) {
         if (needUpdate) {
             quick_add_text.text.clear()
             val needWeightUpdate =
@@ -189,7 +191,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                 Log.e(TAG, "error on item creation")
             }
         }
-        if (i.id > 0) {
+        if (i.id > 0 && filter(tasksList, i.name).isEmpty()) {
             // add to adapter, but need to find the right position
             val t = Task(i)
             tasksList.add(t)
@@ -273,12 +275,11 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     }
 
     private fun filter(list: MutableList<Task>, s: String): MutableList<Task> {
-        val f = s.toLowerCase()
-        val filtered = list.filterTo(LinkedList<Task>()) {
-            (it.type == TaskAdapter.VIEW_TYPES.Normal && it.item.normName().toLowerCase().contains(f)) ||
+        val f = s.normalize()
+        return list.filterTo(LinkedList()) {
+            (it.type == TaskAdapter.VIEW_TYPES.Normal && it.item.normName().contains(f)) ||
                     it.type == TaskAdapter.VIEW_TYPES.Header
         }
-        return filtered
     }
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
@@ -306,7 +307,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
     // Database operations
     //
 
-    fun fetchStore(ctx: Fragment, storeId: Long) {
+    private fun fetchStore(ctx: Fragment, storeId: Long) {
         val b = Bundle()
         b.putLong("storeId", storeId)
         if (cursorLoader == null) {
@@ -351,6 +352,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         when (cursorLoader.id) {
             GET_TASKS_OF_STORE -> {
                 if (cursor.count > 0) {
+                    Log.d(TAG, DatabaseUtils.dumpCursorToString(cursor))
                     tasksList = if (mainActivity.prefs.getBoolean("invert_list_pref", false))
                         cursor.mapInvert(::Task) else cursor.map(::Task)
                     tasks_list.visibility = View.VISIBLE
