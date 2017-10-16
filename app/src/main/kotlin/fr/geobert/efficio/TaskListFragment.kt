@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.Loader
 import android.database.Cursor
-import android.database.DatabaseUtils
 import android.os.Bundle
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
@@ -352,7 +351,6 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         when (cursorLoader.id) {
             GET_TASKS_OF_STORE -> {
                 if (cursor.count > 0) {
-                    Log.d(TAG, DatabaseUtils.dumpCursorToString(cursor))
                     tasksList = if (mainActivity.prefs.getBoolean("invert_list_pref", false))
                         cursor.mapInvert(::Task) else cursor.map(::Task)
                     tasks_list.visibility = View.VISIBLE
