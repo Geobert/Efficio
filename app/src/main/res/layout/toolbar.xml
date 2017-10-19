@@ -4,7 +4,7 @@
     android:id="@+id/my_toolbar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorPrimary"
+    android:background="@drawable/titlebar"
     android:fitsSystemWindows="true"
     android:minHeight="?attr/actionBarSize"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -16,4 +16,6 @@
         android:layout_marginTop="2dp"
         android:minWidth="150dp"
         app:popupTheme="@style/ToolbarSpinner"/>
+
+
 </android.support.v7.widget.Toolbar>

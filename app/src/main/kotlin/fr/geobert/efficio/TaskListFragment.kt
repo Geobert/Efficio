@@ -190,7 +190,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                 Log.e(TAG, "error on item creation")
             }
         }
-        if (i.id > 0 && filter(tasksList, i.name).isEmpty()) {
+        if (i.id > 0) {
             // add to adapter, but need to find the right position
             val t = Task(i)
             tasksList.add(t)

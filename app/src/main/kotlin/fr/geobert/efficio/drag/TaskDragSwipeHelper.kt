@@ -284,7 +284,7 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                         itemView.right.toFloat() - extHorizontalMargin,
                         itemView.bottom.toFloat() - verticalMargin)
                 c.drawRect(background, p)
-                icon = BitmapFactory.decodeResource(fragment.resources, R.drawable.plus_math)
+                icon = BitmapFactory.decodeResource(fragment.resources, R.drawable.plus_math_green)
                 val icon_dest = RectF(itemView.right.toFloat() - 2 * width,
                         itemView.top.toFloat() + width,
                         itemView.right.toFloat() - width,

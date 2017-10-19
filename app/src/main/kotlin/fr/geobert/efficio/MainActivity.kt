@@ -4,9 +4,11 @@ import android.app.Fragment
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.util.Log
 import android.view.View
@@ -217,10 +219,13 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener,
             currentStore = storeManager.storesList[0]
             lastStoreId = currentStore.id
             title = currentStore.name
+            titleColor = ContextCompat.getColor(this, R.color.colorPrimaryDark)
             setSpinnerVisibility(View.GONE)
         } else {
             currentStore = storeManager.storesList.find { it.id == lastStoreId } as Store
             store_spinner.setSelection(storeManager.indexOf(lastStoreId))
+            store_spinner.background.setColorFilter(ContextCompat.getColor(this,
+                    R.color.colorPrimaryDark), PorterDuff.Mode.SRC_ATOP)
             setSpinnerVisibility(View.VISIBLE)
             title = ""
         }
