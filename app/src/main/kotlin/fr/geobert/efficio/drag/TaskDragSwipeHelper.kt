@@ -285,11 +285,13 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                         itemView.bottom.toFloat() - verticalMargin)
                 c.drawRect(background, p)
                 icon = BitmapFactory.decodeResource(fragment.resources, R.drawable.plus_math_green)
-                val icon_dest = RectF(itemView.right.toFloat() - 2 * width,
+                val iconDest = RectF(itemView.right.toFloat() - 2 * width,
                         itemView.top.toFloat() + width,
                         itemView.right.toFloat() - width,
                         itemView.bottom.toFloat() - width)
-                c.drawBitmap(icon, null, icon_dest, p)
+//                p.colorFilter = PorterDuffColorFilter(ContextCompat.getColor(activity,
+//                        R.color.colorPrimaryDark), PorterDuff.Mode.ADD)
+                c.drawBitmap(icon, null, iconDest, p)
                 if (dX < -maxDx) {
                     directionReached = ItemTouchHelper.LEFT
                     if (isCurrentlyActive)
@@ -309,37 +311,4 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
         super.onChildDraw(c, recyclerView, viewHolder, dXToUse, dY, actionState, isCurrentlyActive)
     }
 
-//    private fun updateTaskWeight(dragged: TaskViewHolder, target: TaskViewHolder): Boolean {
-//        val dItem = dragged.task.item
-//        val tItem = target.task.item
-//        val dDep = dItem.department
-//        val tDep = tItem.department
-//        var res: Boolean = false
-//        if (dragged.adapterPosition > target.adapterPosition) {
-//            // item goes up
-//            if (dDep.id == tDep.id) {
-//                if (dItem.weight <= tItem.weight) {
-//                    dItem.weight = tItem.weight + 1
-//                }
-//            } else {
-//                if (dDep.weight <= tDep.weight) {
-//                    dDep.weight = tDep.weight + 1
-//                    res = true
-//                }
-//            }
-//        } else if (dragged.adapterPosition < target.adapterPosition) {
-//            // item goes down
-//            if (dDep.id == tDep.id) {
-//                if (dItem.weight >= tItem.weight) {
-//                    dItem.weight = tItem.weight - 1
-//                }
-//            } else {
-//                if (dDep.weight >= tDep.weight) {
-//                    dDep.weight = tDep.weight - 1
-//                    res = true
-//                }
-//            }
-//        }
-//        return res
-//    }
 }

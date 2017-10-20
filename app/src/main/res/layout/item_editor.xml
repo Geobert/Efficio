@@ -41,7 +41,7 @@
             android:paddingEnd="15dp"
             android:paddingStart="15dp"
             android:paddingTop="12dp"
-            android:src="@drawable/delete"
+            android:src="@drawable/delete_dark"
             android:text="@string/delete_task"/>
     </LinearLayout>
 
@@ -103,8 +103,8 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/cancel_custom_period"
-                android:src="@drawable/cancel"
-                android:tint="@android:color/black"/>
+                android:src="@drawable/cancel_dark"
+                />
         </LinearLayout>
 
 

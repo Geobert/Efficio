@@ -9,15 +9,4 @@
         android:drawable="@drawable/ic_efficio_banner_deco_right"
         android:gravity="end"/>
 
-    <item
-        android:drawable="@drawable/ic_efficio_banner_icon"
-        android:gravity="center_vertical|left"
-        android:left="50dp"
-        />
-
-    <item
-        android:drawable="@drawable/ic_efficio_logo"
-        android:gravity="center"
-        android:left="40dp"
-        android:top="20dp"/>
 </layer-list>

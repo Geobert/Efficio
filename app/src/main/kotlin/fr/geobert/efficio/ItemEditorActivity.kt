@@ -1,14 +1,20 @@
 package fr.geobert.efficio
 
-import android.app.*
-import android.content.*
+import android.app.Activity
+import android.app.Fragment
+import android.app.LoaderManager
+import android.content.CursorLoader
+import android.content.Intent
+import android.content.Loader
 import android.database.Cursor
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.util.Log
-import android.view.*
+import android.view.MenuItem
+import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import fr.geobert.efficio.data.*
 import fr.geobert.efficio.db.TaskTable
 import fr.geobert.efficio.dialog.DeleteConfirmationDialog
@@ -38,6 +44,7 @@ class ItemEditorActivity : BaseActivity(), DepartmentManager.DepartmentChoiceLis
         setContentView(R.layout.item_editor)
         initToolbar(this)
         setTitle(R.string.change_item_name_and_dep)
+        titleColor = R.color.colorPrimaryDark
         val extras = intent.extras
         depManager = DepartmentManager(this, findViewById(R.id.department_layout)!!,
                 extras.getLong("storeId"), this)

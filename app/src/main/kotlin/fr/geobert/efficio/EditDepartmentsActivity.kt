@@ -48,7 +48,6 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         setContentView(R.layout.edit_departments_activity)
         title = getString(R.string.edit_departments)
         storeId = intent.extras.getLong("storeId")
-
         depManager = DepartmentManager(this, findViewById(R.id.department_layout)!!,
                 storeId, this, true)
         depManager.setEditMode(true)
@@ -57,7 +56,8 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         setIcon(R.mipmap.ic_action_arrow_left)
         setIconOnClick(View.OnClickListener { onBackPressed() })
         setSpinnerVisibility(View.GONE)
-        titleColor = ContextCompat.getColor(this, android.R.color.primary_text_dark)
+        titleColor = ContextCompat.getColor(this, R.color.colorPrimaryDark)
+        empty_text.setTextColor(ContextCompat.getColor(this, R.color.hint))
     }
 
     override fun onBackPressed() {
