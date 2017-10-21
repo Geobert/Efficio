@@ -16,6 +16,7 @@ import fr.geobert.efficio.dialog.FileChooserDialogListener
 import fr.geobert.efficio.dialog.MessageDialog
 import fr.geobert.efficio.misc.MY_PERM_REQUEST_WRITE_EXT_STORAGE
 import fr.geobert.efficio.misc.OnRefreshReceiver
+import fr.geobert.efficio.misc.updateWidgets
 import kotlinx.android.synthetic.main.item_editor.*
 import kotlinx.android.synthetic.main.settings_activity.*
 
@@ -73,6 +74,7 @@ class SettingsActivity : BaseActivity(), FileChooserDialogListener {
         val msg = if (DbHelper.restoreDatabase(this, name)) {
             val i = Intent(OnRefreshReceiver.REFRESH_ACTION)
             sendBroadcast(i)
+            updateWidgets(this)
             R.string.restore_database_done
         } else R.string.restore_database_fail
         Snackbar.make(my_toolbar, msg, Snackbar.LENGTH_LONG).show()

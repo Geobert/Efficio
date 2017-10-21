@@ -33,9 +33,9 @@ object TaskTable : BaseTable() {
             foreignId(COL_ITEM_ID, ItemTable.TABLE_NAME)
 
 
-    val ADD_LAST_CHECKED_COL = "ALTER TABLE $TABLE_NAME ADD COLUMN $COL_LAST_CHECKED INTEGER NOT NULL DEFAULT 0"
-    val ADD_PERIOD_COL = "ALTER TABLE $TABLE_NAME ADD COLUMN $COL_PERIOD INTEGER NOT NULL DEFAULT 0"
-    val ADD_PERIOD_UNIT_COL = "ALTER TABLE $TABLE_NAME ADD COLUMN $COL_PERIOD_UNIT INTEGER NOT NULL DEFAULT 0"
+    private val ADD_LAST_CHECKED_COL = "ALTER TABLE $TABLE_NAME ADD COLUMN $COL_LAST_CHECKED INTEGER NOT NULL DEFAULT 0"
+    private val ADD_PERIOD_COL = "ALTER TABLE $TABLE_NAME ADD COLUMN $COL_PERIOD INTEGER NOT NULL DEFAULT 0"
+    private val ADD_PERIOD_UNIT_COL = "ALTER TABLE $TABLE_NAME ADD COLUMN $COL_PERIOD_UNIT INTEGER NOT NULL DEFAULT 0"
 
     val TABLE_JOINED = "$TABLE_NAME " +
             "${leftOuterJoin(TABLE_NAME, COL_STORE_ID, StoreTable.TABLE_NAME)} " +
@@ -60,8 +60,8 @@ object TaskTable : BaseTable() {
             COL_LAST_CHECKED
     )
 
-    val RESTRICT_TO_STORE = "(${TaskTable.TABLE_NAME}.$COL_STORE_ID = ?)"
-    val ORDERING = "is_done asc, dep_weight asc, dep_name asc, item_weight asc, item_name asc"
+    private val RESTRICT_TO_STORE = "(${TaskTable.TABLE_NAME}.$COL_STORE_ID = ?)"
+    private val ORDERING = "is_done asc, dep_weight asc, dep_name asc, item_weight asc, item_name asc"
 
     val CREATE_TRIGGER_ON_TASK_DEL by lazy {
         "CREATE TRIGGER on_task_deleted " +
@@ -82,10 +82,10 @@ object TaskTable : BaseTable() {
     }
 
     // sync version
-    fun getAllTasksForStore(ctx: Context, storeId: Long): Cursor? {
-        return ctx.contentResolver.query(TaskTable.CONTENT_URI,
-                TaskTable.COLS_TO_QUERY, RESTRICT_TO_STORE, arrayOf(storeId.toString()), ORDERING)
-    }
+//    fun getAllTasksForStore(ctx: Context, storeId: Long): Cursor? {
+//        return ctx.contentResolver.query(TaskTable.CONTENT_URI,
+//                TaskTable.COLS_TO_QUERY, RESTRICT_TO_STORE, arrayOf(storeId.toString()), ORDERING)
+//    }
 
     fun getTaskById(ctx: Context, taskId: Long): Cursor? {
         return ctx.contentResolver.query(buildWithId(taskId), COLS_TO_QUERY, null, null, null)

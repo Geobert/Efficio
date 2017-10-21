@@ -35,8 +35,8 @@ class DbContentProvider : ContentProvider() {
         val WIDGET = 800
         val WIDGET_WITH_ID = 801
 
-        fun createUriMatcher(): UriMatcher {
-            val matcher: UriMatcher = UriMatcher(UriMatcher.NO_MATCH)
+        private fun createUriMatcher(): UriMatcher {
+            val matcher = UriMatcher(UriMatcher.NO_MATCH)
             val authority = CONTENT_AUTHORITY
 
             fun addUri(path: String, noId: Int, withId: Int) {
@@ -170,7 +170,7 @@ class DbContentProvider : ContentProvider() {
         val table = switchToTableWrite(sURIMatcher.match(uri), uri)
         Log.d(TAG, "update id: $id, table: $table")
         // return nb updated items
-        return if (id != null) {
+        val res = if (id != null) {
             if (selection == null || selection.trim().isEmpty()) {
                 db.update(table, values, "${BaseColumns._ID}=?", arrayOf(id))
             } else {
@@ -187,6 +187,7 @@ class DbContentProvider : ContentProvider() {
         } else {
             db.update(table, values, selection, selectionArgs)
         }
+        return res
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {

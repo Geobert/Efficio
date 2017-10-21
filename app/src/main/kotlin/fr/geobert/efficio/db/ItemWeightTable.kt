@@ -28,10 +28,12 @@ object ItemWeightTable : BaseTable() {
         return insert(activity, v)
     }
 
-    fun updateWeight(activity: Activity, item: Item): Int {
+    fun updateWeight(activity: Activity, item: Item, storeId: Long): Int {
         val v = ContentValues()
         v.put(COL_WEIGHT, item.weight)
-        return update(activity, item.id, v)
+        return activity.contentResolver.update(CONTENT_URI, v,
+                "$COL_ITEM_ID=? AND $COL_STORE_ID=?",
+                arrayOf(item.id.toString(), storeId.toString()))
     }
 
 

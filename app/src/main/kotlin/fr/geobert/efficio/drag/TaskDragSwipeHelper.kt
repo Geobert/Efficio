@@ -20,8 +20,8 @@ import fr.geobert.efficio.db.TaskTable
 import java.util.*
 import kotlin.properties.Delegates
 
-class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: MutableList<Task>,
-                          val taskAdapter: TaskAdapter) :
+class TaskDragSwipeHelper(private val fragment: TaskListFragment, var tasksList: MutableList<Task>,
+                          private val taskAdapter: TaskAdapter, var currentStore: Long) :
         ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
     private enum class Direction { UP, DOWN }
@@ -40,12 +40,12 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
 
     override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder,
                         target: RecyclerView.ViewHolder): Boolean {
-        Log.d(TAG, "onMove: viewHolder.adapterPosition: ${viewHolder.adapterPosition} / target.adapterPosition: ${target.adapterPosition}  / tasksList.count: ${tasksList.size}")
+        //Log.d(TAG, "onMove: viewHolder.adapterPosition: ${viewHolder.adapterPosition} / target.adapterPosition: ${target.adapterPosition}  / tasksList.count: ${tasksList.size}")
         Collections.swap(tasksList, viewHolder.adapterPosition, target.adapterPosition)
-        if (viewHolder.adapterPosition > target.adapterPosition) {
-            direction = Direction.UP
+        direction = if (viewHolder.adapterPosition > target.adapterPosition) {
+            Direction.UP
         } else {
-            direction = Direction.DOWN
+            Direction.DOWN
         }
         val dragged = (viewHolder as TaskViewHolder).task
         val targeted = (target as TaskViewHolder).task
@@ -63,10 +63,11 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
         val t = lastDragTask
         if (t != null) {
             t.cardView.cardElevation = orig
-            //Log.d(TAG, "end of drag n drop, sort the list")
+            Log.d(TAG, "${t.task.item.name} weight before update: ${t.task.item.weight} / ${t.task.item.department.weight}")
             updateTaskWeight(t)
+            Log.d(TAG, "${t.task.item.name} weight after update: ${t.task.item.weight} / ${t.task.item.department.weight}")
             StoreCompositionTable.updateDepWeight(activity, t.task.item.department)
-            ItemWeightTable.updateWeight(activity, t.task.item)
+            ItemWeightTable.updateWeight(activity, t.task.item, currentStore)
             //Log.d(TAG, "before sort : ${tasksList[0]} / ${tasksList[1]}")
             tasksList.sort()
             //Log.d(TAG, "after sort : ${tasksList[0]} / ${tasksList[1]}")
@@ -133,13 +134,13 @@ class TaskDragSwipeHelper(val fragment: TaskListFragment, var tasksList: Mutable
                         item.weight = lastItemSameDep.weight + inc
                     needAdapterSort = true
                 } else {
-                    if (itemDep.id == prevDep.id && itemDep.id != nextDep.id) {
+                    if (itemDep.id == prevDep.id && itemDep.id != nextDep.id) { // last of the department
                         if (item.weight <= prev.weight)
                             item.weight = prev.weight + 1.0
-                    } else if (itemDep.id == nextDep.id && itemDep.id == prevDep.id) {
+                    } else if (itemDep.id == nextDep.id && itemDep.id != prevDep.id) { // first of the department
                         if (item.weight >= next.weight)
                             item.weight = next.weight - 1.0
-                    } else {
+                    } else { // middle of department
                         if (item.weight <= prev.weight || item.weight >= next.weight) {
                             item.weight = (next.weight + prev.weight) / 2.0
                             if (item.weight >= next.weight || item.weight <= prev.weight)

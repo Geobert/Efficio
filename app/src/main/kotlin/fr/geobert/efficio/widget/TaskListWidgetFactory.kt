@@ -67,10 +67,10 @@ class TaskListWidgetFactory(val ctx: Context, intent: Intent) : RemoteViewsServi
         val token = Binder.clearCallingIdentity()
         try {
             val cursor = TaskTable.getAllNotDoneTasksForStore(ctx, storeId)
-            if (cursor != null && cursor.count > 0) {
-                tasksList = cursor.map(::Task)
+            tasksList = if (cursor != null && cursor.count > 0) {
+                cursor.map(::Task)
             } else {
-                tasksList = LinkedList()
+                LinkedList()
             }
             cursor?.close()
         } finally {

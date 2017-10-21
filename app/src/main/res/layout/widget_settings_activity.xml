@@ -23,6 +23,7 @@
         android:layout_below="@+id/my_toolbar"
         android:layout_margin="12dp"
         android:text="@string/choose_store"
+        android:textColor="@color/hint"
         android:textSize="18sp"/>
 
     <Spinner
@@ -42,6 +43,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:text="@string/opacity"
+        android:textColor="@color/hint"
         android:textSize="18sp"/>
 
     <android.support.v7.widget.AppCompatSeekBar
@@ -61,5 +63,6 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="1dp"
         android:text="100%"
+        android:textColor="@color/hint"
         android:textSize="14sp"/>
 </RelativeLayout>

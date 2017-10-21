@@ -32,7 +32,7 @@ object ItemDepTable : BaseTable() {
     fun updateItemDep(activity: Activity, itemId: Long, depId: Long): Int {
         val v = ContentValues()
         v.put(COL_DEP_ID, depId)
-        return update(activity, itemId, v)
+        return activity.contentResolver.update(CONTENT_URI, v, "${COL_ITEM_ID}=?", arrayOf(itemId.toString()))
     }
 
 }

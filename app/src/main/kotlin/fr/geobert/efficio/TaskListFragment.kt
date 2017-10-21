@@ -43,18 +43,18 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         RefreshInterface {
     private val TAG = "TaskListFragment"
 
-    var lastStoreId: Long = 1 // todo get it from prefs
-    var currentStore: Store? = null
-    var cursorLoader: Loader<Cursor>? = null
-    var taskAdapter: TaskAdapter? = null
-    var tasksList: MutableList<Task> = LinkedList()
-    val refreshReceiver = OnRefreshReceiver(this)
-    val mainActivity by lazy { activity as MainActivity }
+    private var lastStoreId: Long = 1 // todo get it from prefs
+    private var currentStore: Store? = null
+    private var cursorLoader: Loader<Cursor>? = null
+    private var taskAdapter: TaskAdapter? = null
+    private var tasksList: MutableList<Task> = LinkedList()
+    private val refreshReceiver = OnRefreshReceiver(this)
+    private val mainActivity by lazy { activity as MainActivity }
 
     private val header = Task()
 
     // this manage drag and swipe on tasks
-    private val dragSwipeHlp by lazy { TaskDragSwipeHelper(this, tasksList, taskAdapter!!) }
+    private val dragSwipeHlp by lazy { TaskDragSwipeHelper(this, tasksList, taskAdapter!!, lastStoreId) }
     private val taskItemTouchHlp by lazy { ItemTouchHelper(dragSwipeHlp) }
 
     fun updateTasksList(needAdapterSort: Boolean) {
@@ -159,7 +159,7 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
                 if (task != null) {
                     val max = findMaxWeightForDepartment(task.item.department)
                     task.item.weight = max + 1.0
-                    ItemWeightTable.updateWeight(activity, task.item)
+                    ItemWeightTable.updateWeight(activity, task.item, lastStoreId)
                 }
             }
             fetchStore(this, lastStoreId)
@@ -294,7 +294,10 @@ class TaskListFragment : Fragment(), LoaderManager.LoaderCallbacks<Cursor>, Text
         val storeId = extras?.getLong("storeId", -1) ?: -1
         val newStoreId = extras?.getLong("newStoreId", -1) ?: -1
         val taskId = extras?.getLong("taskId", -1) ?: -1
-        if (newStoreId > 0) lastStoreId = newStoreId
+        if (newStoreId > 0) {
+            lastStoreId = newStoreId
+            dragSwipeHlp.currentStore = newStoreId
+        }
         if (taskId > -1) { // for the moment, this is only when a quantity has been edited via dialog
             taskAdapter!!.refreshTaskFromDB(activity, taskId)
         } else if (storeId == lastStoreId || storeId < 0L) {
