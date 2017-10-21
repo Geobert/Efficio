@@ -53,7 +53,7 @@ class EditDepartmentsActivity : BaseActivity(), DepartmentManager.DepartmentChoi
         depManager.setEditMode(true)
         depManager.request()
         depTouchHelper.attachToRecyclerView(dep_list)
-        setIcon(R.mipmap.ic_action_arrow_left)
+        setIcon(R.drawable.ic_action_arrow_left)
         setIconOnClick(View.OnClickListener { onBackPressed() })
         setSpinnerVisibility(View.GONE)
         titleColor = ContextCompat.getColor(this, R.color.colorPrimaryDark)

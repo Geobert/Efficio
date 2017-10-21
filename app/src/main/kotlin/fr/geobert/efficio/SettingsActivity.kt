@@ -45,7 +45,7 @@ class SettingsActivity : BaseActivity(), FileChooserDialogListener {
         setContentView(R.layout.settings_activity)
         setSpinnerVisibility(View.GONE)
         setTitle(R.string.settings)
-        setIcon(R.mipmap.ic_action_arrow_left)
+        setIcon(R.drawable.ic_action_arrow_left)
         setIconOnClick(View.OnClickListener { onBackPressed() })
 
         if (savedInstanceState == null) {
