@@ -22,7 +22,7 @@ import fr.geobert.efficio.db.StoreTable
 import fr.geobert.efficio.dialog.DeleteConfirmationDialog
 import fr.geobert.efficio.dialog.StoreNameDialog
 import fr.geobert.efficio.misc.*
-import fr.geobert.efficio.service.EfficioService
+import fr.geobert.efficio.service.EfficioJobService
 import fr.geobert.efficio.service.InstallServiceReceiver
 import fr.geobert.efficio.service.OnAlarmReceiver
 import io.fabric.sdk.android.Fabric
@@ -100,7 +100,7 @@ class MainActivity : BaseActivity(), DeleteDialogInterface, StoreLoaderListener,
             intent.action = "fr.geobert.efficio.INSTALL_TIMER"
             sendBroadcast(intent)
         }
-        EfficioService.callMe(this, lastStoreId)
+        EfficioJobService.enqueueWork(this, lastStoreId)
     }
 
     override fun onResume() {

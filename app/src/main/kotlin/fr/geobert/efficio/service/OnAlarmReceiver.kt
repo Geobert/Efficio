@@ -1,6 +1,8 @@
 package fr.geobert.efficio.service
 
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 
 class OnAlarmReceiver : BroadcastReceiver() {
@@ -10,8 +12,7 @@ class OnAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         synchronized(startServiceLock) {
             Log.d("OnAlarmReceiver", "onReceive")
-            EfficioService.acquireStaticLock(context)
-            context.startService(Intent(context, EfficioService::class.java))
+            EfficioJobService.enqueueWork(context, -1)
         }
     }
 
